@@ -1,0 +1,92 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "LanguageProficiency",
+  "description": "Language proficiency - represents a person's ability in a specific language",
+  "properties": [
+    {
+      "name": "language",
+      "type": "Language",
+      "description": "Reference to the language",
+      "required": true
+    },
+    {
+      "name": "proficiency",
+      "type": "string",
+      "description": "Level of proficiency (native, fluent, advanced, intermediate, beginner, basic)",
+      "example": "fluent"
+    },
+    {
+      "name": "isPreferred",
+      "type": "boolean",
+      "description": "Whether this is the person's preferred language for communication",
+      "example": true
+    },
+    {
+      "name": "isNative",
+      "type": "boolean",
+      "description": "Whether this is a native/mother tongue language",
+      "example": false
+    },
+    {
+      "name": "canSpeak",
+      "type": "boolean",
+      "description": "Can speak this language",
+      "example": true
+    },
+    {
+      "name": "canRead",
+      "type": "boolean",
+      "description": "Can read this language",
+      "example": true
+    },
+    {
+      "name": "canWrite",
+      "type": "boolean",
+      "description": "Can write this language",
+      "example": true
+    }
+  ],
+  "examples": [
+    {
+      "@type": "LanguageProficiency",
+      "language": {
+        "@type": "Language",
+        "code": "fr",
+        "name": "French"
+      },
+      "proficiency": "native",
+      "isPreferred": true,
+      "isNative": true,
+      "canSpeak": true,
+      "canRead": true,
+      "canWrite": true
+    },
+    {
+      "@type": "LanguageProficiency",
+      "language": {
+        "@type": "Language",
+        "code": "en",
+        "name": "English"
+      },
+      "proficiency": "fluent",
+      "isPreferred": false,
+      "isNative": false,
+      "canSpeak": true,
+      "canRead": true,
+      "canWrite": true
+    },
+    {
+      "@type": "LanguageProficiency",
+      "language": {
+        "@type": "Language",
+        "code": "es",
+        "name": "Spanish"
+      },
+      "proficiency": "intermediate",
+      "canSpeak": true,
+      "canRead": true,
+      "canWrite": false
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "Language",
+  "description": "Language reference data with ISO codes",
+  "properties": [
+    {
+      "name": "code",
+      "type": "string",
+      "description": "ISO 639-1 two-letter language code",
+      "required": true,
+      "format": "iso-language-code",
+      "example": "en"
+    },
+    {
+      "name": "code3",
+      "type": "string",
+      "description": "ISO 639-2/T three-letter language code",
+      "format": "iso-language-code",
+      "example": "eng"
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "description": "Language name in English",
+      "required": true,
+      "example": "English"
+    },
+    {
+      "name": "nativeName",
+      "type": "string",
+      "description": "Language name in the language itself",
+      "example": "English"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "Language",
+      "code": "en",
+      "code3": "eng",
+      "name": "English",
+      "nativeName": "English"
+    },
+    {
+      "@type": "Language",
+      "code": "fr",
+      "code3": "fra",
+      "name": "French",
+      "nativeName": "Français"
+    },
+    {
+      "@type": "Language",
+      "code": "es",
+      "code3": "spa",
+      "name": "Spanish",
+      "nativeName": "Español"
+    },
+    {
+      "@type": "Language",
+      "code": "de",
+      "code3": "deu",
+      "name": "German",
+      "nativeName": "Deutsch"
+    }
+  ]
+}

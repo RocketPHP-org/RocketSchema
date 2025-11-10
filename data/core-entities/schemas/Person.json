@@ -2,78 +2,154 @@
   "@type": "Schema",
   "@context": "https://rocketschema.org/context",
   "name": "Person",
-  "description": "An individual person - employee, contact, customer, or any human entity in business context",
+  "description": "An individual person - the base entity for representing human beings in any business context",
   "properties": [
+    {
+      "name": "prefix",
+      "type": "string",
+      "description": "Title or honorific (Mr., Mrs., Ms., Dr., Prof., etc.)",
+      "example": "Dr."
+    },
     {
       "name": "givenName",
       "type": "string",
-      "description": "First name or given name of the person",
+      "description": "First name or given name",
       "required": true,
       "example": "John"
     },
     {
+      "name": "middleName",
+      "type": "string",
+      "description": "Middle name(s)",
+      "example": "Michael"
+    },
+    {
       "name": "familyName",
       "type": "string",
-      "description": "Last name or family name of the person",
+      "description": "Last name or family name",
       "required": true,
       "example": "Doe"
     },
     {
-      "name": "email",
+      "name": "suffix",
       "type": "string",
-      "description": "Email address",
-      "format": "email",
-      "example": "john.doe@example.com"
+      "description": "Name suffix (Jr., Sr., III, PhD, MD, etc.)",
+      "example": "Jr."
     },
     {
-      "name": "telephone",
+      "name": "preferredName",
       "type": "string",
-      "description": "Telephone number",
-      "format": "phone",
-      "example": "+1-555-0123"
+      "description": "Name the person prefers to be called",
+      "example": "Johnny"
     },
     {
-      "name": "jobTitle",
+      "name": "status",
       "type": "string",
-      "description": "Job title or position",
-      "example": "Software Engineer"
+      "description": "Current status (active, inactive, deceased)",
+      "example": "active"
     },
     {
-      "name": "worksFor",
-      "type": "Organization",
-      "description": "Organization where the person works"
+      "name": "gender",
+      "type": "Gender",
+      "description": "Gender identity (reference to Gender entity)"
     },
     {
-      "name": "address",
-      "type": "PostalAddress",
-      "description": "Physical address of the person"
+      "name": "maritalStatus",
+      "type": "MaritalStatus",
+      "description": "Marital status (reference to MaritalStatus entity)"
     },
     {
       "name": "birthDate",
-      "type": "string",
+      "type": "Date",
       "description": "Date of birth",
-      "format": "date",
       "example": "1990-01-15"
     },
     {
       "name": "nationality",
+      "type": "Country[]",
+      "description": "Nationality or citizenship - supports multiple nationalities (reference to Country entity)"
+    },
+    {
+      "name": "languages",
+      "type": "LanguageProficiency[]",
+      "description": "Languages spoken by the person with proficiency levels"
+    },
+    {
+      "name": "telecoms",
+      "type": "ContactPoint[]",
+      "description": "Contact points - phone numbers, emails, etc."
+    },
+    {
+      "name": "onlinePresence",
+      "type": "OnlinePresence[]",
+      "description": "Online profiles and social media"
+    },
+    {
+      "name": "address",
+      "type": "PostalAddress[]",
+      "description": "Physical addresses"
+    },
+    {
+      "name": "photoUrl",
       "type": "string",
-      "description": "Nationality or citizenship",
-      "example": "American"
+      "description": "URL to person's photograph or avatar",
+      "format": "uri",
+      "example": "https://example.com/photos/person.jpg"
+    },
+    {
+      "name": "identifier",
+      "type": "Identifier[]",
+      "description": "Official identifiers - national ID, passport, driver's license, etc."
+    },
+    {
+      "name": "metadata",
+      "type": "object",
+      "description": "Additional metadata for extensibility"
     }
   ],
   "examples": [
     {
       "@type": "Person",
-      "givenName": "John",
-      "familyName": "Doe",
-      "email": "john.doe@acme.com",
-      "telephone": "+1-555-0123",
-      "jobTitle": "Senior Developer",
-      "worksFor": {
-        "@type": "Organization",
-        "name": "Acme Corp"
-      }
+      "prefix": "Dr.",
+      "givenName": "Jane",
+      "middleName": "Marie",
+      "familyName": "Smith",
+      "suffix": "PhD",
+      "preferredName": "Jane",
+      "status": "active",
+      "gender": {
+        "@type": "Gender",
+        "code": "F",
+        "label": "Female"
+      },
+      "birthDate": "1985-03-20",
+      "telecoms": [
+        {
+          "@type": "ContactPoint",
+          "system": "email",
+          "value": "jane.smith@example.com",
+          "use": "home",
+          "rank": 1
+        },
+        {
+          "@type": "ContactPoint",
+          "system": "phone",
+          "value": "+1-555-0999",
+          "use": "mobile"
+        }
+      ],
+      "address": [
+        {
+          "@type": "PostalAddress",
+          "use": "home",
+          "streetAddress": "123 Oak Street",
+          "addressLocality": "Boston",
+          "addressRegion": "MA",
+          "postalCode": "02115",
+          "addressCountry": "US"
+        }
+      ],
+      "photoUrl": "https://example.com/photos/jane-smith.jpg"
     }
   ]
 }

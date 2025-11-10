@@ -1,8 +1,8 @@
 {
   "@type": "Schema",
   "@context": "https://rocketschema.org/context",
-  "name": "ContactPerson",
-  "description": "A contact person within an organization - extends Person with role and organizational context",
+  "name": "OrganizationContact",
+  "description": "A professional contact within an organization (sales rep, manager, support agent, etc.) - extends Person with organizational role and context",
   "extends": "Person",
   "properties": [
     {
@@ -44,7 +44,7 @@
   ],
   "examples": [
     {
-      "@type": "ContactPerson",
+      "@type": "OrganizationContact",
       "givenName": "Jane",
       "familyName": "Smith",
       "email": "jane.smith@acme.com",
@@ -57,7 +57,7 @@
       "preferredContactMethod": "email"
     },
     {
-      "@type": "ContactPerson",
+      "@type": "OrganizationContact",
       "givenName": "John",
       "familyName": "Doe",
       "email": "john.doe@acme.com",

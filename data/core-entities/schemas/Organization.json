@@ -107,8 +107,8 @@
     },
     {
       "name": "contacts",
-      "type": "ContactPerson[]",
-      "description": "List of contact persons with their roles and contact information"
+      "type": "OrganizationContact[]",
+      "description": "Professional contacts within the organization (sales representatives, managers, support agents, etc.)"
     },
     {
       "name": "slug",

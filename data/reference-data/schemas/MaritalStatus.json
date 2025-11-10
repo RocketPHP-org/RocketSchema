@@ -1,0 +1,59 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "MaritalStatus",
+  "description": "Marital status reference data",
+  "properties": [
+    {
+      "name": "code",
+      "type": "string",
+      "description": "Marital status code (S, M, D, W, P for Single, Married, Divorced, Widowed, Partnered)",
+      "required": true,
+      "example": "M"
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "description": "Human-readable label",
+      "required": true,
+      "example": "Married"
+    },
+    {
+      "name": "description",
+      "type": "string",
+      "description": "Detailed description"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "MaritalStatus",
+      "code": "S",
+      "label": "Single"
+    },
+    {
+      "@type": "MaritalStatus",
+      "code": "M",
+      "label": "Married"
+    },
+    {
+      "@type": "MaritalStatus",
+      "code": "D",
+      "label": "Divorced"
+    },
+    {
+      "@type": "MaritalStatus",
+      "code": "W",
+      "label": "Widowed"
+    },
+    {
+      "@type": "MaritalStatus",
+      "code": "P",
+      "label": "Domestic Partnership / Civil Union"
+    },
+    {
+      "@type": "MaritalStatus",
+      "code": "U",
+      "label": "Unknown / Prefer not to say"
+    }
+  ]
+}
