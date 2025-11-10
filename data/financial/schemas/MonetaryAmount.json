@@ -1,0 +1,50 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "MonetaryAmount",
+  "description": "A monetary value with currency specification",
+  "properties": [
+    {
+      "name": "value",
+      "type": "number",
+      "description": "Numeric amount",
+      "required": true,
+      "example": 1299.99
+    },
+    {
+      "name": "currency",
+      "type": "Currency",
+      "description": "Currency of the amount (reference to Currency entity)",
+      "required": true
+    }
+  ],
+  "examples": [
+    {
+      "@type": "MonetaryAmount",
+      "value": 1299.99,
+      "currency": {
+        "@type": "Currency",
+        "code": "USD",
+        "symbol": "$"
+      }
+    },
+    {
+      "@type": "MonetaryAmount",
+      "value": 999.50,
+      "currency": {
+        "@type": "Currency",
+        "code": "EUR",
+        "symbol": "€"
+      }
+    },
+    {
+      "@type": "MonetaryAmount",
+      "value": 850.00,
+      "currency": {
+        "@type": "Currency",
+        "code": "GBP",
+        "symbol": "£"
+      }
+    }
+  ]
+}

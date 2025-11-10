@@ -1,0 +1,101 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "DocumentType",
+  "description": "Type of commercial document with business rules and properties",
+  "properties": [
+    {
+      "name": "code",
+      "type": "string",
+      "description": "Document type code (QUOTE, ORDER, DELIVERY, INVOICE, CREDIT_NOTE, RECEIPT, etc.)",
+      "required": true,
+      "example": "INVOICE"
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "description": "Human-readable label",
+      "required": true,
+      "example": "Invoice"
+    },
+    {
+      "name": "description",
+      "type": "string",
+      "description": "Detailed description of this document type"
+    },
+    {
+      "name": "isAccountingDocument",
+      "type": "boolean",
+      "description": "Whether this is an accounting/fiscal document",
+      "example": true
+    },
+    {
+      "name": "requiresSignature",
+      "type": "boolean",
+      "description": "Whether this document requires signature",
+      "example": false
+    },
+    {
+      "name": "hasLegalValue",
+      "type": "boolean",
+      "description": "Whether this document has legal/contractual value",
+      "example": true
+    }
+  ],
+  "examples": [
+    {
+      "@type": "DocumentType",
+      "code": "QUOTE",
+      "label": "Quote / Estimate / Devis",
+      "description": "Proposal document with no legal value until accepted",
+      "isAccountingDocument": false,
+      "requiresSignature": false,
+      "hasLegalValue": false
+    },
+    {
+      "@type": "DocumentType",
+      "code": "ORDER",
+      "label": "Purchase Order / Bon de Commande",
+      "description": "Commitment to purchase, legally binding when accepted",
+      "isAccountingDocument": false,
+      "requiresSignature": true,
+      "hasLegalValue": true
+    },
+    {
+      "@type": "DocumentType",
+      "code": "DELIVERY",
+      "label": "Delivery Note / Bon de Livraison",
+      "description": "Proof of delivery, no pricing",
+      "isAccountingDocument": false,
+      "requiresSignature": true,
+      "hasLegalValue": false
+    },
+    {
+      "@type": "DocumentType",
+      "code": "INVOICE",
+      "label": "Invoice / Facture",
+      "description": "Accounting and fiscal document requesting payment",
+      "isAccountingDocument": true,
+      "requiresSignature": false,
+      "hasLegalValue": true
+    },
+    {
+      "@type": "DocumentType",
+      "code": "CREDIT_NOTE",
+      "label": "Credit Note / Avoir",
+      "description": "Document to cancel or adjust an invoice",
+      "isAccountingDocument": true,
+      "requiresSignature": false,
+      "hasLegalValue": true
+    },
+    {
+      "@type": "DocumentType",
+      "code": "RECEIPT",
+      "label": "Receipt / Reçu",
+      "description": "Proof of payment",
+      "isAccountingDocument": true,
+      "requiresSignature": false,
+      "hasLegalValue": true
+    }
+  ]
+}

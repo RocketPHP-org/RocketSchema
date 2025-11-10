@@ -1,0 +1,116 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "CommercialDocumentLine",
+  "description": "A line item in a commercial document (quote, invoice, order, etc.)",
+  "properties": [
+    {
+      "name": "lineNumber",
+      "type": "number",
+      "description": "Line number/position in the document",
+      "example": 1
+    },
+    {
+      "name": "product",
+      "type": "Product",
+      "description": "Reference to the product being sold/purchased"
+    },
+    {
+      "name": "description",
+      "type": "string",
+      "description": "Description of the item or service",
+      "required": true,
+      "example": "Premium Laptop - 16GB RAM, 512GB SSD"
+    },
+    {
+      "name": "quantity",
+      "type": "number",
+      "description": "Quantity ordered/delivered/invoiced",
+      "required": true,
+      "example": 2
+    },
+    {
+      "name": "unit",
+      "type": "UnitOfMeasure",
+      "description": "Unit of measure (reference to UnitOfMeasure entity)"
+    },
+    {
+      "name": "unitPrice",
+      "type": "MonetaryAmount",
+      "description": "Price per unit",
+      "required": true
+    },
+    {
+      "name": "taxRate",
+      "type": "number",
+      "description": "Tax rate percentage applied to this line",
+      "example": 20
+    },
+    {
+      "name": "discountPercentage",
+      "type": "number",
+      "description": "Discount percentage for this line",
+      "example": 10
+    },
+    {
+      "name": "discountAmount",
+      "type": "MonetaryAmount",
+      "description": "Fixed discount amount for this line"
+    },
+    {
+      "name": "notes",
+      "type": "string",
+      "description": "Additional notes for this line"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "CommercialDocumentLine",
+      "lineNumber": 1,
+      "product": {
+        "@type": "Product",
+        "name": "Premium Laptop",
+        "sku": "LAP-001"
+      },
+      "description": "Premium Laptop - 16GB RAM, 512GB SSD",
+      "quantity": 2,
+      "unit": {
+        "@type": "UnitOfMeasure",
+        "code": "PCE",
+        "name": "Piece"
+      },
+      "unitPrice": {
+        "@type": "MonetaryAmount",
+        "value": 1299.99,
+        "currency": {
+          "@type": "Currency",
+          "code": "USD",
+          "symbol": "$"
+        }
+      },
+      "taxRate": 20,
+      "discountPercentage": 10
+    },
+    {
+      "@type": "CommercialDocumentLine",
+      "lineNumber": 2,
+      "description": "Consulting Services - 10 hours",
+      "quantity": 10,
+      "unit": {
+        "@type": "UnitOfMeasure",
+        "code": "HUR",
+        "name": "Hour"
+      },
+      "unitPrice": {
+        "@type": "MonetaryAmount",
+        "value": 150.00,
+        "currency": {
+          "@type": "Currency",
+          "code": "USD",
+          "symbol": "$"
+        }
+      },
+      "taxRate": 20
+    }
+  ]
+}
