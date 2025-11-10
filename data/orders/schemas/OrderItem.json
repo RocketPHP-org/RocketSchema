@@ -1,0 +1,50 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "OrderItem",
+  "description": "A single item in an order",
+  "properties": [
+    {
+      "name": "product",
+      "type": "Product",
+      "description": "Product being ordered",
+      "required": true
+    },
+    {
+      "name": "quantity",
+      "type": "number",
+      "description": "Quantity ordered",
+      "required": true,
+      "example": 2
+    },
+    {
+      "name": "price",
+      "type": "MonetaryAmount",
+      "description": "Total price for this item (quantity × unit price)",
+      "required": true
+    },
+    {
+      "name": "itemStatus",
+      "type": "string",
+      "description": "Status of this specific item",
+      "example": "in_stock"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "OrderItem",
+      "product": {
+        "@type": "Product",
+        "name": "Premium Laptop",
+        "sku": "LAP-PRE-001"
+      },
+      "quantity": 2,
+      "price": {
+        "@type": "MonetaryAmount",
+        "value": 2599.98,
+        "currency": "USD"
+      },
+      "itemStatus": "in_stock"
+    }
+  ]
+}

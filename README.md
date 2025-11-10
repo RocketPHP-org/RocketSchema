@@ -1,12 +1,12 @@
 # RocketSchema
 
-**A schema standard for ERP systems**
+**A universal schema standard for business applications**
 
-RocketSchema is to ERPs what Schema.org is to the semantic web: a standardized and reusable vocabulary for structuring business data.
+A standardized and reusable vocabulary for structuring business data across CRM, ERP, e-commerce, and any business application.
 
 ## Overview
 
-RocketSchema provides a collection of schemas (types, properties, and relationships) that allow you to capitalize on proven designs for common business entities in ERPs:
+RocketSchema provides a collection of schemas (types, properties, and relationships) that allow you to capitalize on proven designs for common business entities:
 
 - **Person**: individuals, employees, contacts
 - **Organization**: companies, subsidiaries, partners
@@ -19,7 +19,7 @@ RocketSchema provides a collection of schemas (types, properties, and relationsh
 
 ### The Problem
 
-Every ERP reinvents the wheel by creating its own data structures for universal concepts. This leads to:
+Every business application (CRM, ERP, e-commerce platform) reinvents the wheel by creating its own data structures for universal concepts. This leads to:
 
 - **Duplication of effort**: repeated design of the same entities
 - **Incompatibility**: difficulty integrating between systems
@@ -31,8 +31,8 @@ Every ERP reinvents the wheel by creating its own data structures for universal 
 RocketSchema offers a **common repository** that:
 
 ✅ Standardizes business data structures
-✅ Facilitates interoperability between ERPs
-✅ Accelerates development of new applications
+✅ Facilitates interoperability between applications
+✅ Accelerates development of new solutions
 ✅ Capitalizes on industry best practices
 
 ## Tech Stack
@@ -77,9 +77,28 @@ npm start
 │   ├── lib/          # Utility functions
 │   └── types/        # TypeScript type definitions
 ├── data/
-│   └── schemas/      # JSON schema definitions
-└── public/           # Static assets
+│   ├── core-entities/     # People, Organizations
+│   ├── products/          # Product catalog schemas
+│   ├── financial/         # Invoices, Payments
+│   ├── orders/            # Orders, Commerce
+│   └── support-types/     # Addresses, Values
+└── public/                # Static assets
 ```
+
+## Adding New Schemas
+
+Simply create a new JSON file in the appropriate category folder:
+
+```bash
+# Add a new category
+mkdir -p data/my-category/schemas
+echo '{"name":"my-category","label":"My Category",...}' > data/my-category/category.json
+
+# Add a new schema
+data/my-category/schemas/MySchema.json
+```
+
+No code changes needed - schemas are loaded dynamically!
 
 ## Contributing
 
@@ -93,4 +112,4 @@ MIT - Free to use for all commercial and open source projects
 
 ---
 
-**RocketSchema** - Accelerate your ERP development with shared standards 🚀
+**RocketSchema** - Accelerate your business application development with shared standards 🚀

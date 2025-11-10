@@ -1,0 +1,127 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "Order",
+  "description": "A commercial order for products or services - purchase orders, sales orders, etc.",
+  "properties": [
+    {
+      "name": "orderNumber",
+      "type": "string",
+      "description": "Unique order identifier",
+      "required": true,
+      "example": "ORD-2024-001"
+    },
+    {
+      "name": "orderDate",
+      "type": "string",
+      "description": "Date the order was placed",
+      "required": true,
+      "format": "date",
+      "example": "2024-01-10"
+    },
+    {
+      "name": "orderStatus",
+      "type": "string",
+      "description": "Current status of the order",
+      "required": true,
+      "example": "processing"
+    },
+    {
+      "name": "customer",
+      "type": ["Organization", "Person"],
+      "description": "Customer who placed the order",
+      "required": true
+    },
+    {
+      "name": "seller",
+      "type": "Organization",
+      "description": "Organization fulfilling the order"
+    },
+    {
+      "name": "orderItems",
+      "type": ["OrderItem"],
+      "description": "Items in the order",
+      "required": true
+    },
+    {
+      "name": "totalPrice",
+      "type": "MonetaryAmount",
+      "description": "Total order amount",
+      "required": true
+    },
+    {
+      "name": "shippingAddress",
+      "type": "PostalAddress",
+      "description": "Delivery address"
+    },
+    {
+      "name": "billingAddress",
+      "type": "PostalAddress",
+      "description": "Billing address"
+    },
+    {
+      "name": "expectedDeliveryDate",
+      "type": "string",
+      "description": "Expected delivery date",
+      "format": "date",
+      "example": "2024-01-20"
+    },
+    {
+      "name": "paymentMethod",
+      "type": "string",
+      "description": "Payment method used",
+      "example": "credit_card"
+    },
+    {
+      "name": "trackingNumber",
+      "type": "string",
+      "description": "Shipping tracking number",
+      "example": "TRK123456789"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "Order",
+      "orderNumber": "ORD-2024-001",
+      "orderDate": "2024-01-10",
+      "orderStatus": "processing",
+      "customer": {
+        "@type": "Person",
+        "givenName": "John",
+        "familyName": "Doe",
+        "email": "john.doe@example.com"
+      },
+      "orderItems": [
+        {
+          "@type": "OrderItem",
+          "product": {
+            "@type": "Product",
+            "name": "Premium Laptop",
+            "sku": "LAP-PRE-001"
+          },
+          "quantity": 1,
+          "price": {
+            "@type": "MonetaryAmount",
+            "value": 1299.99,
+            "currency": "USD"
+          }
+        }
+      ],
+      "totalPrice": {
+        "@type": "MonetaryAmount",
+        "value": 1299.99,
+        "currency": "USD"
+      },
+      "shippingAddress": {
+        "@type": "PostalAddress",
+        "streetAddress": "123 Main St",
+        "addressLocality": "San Francisco",
+        "addressRegion": "CA",
+        "postalCode": "94105",
+        "addressCountry": "US"
+      },
+      "expectedDeliveryDate": "2024-01-20",
+      "paymentMethod": "credit_card"
+    }
+  ]
+}
