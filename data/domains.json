@@ -1,0 +1,42 @@
+[
+  {
+    "name": "core-entities",
+    "label": "Core Business Entities",
+    "description": "Fundamental business entities - people and organizations",
+    "tags": ["core", "entities", "people", "organizations"],
+    "icon": "users",
+    "order": 1
+  },
+  {
+    "name": "products",
+    "label": "Products & Inventory",
+    "description": "Product catalog, inventory management, and stock tracking",
+    "tags": ["products", "inventory", "catalog", "stock"],
+    "icon": "package",
+    "order": 2
+  },
+  {
+    "name": "financial",
+    "label": "Financial",
+    "description": "Accounting, invoicing, payments, and financial transactions",
+    "tags": ["financial", "accounting", "invoices", "payments"],
+    "icon": "dollar-sign",
+    "order": 3
+  },
+  {
+    "name": "orders",
+    "label": "Orders & Commerce",
+    "description": "Sales orders, purchase orders, and e-commerce transactions",
+    "tags": ["orders", "commerce", "sales", "purchases"],
+    "icon": "shopping-cart",
+    "order": 4
+  },
+  {
+    "name": "support-types",
+    "label": "Support Types",
+    "description": "Supporting data types and utilities - addresses, measurements, and values",
+    "tags": ["support", "utilities", "types", "helpers"],
+    "icon": "wrench",
+    "order": 5
+  }
+]
