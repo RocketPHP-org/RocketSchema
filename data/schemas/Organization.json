@@ -1,0 +1,111 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "Organization",
+  "description": "An organization such as a company, business, NGO, or institution",
+  "properties": [
+    {
+      "name": "name",
+      "type": "string",
+      "description": "Name of the organization",
+      "required": true,
+      "example": "Acme Corporation"
+    },
+    {
+      "name": "legalName",
+      "type": "string",
+      "description": "Legal registered name of the organization",
+      "example": "Acme Corporation Inc."
+    },
+    {
+      "name": "taxID",
+      "type": "string",
+      "description": "Tax identification number",
+      "example": "US123456789"
+    },
+    {
+      "name": "vatID",
+      "type": "string",
+      "description": "Value Added Tax identification number",
+      "example": "FR12345678901"
+    },
+    {
+      "name": "email",
+      "type": "string",
+      "description": "General email address",
+      "format": "email",
+      "example": "contact@acme.com"
+    },
+    {
+      "name": "telephone",
+      "type": "string",
+      "description": "Primary telephone number",
+      "format": "phone",
+      "example": "+1-555-0100"
+    },
+    {
+      "name": "address",
+      "type": "PostalAddress",
+      "description": "Physical address of the organization",
+      "required": true
+    },
+    {
+      "name": "foundingDate",
+      "type": "string",
+      "description": "Date when the organization was founded",
+      "format": "date",
+      "example": "2010-05-15"
+    },
+    {
+      "name": "numberOfEmployees",
+      "type": "number",
+      "description": "Number of employees",
+      "example": 250
+    },
+    {
+      "name": "parentOrganization",
+      "type": "Organization",
+      "description": "Parent organization if this is a subsidiary"
+    },
+    {
+      "name": "employees",
+      "type": ["Person"],
+      "description": "List of employees"
+    },
+    {
+      "name": "logo",
+      "type": "string",
+      "description": "URL to the organization logo",
+      "format": "uri",
+      "example": "https://example.com/logo.png"
+    },
+    {
+      "name": "website",
+      "type": "string",
+      "description": "Official website URL",
+      "format": "uri",
+      "example": "https://acme.com"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "Organization",
+      "name": "Acme Corp",
+      "legalName": "Acme Corporation Inc.",
+      "taxID": "US123456789",
+      "email": "contact@acme.com",
+      "telephone": "+1-555-0100",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "123 Main Street",
+        "addressLocality": "San Francisco",
+        "addressRegion": "CA",
+        "postalCode": "94105",
+        "addressCountry": "US"
+      },
+      "foundingDate": "2010-05-15",
+      "numberOfEmployees": 250,
+      "website": "https://acme.com"
+    }
+  ]
+}

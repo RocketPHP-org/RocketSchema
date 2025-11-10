@@ -1,0 +1,79 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "Person",
+  "description": "An individual person - employee, contact, customer, or any human entity in business context",
+  "properties": [
+    {
+      "name": "givenName",
+      "type": "string",
+      "description": "First name or given name of the person",
+      "required": true,
+      "example": "John"
+    },
+    {
+      "name": "familyName",
+      "type": "string",
+      "description": "Last name or family name of the person",
+      "required": true,
+      "example": "Doe"
+    },
+    {
+      "name": "email",
+      "type": "string",
+      "description": "Email address",
+      "format": "email",
+      "example": "john.doe@example.com"
+    },
+    {
+      "name": "telephone",
+      "type": "string",
+      "description": "Telephone number",
+      "format": "phone",
+      "example": "+1-555-0123"
+    },
+    {
+      "name": "jobTitle",
+      "type": "string",
+      "description": "Job title or position",
+      "example": "Software Engineer"
+    },
+    {
+      "name": "worksFor",
+      "type": "Organization",
+      "description": "Organization where the person works"
+    },
+    {
+      "name": "address",
+      "type": "PostalAddress",
+      "description": "Physical address of the person"
+    },
+    {
+      "name": "birthDate",
+      "type": "string",
+      "description": "Date of birth",
+      "format": "date",
+      "example": "1990-01-15"
+    },
+    {
+      "name": "nationality",
+      "type": "string",
+      "description": "Nationality or citizenship",
+      "example": "American"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "Person",
+      "givenName": "John",
+      "familyName": "Doe",
+      "email": "john.doe@acme.com",
+      "telephone": "+1-555-0123",
+      "jobTitle": "Senior Developer",
+      "worksFor": {
+        "@type": "Organization",
+        "name": "Acme Corp"
+      }
+    }
+  ]
+}
