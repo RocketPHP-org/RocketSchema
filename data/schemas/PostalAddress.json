@@ -1,0 +1,66 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "PostalAddress",
+  "description": "Physical mailing address",
+  "properties": [
+    {
+      "name": "streetAddress",
+      "type": "string",
+      "description": "Street address (number and street name)",
+      "required": true,
+      "example": "123 Main Street"
+    },
+    {
+      "name": "addressLocality",
+      "type": "string",
+      "description": "City or locality",
+      "required": true,
+      "example": "San Francisco"
+    },
+    {
+      "name": "addressRegion",
+      "type": "string",
+      "description": "State, province, or region",
+      "example": "CA"
+    },
+    {
+      "name": "postalCode",
+      "type": "string",
+      "description": "Postal or ZIP code",
+      "required": true,
+      "example": "94105"
+    },
+    {
+      "name": "addressCountry",
+      "type": "string",
+      "description": "Country (ISO 3166-1 alpha-2 country code)",
+      "required": true,
+      "format": "iso-country-code",
+      "example": "US"
+    },
+    {
+      "name": "postOfficeBoxNumber",
+      "type": "string",
+      "description": "P.O. Box number if applicable",
+      "example": "PO Box 123"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "PostalAddress",
+      "streetAddress": "123 Main Street",
+      "addressLocality": "San Francisco",
+      "addressRegion": "CA",
+      "postalCode": "94105",
+      "addressCountry": "US"
+    },
+    {
+      "@type": "PostalAddress",
+      "streetAddress": "10 Rue de la Paix",
+      "addressLocality": "Paris",
+      "postalCode": "75002",
+      "addressCountry": "FR"
+    }
+  ]
+}
