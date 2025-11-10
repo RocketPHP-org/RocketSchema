@@ -68,6 +68,9 @@ function renderType(type: string | string[]) {
 }
 
 export default function PropertyTable({ properties }: PropertyTableProps) {
+  // Check if any property has a source (inheritance)
+  const hasInheritance = properties.some(prop => prop.source);
+
   return (
     <Table>
       <TableHeader>
@@ -76,11 +79,12 @@ export default function PropertyTable({ properties }: PropertyTableProps) {
           <TableHead className="w-[250px]">Type</TableHead>
           <TableHead>Description</TableHead>
           <TableHead className="w-[120px]">Required</TableHead>
+          {hasInheritance && <TableHead className="w-[150px]">Source</TableHead>}
         </TableRow>
       </TableHeader>
       <TableBody>
         {properties.map((property) => (
-          <TableRow key={property.name}>
+          <TableRow key={`${property.source || 'own'}-${property.name}`}>
             <TableCell className="font-mono text-sm font-medium text-purple-600 dark:text-purple-400">
               {property.name}
             </TableCell>
@@ -105,6 +109,13 @@ export default function PropertyTable({ properties }: PropertyTableProps) {
                 {property.required ? 'Required' : 'Optional'}
               </Badge>
             </TableCell>
+            {hasInheritance && (
+              <TableCell>
+                <Badge variant="outline" className="font-mono text-xs">
+                  {property.source || 'Own'}
+                </Badge>
+              </TableCell>
+            )}
           </TableRow>
         ))}
       </TableBody>
