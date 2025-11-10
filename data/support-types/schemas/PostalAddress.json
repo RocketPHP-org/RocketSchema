@@ -2,8 +2,20 @@
   "@type": "Schema",
   "@context": "https://rocketschema.org/context",
   "name": "PostalAddress",
-  "description": "Physical mailing address",
+  "description": "Physical mailing address with optional geographic coordinates",
   "properties": [
+    {
+      "name": "use",
+      "type": "string",
+      "description": "Purpose of this address (work, home, billing, shipping, headquarters, branch, warehouse, mailing)",
+      "example": "work"
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "description": "Human-readable label for this address",
+      "example": "Head Office"
+    },
     {
       "name": "streetAddress",
       "type": "string",
@@ -44,6 +56,18 @@
       "type": "string",
       "description": "P.O. Box number if applicable",
       "example": "PO Box 123"
+    },
+    {
+      "name": "latitude",
+      "type": "number",
+      "description": "Geographic latitude coordinate for precise location",
+      "example": 37.7749
+    },
+    {
+      "name": "longitude",
+      "type": "number",
+      "description": "Geographic longitude coordinate for precise location",
+      "example": -122.4194
     }
   ],
   "examples": [
@@ -53,14 +77,18 @@
       "addressLocality": "San Francisco",
       "addressRegion": "CA",
       "postalCode": "94105",
-      "addressCountry": "US"
+      "addressCountry": "US",
+      "latitude": 37.7749,
+      "longitude": -122.4194
     },
     {
       "@type": "PostalAddress",
       "streetAddress": "10 Rue de la Paix",
       "addressLocality": "Paris",
       "postalCode": "75002",
-      "addressCountry": "FR"
+      "addressCountry": "FR",
+      "latitude": 48.8698,
+      "longitude": 2.3308
     }
   ]
 }

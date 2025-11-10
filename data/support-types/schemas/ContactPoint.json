@@ -1,0 +1,91 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "ContactPoint",
+  "description": "A contact point for a person or organization - phone, email, fax, etc. Based on FHIR ContactPoint and common ERP patterns",
+  "properties": [
+    {
+      "name": "system",
+      "type": "string",
+      "description": "Type of contact point (phone, email, fax, url, sms, other)",
+      "required": true,
+      "example": "phone"
+    },
+    {
+      "name": "value",
+      "type": "string",
+      "description": "The actual contact point value (phone number, email address, etc.)",
+      "required": true,
+      "example": "+1-555-0100"
+    },
+    {
+      "name": "use",
+      "type": "string",
+      "description": "Purpose of this contact point (work, home, mobile, main, billing, support, emergency)",
+      "example": "work"
+    },
+    {
+      "name": "rank",
+      "type": "number",
+      "description": "Order of preference (1 = highest priority)",
+      "example": 1
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "description": "Human-readable label for this contact point",
+      "example": "Main Office"
+    },
+    {
+      "name": "extension",
+      "type": "string",
+      "description": "Phone extension number if applicable",
+      "example": "1234"
+    },
+    {
+      "name": "period",
+      "type": "Period",
+      "description": "Time period when this contact point is valid"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "ContactPoint",
+      "system": "phone",
+      "value": "+1-555-0100",
+      "use": "work",
+      "rank": 1,
+      "label": "Main Office"
+    },
+    {
+      "@type": "ContactPoint",
+      "system": "email",
+      "value": "contact@acme.com",
+      "use": "work",
+      "rank": 1,
+      "label": "General Inquiries"
+    },
+    {
+      "@type": "ContactPoint",
+      "system": "phone",
+      "value": "+1-555-0200",
+      "use": "support",
+      "rank": 2,
+      "label": "Customer Support"
+    },
+    {
+      "@type": "ContactPoint",
+      "system": "email",
+      "value": "billing@acme.com",
+      "use": "billing",
+      "rank": 1,
+      "label": "Billing Department"
+    },
+    {
+      "@type": "ContactPoint",
+      "system": "fax",
+      "value": "+1-555-0101",
+      "use": "work"
+    }
+  ]
+}

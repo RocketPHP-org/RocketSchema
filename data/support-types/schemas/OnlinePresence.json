@@ -1,0 +1,77 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "OnlinePresence",
+  "description": "Online presence point for an organization or person - website, social media profiles, online platforms",
+  "properties": [
+    {
+      "name": "platform",
+      "type": "string",
+      "description": "Platform or service name (website, linkedin, twitter, facebook, instagram, youtube, github, etc.)",
+      "required": true,
+      "example": "website"
+    },
+    {
+      "name": "url",
+      "type": "string",
+      "description": "URL to the profile or page",
+      "required": true,
+      "format": "uri",
+      "example": "https://acme.com"
+    },
+    {
+      "name": "handle",
+      "type": "string",
+      "description": "Username or handle on the platform (without @ symbol)",
+      "example": "acmecorp"
+    },
+    {
+      "name": "verified",
+      "type": "boolean",
+      "description": "Whether this is a verified/official account",
+      "example": true
+    },
+    {
+      "name": "primary",
+      "type": "boolean",
+      "description": "Whether this is the primary online presence",
+      "example": true
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "description": "Human-readable label",
+      "example": "Official Website"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "OnlinePresence",
+      "platform": "website",
+      "url": "https://acme.com",
+      "primary": true,
+      "label": "Official Website"
+    },
+    {
+      "@type": "OnlinePresence",
+      "platform": "linkedin",
+      "url": "https://linkedin.com/company/acme-corp",
+      "handle": "acme-corp",
+      "verified": true,
+      "label": "LinkedIn Company Page"
+    },
+    {
+      "@type": "OnlinePresence",
+      "platform": "twitter",
+      "url": "https://twitter.com/acmecorp",
+      "handle": "acmecorp",
+      "verified": true
+    },
+    {
+      "@type": "OnlinePresence",
+      "platform": "github",
+      "url": "https://github.com/acme-corp",
+      "handle": "acme-corp"
+    }
+  ]
+}

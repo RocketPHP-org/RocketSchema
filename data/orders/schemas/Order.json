@@ -28,7 +28,7 @@
     },
     {
       "name": "customer",
-      "type": ["Organization", "Person"],
+      "type": "Organization | Person",
       "description": "Customer who placed the order",
       "required": true
     },
@@ -39,7 +39,7 @@
     },
     {
       "name": "orderItems",
-      "type": ["OrderItem"],
+      "type": "OrderItem[]",
       "description": "Items in the order",
       "required": true
     },

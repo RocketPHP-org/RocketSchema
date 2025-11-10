@@ -34,7 +34,7 @@
     },
     {
       "name": "customer",
-      "type": ["Organization", "Person"],
+      "type": "Organization | Person",
       "description": "Customer receiving the invoice",
       "required": true
     },
@@ -45,7 +45,7 @@
     },
     {
       "name": "lineItems",
-      "type": ["InvoiceLineItem"],
+      "type": "InvoiceLineItem[]",
       "description": "List of items on the invoice",
       "required": true
     },
