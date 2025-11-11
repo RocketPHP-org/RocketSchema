@@ -1,0 +1,40 @@
+{
+  "home": {
+    "title": "RocketSchema",
+    "subtitle": "Un estándar de esquemas para aplicaciones empresariales",
+    "hero": {
+      "title": "Esquemas Empresariales Estandarizados",
+      "description": "Un estándar universal para modelos de datos de aplicaciones empresariales. Deja de reinventar la rueda - capitaliza en esquemas probados y reutilizables para CRM, ERP, comercio electrónico y cualquier solución empresarial."
+    },
+    "stats": {
+      "domains": "Dominios",
+      "schemas": "Esquemas"
+    },
+    "search": {
+      "placeholder": "Buscar esquemas...",
+      "filter": {
+        "all": "Todas las categorías",
+        "category": "{category}"
+      }
+    },
+    "footer": {
+      "license": "Licencia MIT - Libre de usar para todos los proyectos comerciales y de código abierto",
+      "madeIn": "Hecho con ❤️ en España"
+    },
+    "buttons": {
+      "github": "GitHub"
+    }
+  },
+  "schema": {
+    "properties": "Propiedades",
+    "examples": "Ejemplos",
+    "extends": "Extiende",
+    "inheritedFrom": "Heredado de {source}",
+    "required": "Requerido",
+    "description": "Descripción",
+    "type": "Tipo",
+    "example": "Ejemplo",
+    "format": "Formato",
+    "backToHome": "Volver al inicio"
+  }
+}

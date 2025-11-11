@@ -1,5 +1,7 @@
 import Link from 'next/link';
+import { getTranslations } from 'next-intl/server';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { Button } from '@/components/ui/button';
 import { getAllSchemas, getAllCategories, getSchemasByCategory } from '@/lib/schemas';
 import { Github } from 'lucide-react';
@@ -9,7 +11,8 @@ import { SchemaGrid } from '@/components/SchemaGrid';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-export default function Home() {
+export default async function Home() {
+  const t = await getTranslations('home');
   const schemas = getAllSchemas();
   const categories = getAllCategories();
 
@@ -26,14 +29,13 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold">
-                🚀 RocketSchema
-              </h1>
+              <h1 className="text-2xl font-bold">{t('title')}</h1>
               <p className="mt-1 text-sm text-muted-foreground">
-                A schema standard for business applications
+                {t('subtitle')}
               </p>
             </div>
             <div className="flex items-center gap-2">
+              <LanguageSwitcher />
               <ThemeToggle />
               <Link
                 href="https://github.com/RocketPHP-org/RocketSchema"
@@ -42,7 +44,7 @@ export default function Home() {
               >
                 <Button variant="outline">
                   <Github className="mr-2 h-4 w-4" />
-                  GitHub
+                  {t('buttons.github')}
                 </Button>
               </Link>
             </div>
@@ -55,10 +57,10 @@ export default function Home() {
         <div className="text-center space-y-8">
           <div className="space-y-4">
             <h2 className="text-4xl font-extrabold tracking-tight sm:text-5xl">
-              Standardized Business Schemas
+              {t('hero.title')}
             </h2>
             <p className="max-w-2xl mx-auto text-xl text-muted-foreground">
-              A universal standard for business application data models. Stop reinventing the wheel - capitalize on proven, reusable schemas for CRM, ERP, e-commerce, and any business solution.
+              {t('hero.description')}
             </p>
           </div>
 
@@ -68,14 +70,14 @@ export default function Home() {
               <div className="text-3xl font-bold text-primary">
                 {categories.length}
               </div>
-              <div className="text-sm text-muted-foreground">Domains</div>
+              <div className="text-sm text-muted-foreground">{t('stats.domains')}</div>
             </div>
             <div className="w-px bg-border"></div>
             <div className="text-center">
               <div className="text-3xl font-bold text-primary">
                 {schemas.length}
               </div>
-              <div className="text-sm text-muted-foreground">Schemas</div>
+              <div className="text-sm text-muted-foreground">{t('stats.schemas')}</div>
             </div>
           </div>
         </div>
@@ -89,9 +91,14 @@ export default function Home() {
       {/* Footer */}
       <footer className="border-t mt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <p className="text-center text-muted-foreground text-sm">
-            MIT License - Free to use for all commercial and open source projects
-          </p>
+          <div className="flex flex-col items-center gap-2">
+            <p className="text-center text-muted-foreground text-sm">
+              {t('footer.license')}
+            </p>
+            <p className="text-center text-muted-foreground text-sm">
+              {t('footer.madeIn')}
+            </p>
+          </div>
         </div>
       </footer>
     </div>

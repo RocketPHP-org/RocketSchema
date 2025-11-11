@@ -1,0 +1,40 @@
+{
+  "home": {
+    "title": "RocketSchema",
+    "subtitle": "Un standard de schémas pour applications métier",
+    "hero": {
+      "title": "Schémas Métier Standardisés",
+      "description": "Un standard universel pour les modèles de données d'applications métier. Arrêtez de réinventer la roue - capitalisez sur des schémas éprouvés et réutilisables pour CRM, ERP, e-commerce et toute solution métier."
+    },
+    "stats": {
+      "domains": "Domaines",
+      "schemas": "Schémas"
+    },
+    "search": {
+      "placeholder": "Rechercher des schémas...",
+      "filter": {
+        "all": "Toutes les catégories",
+        "category": "{category}"
+      }
+    },
+    "footer": {
+      "license": "Licence MIT - Libre d'utilisation pour tous projets commerciaux et open source",
+      "madeIn": "Fait avec ❤️ en Espagne"
+    },
+    "buttons": {
+      "github": "GitHub"
+    }
+  },
+  "schema": {
+    "properties": "Propriétés",
+    "examples": "Exemples",
+    "extends": "Étend",
+    "inheritedFrom": "Hérité de {source}",
+    "required": "Requis",
+    "description": "Description",
+    "type": "Type",
+    "example": "Exemple",
+    "format": "Format",
+    "backToHome": "Retour à l'accueil"
+  }
+}

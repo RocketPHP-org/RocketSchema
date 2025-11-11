@@ -1,0 +1,40 @@
+{
+  "home": {
+    "title": "RocketSchema",
+    "subtitle": "A schema standard for business applications",
+    "hero": {
+      "title": "Standardized Business Schemas",
+      "description": "A universal standard for business application data models. Stop reinventing the wheel - capitalize on proven, reusable schemas for CRM, ERP, e-commerce, and any business solution."
+    },
+    "stats": {
+      "domains": "Domains",
+      "schemas": "Schemas"
+    },
+    "search": {
+      "placeholder": "Search schemas...",
+      "filter": {
+        "all": "All Categories",
+        "category": "{category}"
+      }
+    },
+    "footer": {
+      "license": "MIT License - Free to use for all commercial and open source projects",
+      "madeIn": "Made with ❤️ in Spain"
+    },
+    "buttons": {
+      "github": "GitHub"
+    }
+  },
+  "schema": {
+    "properties": "Properties",
+    "examples": "Examples",
+    "extends": "Extends",
+    "inheritedFrom": "Inherited from {source}",
+    "required": "Required",
+    "description": "Description",
+    "type": "Type",
+    "example": "Example",
+    "format": "Format",
+    "backToHome": "Back to Home"
+  }
+}
