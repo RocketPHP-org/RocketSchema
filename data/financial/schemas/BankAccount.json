@@ -1,0 +1,107 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "BankAccount",
+  "description": "Bank account information for an organization or person",
+  "properties": [
+    {
+      "name": "accountNumber",
+      "type": "string",
+      "description": "Bank account number",
+      "required": true,
+      "example": "123456789"
+    },
+    {
+      "name": "accountType",
+      "type": "string",
+      "description": "Type of account (checking, savings, business, payment)",
+      "example": "business"
+    },
+    {
+      "name": "iban",
+      "type": "string",
+      "description": "International Bank Account Number",
+      "example": "GB82WEST12345698765432"
+    },
+    {
+      "name": "swift",
+      "type": "string",
+      "description": "SWIFT/BIC code",
+      "example": "DEUTDEFF"
+    },
+    {
+      "name": "routingNumber",
+      "type": "string",
+      "description": "Routing number (US) or sort code (UK)",
+      "example": "026009593"
+    },
+    {
+      "name": "bankName",
+      "type": "string",
+      "description": "Name of the bank",
+      "example": "Wells Fargo Bank"
+    },
+    {
+      "name": "bankAddress",
+      "type": "PostalAddress",
+      "description": "Address of the bank branch"
+    },
+    {
+      "name": "accountHolderName",
+      "type": "string",
+      "description": "Name of the account holder",
+      "example": "Acme Corporation Inc."
+    },
+    {
+      "name": "currency",
+      "type": "string",
+      "description": "Primary currency for this account (ISO 4217)",
+      "format": "iso-currency-code",
+      "example": "USD"
+    },
+    {
+      "name": "use",
+      "type": "string",
+      "description": "Purpose of this account (main, payroll, operational, savings, international)",
+      "example": "main"
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "description": "Human-readable label for this account",
+      "example": "Main Operating Account"
+    },
+    {
+      "name": "active",
+      "type": "boolean",
+      "description": "Whether this account is currently active",
+      "example": true
+    }
+  ],
+  "examples": [
+    {
+      "@type": "BankAccount",
+      "accountNumber": "123456789",
+      "accountType": "business",
+      "iban": "GB82WEST12345698765432",
+      "swift": "WESTGB2L",
+      "bankName": "Wells Fargo Bank",
+      "accountHolderName": "Acme Corporation Inc.",
+      "currency": "USD",
+      "use": "main",
+      "label": "Main Operating Account",
+      "active": true
+    },
+    {
+      "@type": "BankAccount",
+      "accountNumber": "987654321",
+      "iban": "FR7612345678901234567890189",
+      "swift": "BNPAFRPP",
+      "bankName": "BNP Paribas",
+      "accountHolderName": "TechStart SARL",
+      "currency": "EUR",
+      "use": "main",
+      "active": true
+    }
+  ]
+}

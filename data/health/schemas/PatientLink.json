@@ -1,0 +1,41 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "PatientLink",
+  "description": "Link to another patient resource that concerns the same actual patient. Used for record linkage and merging duplicate records. Based on FHIR R4 Patient.link element.",
+  "properties": [
+    {
+      "name": "other",
+      "type": "Patient",
+      "description": "Reference to the other patient resource being linked",
+      "required": true
+    },
+    {
+      "name": "type",
+      "type": "string",
+      "description": "Type of link: 'replaced-by' (this patient has been replaced), 'replaces' (this patient replaces another), 'refer' (see also), 'seealso' (alternative reference)",
+      "required": true,
+      "example": "seealso"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "PatientLink",
+      "other": {
+        "@type": "Patient",
+        "medicalRecordNumber": "MRN-2024-999999",
+        "givenName": "Sarah",
+        "familyName": "Smith"
+      },
+      "type": "seealso"
+    },
+    {
+      "@type": "PatientLink",
+      "other": {
+        "@type": "Patient",
+        "medicalRecordNumber": "MRN-OLD-001234"
+      },
+      "type": "replaces"
+    }
+  ]
+}

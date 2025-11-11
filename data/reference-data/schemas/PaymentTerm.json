@@ -1,0 +1,77 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "PaymentTerm",
+  "description": "Payment terms and conditions reference data",
+  "properties": [
+    {
+      "name": "code",
+      "type": "string",
+      "description": "Payment term code (NET_30, NET_60, COD, ADVANCE, etc.)",
+      "required": true,
+      "example": "NET_30"
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "description": "Human-readable label",
+      "required": true,
+      "example": "Net 30 days"
+    },
+    {
+      "name": "description",
+      "type": "string",
+      "description": "Detailed description of the payment terms"
+    },
+    {
+      "name": "daysUntilDue",
+      "type": "number",
+      "description": "Number of days until payment is due (0 for immediate, null for custom)",
+      "example": 30
+    }
+  ],
+  "examples": [
+    {
+      "@type": "PaymentTerm",
+      "code": "NET_30",
+      "label": "Net 30 days",
+      "description": "Payment due within 30 days of invoice date",
+      "daysUntilDue": 30
+    },
+    {
+      "@type": "PaymentTerm",
+      "code": "NET_60",
+      "label": "Net 60 days",
+      "description": "Payment due within 60 days of invoice date",
+      "daysUntilDue": 60
+    },
+    {
+      "@type": "PaymentTerm",
+      "code": "2_10_NET_30",
+      "label": "2/10 Net 30",
+      "description": "2% early payment discount if paid within 10 days, otherwise payment due in 30 days",
+      "daysUntilDue": 30
+    },
+    {
+      "@type": "PaymentTerm",
+      "code": "COD",
+      "label": "Cash on Delivery",
+      "description": "Payment due upon delivery",
+      "daysUntilDue": 0
+    },
+    {
+      "@type": "PaymentTerm",
+      "code": "ADVANCE",
+      "label": "Payment in Advance",
+      "description": "Full payment required before delivery",
+      "daysUntilDue": 0
+    },
+    {
+      "@type": "PaymentTerm",
+      "code": "EOM",
+      "label": "End of Month",
+      "description": "Payment due at the end of the month following invoice date",
+      "daysUntilDue": null
+    }
+  ]
+}

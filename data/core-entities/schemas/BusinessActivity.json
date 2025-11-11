@@ -1,0 +1,71 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "BusinessActivity",
+  "description": "A business activity, industry sector, or line of business for an organization. Represents what the organization does commercially",
+  "properties": [
+    {
+      "name": "code",
+      "type": "string",
+      "description": "Activity classification code (NAICS, SIC, NACE, APE, etc.)",
+      "example": "62.01Z"
+    },
+    {
+      "name": "system",
+      "type": "string",
+      "description": "Classification system used (NAICS, SIC, NACE, APE, ISIC)",
+      "example": "APE"
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "description": "Human-readable description of the activity",
+      "required": true,
+      "example": "Custom software development"
+    },
+    {
+      "name": "isPrimary",
+      "type": "boolean",
+      "description": "Whether this is the primary/main activity",
+      "example": true
+    },
+    {
+      "name": "category",
+      "type": "string",
+      "description": "High-level category (Technology, Healthcare, Retail, Manufacturing, etc.)",
+      "example": "Technology"
+    },
+    {
+      "name": "description",
+      "type": "string",
+      "description": "Detailed description of the activity"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "Activity",
+      "code": "62.01Z",
+      "system": "APE",
+      "label": "Programmation informatique",
+      "isPrimary": true,
+      "category": "Technology",
+      "description": "Custom software development and IT consulting"
+    },
+    {
+      "@type": "Activity",
+      "code": "541511",
+      "system": "NAICS",
+      "label": "Custom Computer Programming Services",
+      "isPrimary": true,
+      "category": "Technology"
+    },
+    {
+      "@type": "Activity",
+      "code": "62.02Z",
+      "system": "APE",
+      "label": "Conseil en systèmes et logiciels informatiques",
+      "isPrimary": false,
+      "category": "Technology"
+    }
+  ]
+}

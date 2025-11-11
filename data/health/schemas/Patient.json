@@ -1,0 +1,406 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "Patient",
+  "description": "Demographics and administrative information about an individual receiving care or other health-related services. Based on HL7 FHIR R4 Patient resource (http://hl7.org/fhir/R4/patient.html)",
+  "extends": "Person",
+  "properties": [
+    {
+      "name": "active",
+      "type": "boolean",
+      "description": "Whether this patient record is in active use. Many systems use this to mark non-current patients (not seen for a period). Deceased patients may be marked inactive but can be active for some time after death.",
+      "required": true,
+      "example": true
+    },
+    {
+      "name": "deceasedBoolean",
+      "type": "boolean",
+      "description": "Indicates if the patient is deceased. If boolean, true means deceased."
+    },
+    {
+      "name": "deceasedDateTime",
+      "type": "Date",
+      "description": "Date and time of death if known",
+      "example": "2024-03-15"
+    },
+    {
+      "name": "multipleBirthBoolean",
+      "type": "boolean",
+      "description": "Indicates whether the patient is part of a multiple birth"
+    },
+    {
+      "name": "multipleBirthInteger",
+      "type": "number",
+      "description": "Birth order in multiple birth (e.g., 1 for first twin, 2 for second)",
+      "example": 1
+    },
+    {
+      "name": "contact",
+      "type": "PatientContact[]",
+      "description": "Contact parties for the patient (e.g., guardian, partner, friend, emergency contact) with relationship and contact details"
+    },
+    {
+      "name": "communication",
+      "type": "PatientCommunication[]",
+      "description": "Languages which may be used to communicate with the patient about their health, with proficiency levels and preferences"
+    },
+    {
+      "name": "generalPractitioner",
+      "type": "Practitioner[]",
+      "description": "Patient's nominated primary care provider(s) or care team"
+    },
+    {
+      "name": "managingOrganization",
+      "type": "Organization",
+      "description": "Organization that is the custodian of the patient record"
+    },
+    {
+      "name": "link",
+      "type": "PatientLink[]",
+      "description": "Links to other patient resources that concern the same actual person (for record linkage/merging)"
+    },
+    {
+      "name": "identityVerification",
+      "type": "IdentityVerification",
+      "description": "Identity verification status with regional support (French INS, European eIDAS, US verification). Contains verification method, date, identity traits, and qualification level."
+    },
+    {
+      "name": "ethnicity",
+      "type": "string",
+      "description": "US Core extension: Ethnicity categorization (Hispanic or Latino, Not Hispanic or Latino)",
+      "example": "Not Hispanic or Latino"
+    },
+    {
+      "name": "birthSex",
+      "type": "string",
+      "description": "US Core extension: Sex assigned at birth (M, F, UNK)",
+      "example": "F"
+    },
+    {
+      "name": "interpreterRequired",
+      "type": "boolean",
+      "description": "US Core extension: Whether an interpreter is needed for medical communication"
+    },
+    {
+      "name": "allergyStatus",
+      "type": "string",
+      "description": "Summary allergy status (UNKNOWN, NO_KNOWN_ALLERGIES, SEE_ALLERGY_LIST)",
+      "example": "SEE_ALLERGY_LIST"
+    },
+    {
+      "name": "disabilityAccommodations",
+      "type": "string[]",
+      "description": "Required accommodations for disabilities (wheelchair access, visual aids, hearing assistance, etc.)"
+    },
+    {
+      "name": "advanceDirective",
+      "type": "boolean",
+      "description": "Whether the patient has an advance directive, living will, or healthcare proxy on file"
+    },
+    {
+      "name": "organDonor",
+      "type": "boolean",
+      "description": "Whether the patient is registered as an organ donor"
+    },
+    {
+      "name": "notes",
+      "type": "string",
+      "description": "Additional clinical or administrative notes about the patient",
+      "example": "Patient prefers morning appointments"
+    },
+    {
+      "name": "metadata",
+      "type": "object",
+      "description": "Additional metadata for extensibility - custom fields, extensions, or facility-specific data"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "Patient",
+      "active": true,
+      "givenName": "Sarah",
+      "middleName": "Marie",
+      "familyName": "Johnson",
+      "birthDate": "1975-08-22",
+      "gender": {
+        "@type": "Gender",
+        "code": "F",
+        "label": "Female"
+      },
+      "birthSex": "F",
+      "ethnicity": "Not Hispanic or Latino",
+      "maritalStatus": {
+        "@type": "MaritalStatus",
+        "code": "M",
+        "label": "Married"
+      },
+      "multipleBirthBoolean": false,
+      "deceasedBoolean": false,
+      "contact": [
+        {
+          "@type": "PatientContact",
+          "relationship": "Emergency Contact",
+          "name": {
+            "givenName": "Michael",
+            "familyName": "Johnson"
+          },
+          "telecom": [
+            {
+              "@type": "ContactPoint",
+              "system": "phone",
+              "value": "+1-555-0123",
+              "use": "mobile"
+            }
+          ]
+        }
+      ],
+      "communication": [
+        {
+          "@type": "PatientCommunication",
+          "language": {
+            "@type": "Language",
+            "code": "en",
+            "name": "English"
+          },
+          "preferred": true
+        },
+        {
+          "@type": "PatientCommunication",
+          "language": {
+            "@type": "Language",
+            "code": "es",
+            "name": "Spanish"
+          },
+          "preferred": false
+        }
+      ],
+      "generalPractitioner": [
+        {
+          "@type": "Practitioner",
+          "name": "Dr. Emily Chen",
+          "specialty": "Family Medicine"
+        }
+      ],
+      "managingOrganization": {
+        "@type": "Organization",
+        "name": "Springfield Memorial Hospital"
+      },
+      "interpreterRequired": false,
+      "allergyStatus": "SEE_ALLERGY_LIST",
+      "organDonor": true,
+      "advanceDirective": true,
+      "disabilityAccommodations": ["Wheelchair access required"],
+      "telecoms": [
+        {
+          "@type": "ContactPoint",
+          "system": "phone",
+          "value": "+1-555-0199",
+          "use": "mobile",
+          "rank": 1
+        },
+        {
+          "@type": "ContactPoint",
+          "system": "email",
+          "value": "sarah.johnson@email.com",
+          "use": "home"
+        }
+      ],
+      "address": [
+        {
+          "@type": "PostalAddress",
+          "use": "home",
+          "streetAddress": "456 Maple Avenue",
+          "addressLocality": "Springfield",
+          "addressRegion": "IL",
+          "postalCode": "62701",
+          "addressCountry": "US"
+        }
+      ],
+      "identifier": [
+        {
+          "@type": "Identifier",
+          "system": "http://hospital.org/mrn",
+          "value": "MRN-2024-001234",
+          "use": "usual",
+          "type": "MRN"
+        },
+        {
+          "@type": "Identifier",
+          "system": "http://hl7.org/fhir/sid/us-ssn",
+          "value": "***-**-1234",
+          "use": "official",
+          "type": "SSN"
+        }
+      ],
+      "notes": "Patient prefers morning appointments. Requires reminder calls 24 hours in advance."
+    },
+    {
+      "@type": "Patient",
+      "active": true,
+      "givenName": "Marie",
+      "middleName": "Louise",
+      "familyName": "MARTIN",
+      "birthDate": "1985-03-20",
+      "gender": {
+        "@type": "Gender",
+        "code": "F",
+        "label": "Female"
+      },
+      "birthSex": "F",
+      "ethnicity": "Not specified",
+      "maritalStatus": {
+        "@type": "MaritalStatus",
+        "code": "M",
+        "label": "Mariée"
+      },
+      "multipleBirthBoolean": false,
+      "deceasedBoolean": false,
+      "identityVerification": {
+        "@type": "IdentityVerification",
+        "verified": true,
+        "verificationMethod": "INS",
+        "verificationDate": "2024-11-15",
+        "verifiedBy": {
+          "@type": "Organization",
+          "name": "Agence du Numérique en Santé (ANS)"
+        },
+        "identityTraits": {
+          "birthName": "MARTIN",
+          "birthGivenNames": ["Marie", "Louise"],
+          "birthDate": "1985-03-20",
+          "sex": "F",
+          "birthPlace": "75112",
+          "birthPlaceLabel": "Paris 12e arrondissement"
+        },
+        "nationalIdentifier": "2 85 03 75 112 123 45",
+        "qualificationLevel": "identité qualifiée",
+        "documentType": "carte-vitale",
+        "documentNumber": "123456789012345",
+        "issuingAuthority": "Assurance Maladie",
+        "metadata": {
+          "insVersion": "2.1",
+          "verificationSession": "VS-2024-FR-5678",
+          "confidenceScore": 0.99,
+          "dmpEnabled": true
+        }
+      },
+      "contact": [
+        {
+          "@type": "PatientContact",
+          "relationship": ["Personne à prévenir", "Conjoint"],
+          "name": {
+            "givenName": "Pierre",
+            "familyName": "MARTIN"
+          },
+          "telecom": [
+            {
+              "@type": "ContactPoint",
+              "system": "phone",
+              "value": "+33 6 12 34 56 78",
+              "use": "mobile"
+            }
+          ]
+        }
+      ],
+      "communication": [
+        {
+          "@type": "PatientCommunication",
+          "language": {
+            "@type": "Language",
+            "code": "fr",
+            "name": "Français"
+          },
+          "preferred": true,
+          "proficiency": "native"
+        }
+      ],
+      "generalPractitioner": [
+        {
+          "@type": "Practitioner",
+          "name": "Dr. Sophie BERNARD",
+          "specialty": "Médecine Générale",
+          "identifier": [
+            {
+              "@type": "Identifier",
+              "system": "https://annuaire.sante.fr/rpps",
+              "value": "10001234567",
+              "use": "official"
+            }
+          ]
+        }
+      ],
+      "managingOrganization": {
+        "@type": "Organization",
+        "name": "Hôpital Européen Georges-Pompidou",
+        "identifier": [
+          {
+            "@type": "Identifier",
+            "system": "https://annuaire.sante.fr/finess",
+            "value": "750100042",
+            "use": "official"
+          }
+        ]
+      },
+      "interpreterRequired": false,
+      "allergyStatus": "SEE_ALLERGY_LIST",
+      "organDonor": true,
+      "advanceDirective": true,
+      "telecoms": [
+        {
+          "@type": "ContactPoint",
+          "system": "phone",
+          "value": "+33 6 98 76 54 32",
+          "use": "mobile",
+          "rank": 1
+        },
+        {
+          "@type": "ContactPoint",
+          "system": "email",
+          "value": "marie.martin@email.fr",
+          "use": "home"
+        }
+      ],
+      "address": [
+        {
+          "@type": "PostalAddress",
+          "use": "home",
+          "streetAddress": "12 Rue de la République",
+          "addressLocality": "Paris",
+          "addressRegion": "Île-de-France",
+          "postalCode": "75012",
+          "addressCountry": "FR"
+        }
+      ],
+      "identifier": [
+        {
+          "@type": "Identifier",
+          "system": "urn:oid:1.2.250.1.213.1.4.8",
+          "value": "2 85 03 75 112 123 45",
+          "use": "official",
+          "type": "INS"
+        },
+        {
+          "@type": "Identifier",
+          "system": "http://hopital-pompidou.fr/ipp",
+          "value": "IPP-2024-567890",
+          "use": "usual",
+          "type": "IPP"
+        },
+        {
+          "@type": "Identifier",
+          "system": "http://esante.gouv.fr/dmp",
+          "value": "DMP-FR-2024-567890",
+          "use": "secondary",
+          "type": "DMP"
+        }
+      ],
+      "notes": "Patiente inscrite au DMP (Dossier Médical Partagé). Préfère les rendez-vous le matin.",
+      "metadata": {
+        "dmpId": "DMP-FR-2024-567890",
+        "sesamVitaleCard": "123456789012345",
+        "socialSecurityRegime": "Régime Général",
+        "complementaryHealthInsurance": "Mutuelle XYZ"
+      }
+    }
+  ]
+}

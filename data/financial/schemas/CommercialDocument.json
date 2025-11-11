@@ -1,0 +1,137 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "CommercialDocument",
+  "description": "Base schema for all commercial documents (invoices, quotes, delivery notes, orders, credit notes, etc.) - universal across all countries and business types",
+  "properties": [
+    {
+      "name": "documentNumber",
+      "type": "string",
+      "description": "Unique document number/reference",
+      "required": true,
+      "example": "DOC-2024-001"
+    },
+    {
+      "name": "documentType",
+      "type": "DocumentType",
+      "description": "Type of document (reference to DocumentType entity)",
+      "required": true
+    },
+    {
+      "name": "status",
+      "type": "string",
+      "description": "Current status (draft, sent, accepted, rejected, paid, cancelled, etc.)",
+      "example": "sent"
+    },
+    {
+      "name": "issueDate",
+      "type": "Date",
+      "description": "Date when the document was issued",
+      "required": true,
+      "example": "2024-01-15"
+    },
+    {
+      "name": "validUntil",
+      "type": "Date",
+      "description": "Validity date (for quotes, offers)",
+      "example": "2024-02-15"
+    },
+    {
+      "name": "dueDate",
+      "type": "Date",
+      "description": "Due date (for invoices, payments)",
+      "example": "2024-02-15"
+    },
+    {
+      "name": "issuer",
+      "type": "Organization",
+      "description": "Organization issuing the document (seller/supplier)",
+      "required": true
+    },
+    {
+      "name": "recipient",
+      "type": "Organization | Person",
+      "description": "Recipient of the document (buyer/customer)",
+      "required": true
+    },
+    {
+      "name": "billingAddress",
+      "type": "PostalAddress",
+      "description": "Billing address"
+    },
+    {
+      "name": "shippingAddress",
+      "type": "PostalAddress",
+      "description": "Shipping/delivery address"
+    },
+    {
+      "name": "lineItems",
+      "type": "CommercialDocumentLine[]",
+      "description": "Line items/products in the document"
+    },
+    {
+      "name": "currency",
+      "type": "Currency",
+      "description": "Currency used in the document",
+      "required": true
+    },
+    {
+      "name": "paymentTerms",
+      "type": "PaymentTerm",
+      "description": "Payment terms and conditions (reference to PaymentTerm entity)"
+    },
+    {
+      "name": "discountAmount",
+      "type": "MonetaryAmount",
+      "description": "Total discount applied to this specific document"
+    },
+    {
+      "name": "notes",
+      "type": "string",
+      "description": "Additional notes or comments"
+    },
+    {
+      "name": "relatedDocuments",
+      "type": "CommercialDocument[]",
+      "description": "Related documents (quote → order → invoice → credit note chain)"
+    },
+    {
+      "name": "attachments",
+      "type": "string[]",
+      "description": "URLs to attached files (PDF, images, etc.)"
+    },
+    {
+      "name": "metadata",
+      "type": "object",
+      "description": "Country-specific or custom fields"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "CommercialDocument",
+      "documentNumber": "DOC-2024-001",
+      "documentType": "invoice",
+      "status": "sent",
+      "issueDate": "2024-01-15",
+      "dueDate": "2024-02-15",
+      "issuer": {
+        "@type": "Organization",
+        "name": "Acme Corp"
+      },
+      "recipient": {
+        "@type": "Organization",
+        "name": "Client Company"
+      },
+      "currency": {
+        "@type": "Currency",
+        "code": "USD",
+        "symbol": "$"
+      },
+      "totalAmount": {
+        "@type": "MonetaryAmount",
+        "value": 1500.00,
+        "currency": "USD"
+      }
+    }
+  ]
+}

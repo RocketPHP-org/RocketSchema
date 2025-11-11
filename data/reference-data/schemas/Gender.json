@@ -1,0 +1,49 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "Gender",
+  "description": "Gender identity reference data",
+  "properties": [
+    {
+      "name": "code",
+      "type": "string",
+      "description": "Gender code (M, F, O, U for Male, Female, Other, Unknown)",
+      "required": true,
+      "example": "F"
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "description": "Human-readable label",
+      "required": true,
+      "example": "Female"
+    },
+    {
+      "name": "description",
+      "type": "string",
+      "description": "Detailed description"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "Gender",
+      "code": "M",
+      "label": "Male"
+    },
+    {
+      "@type": "Gender",
+      "code": "F",
+      "label": "Female"
+    },
+    {
+      "@type": "Gender",
+      "code": "O",
+      "label": "Other"
+    },
+    {
+      "@type": "Gender",
+      "code": "U",
+      "label": "Unknown / Prefer not to say"
+    }
+  ]
+}

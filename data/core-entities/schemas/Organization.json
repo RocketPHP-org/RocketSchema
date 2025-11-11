@@ -2,7 +2,7 @@
   "@type": "Schema",
   "@context": "https://rocketschema.org/context",
   "name": "Organization",
-  "description": "An organization such as a company, business, NGO, or institution",
+  "description": "An organization such as a company, business, institution, healthcare facility, or any formal business entity",
   "properties": [
     {
       "name": "name",
@@ -12,48 +12,48 @@
       "example": "Acme Corporation"
     },
     {
+      "name": "alias",
+      "type": "string[]",
+      "description": "Alternate names or trading names for the organization",
+      "example": ["Acme", "Acme Corp"]
+    },
+    {
       "name": "legalName",
       "type": "string",
       "description": "Legal registered name of the organization",
       "example": "Acme Corporation Inc."
     },
     {
-      "name": "taxID",
+      "name": "status",
       "type": "string",
-      "description": "Tax identification number",
-      "example": "US123456789"
+      "description": "Current operational status of the organization (active, inactive, suspended, pending, dissolved)",
+      "example": "active"
     },
     {
-      "name": "vatID",
-      "type": "string",
-      "description": "Value Added Tax identification number",
-      "example": "FR12345678901"
+      "name": "identifier",
+      "type": "Identifier[]",
+      "description": "Official identifiers from various systems - tax IDs (SIREN, SIRET, EIN, VAT), registration numbers (DUNS, LEI), etc. Supports all country-specific identification systems"
     },
     {
-      "name": "email",
-      "type": "string",
-      "description": "General email address",
-      "format": "email",
-      "example": "contact@acme.com"
+      "name": "telecoms",
+      "type": "ContactPoint[]",
+      "description": "Contact points for the organization - phone numbers, emails, fax, etc. Supports multiple contacts with different purposes and priorities"
     },
     {
-      "name": "telephone",
-      "type": "string",
-      "description": "Primary telephone number",
-      "format": "phone",
-      "example": "+1-555-0100"
+      "name": "onlinePresence",
+      "type": "OnlinePresence[]",
+      "description": "Online presence - website, social media profiles (LinkedIn, Twitter, Facebook, GitHub, etc.)"
     },
     {
       "name": "address",
-      "type": "PostalAddress",
-      "description": "Physical address of the organization",
+      "type": "PostalAddress[]",
+      "description": "Physical addresses of the organization (headquarters, branches, warehouses, mailing, etc.). Use the 'use' and 'label' fields to distinguish between address types",
       "required": true
     },
     {
       "name": "foundingDate",
-      "type": "string",
+      "type": "Date",
       "description": "Date when the organization was founded",
-      "format": "date",
       "example": "2010-05-15"
     },
     {
@@ -65,12 +65,12 @@
     {
       "name": "parentOrganization",
       "type": "Organization",
-      "description": "Parent organization if this is a subsidiary"
+      "description": "Parent organization if this is a subsidiary or division"
     },
     {
-      "name": "employees",
-      "type": ["Person"],
-      "description": "List of employees"
+      "name": "childOrganizations",
+      "type": "Organization[]",
+      "description": "List of subsidiary or child organizations"
     },
     {
       "name": "logo",
@@ -80,32 +80,280 @@
       "example": "https://example.com/logo.png"
     },
     {
-      "name": "website",
+      "name": "description",
       "type": "string",
-      "description": "Official website URL",
-      "format": "uri",
-      "example": "https://acme.com"
+      "description": "Detailed description of the organization and its activities"
+    },
+    {
+      "name": "shortDescription",
+      "type": "string",
+      "description": "Brief description for summaries and previews"
+    },
+    {
+      "name": "organizationType",
+      "type": "string",
+      "description": "Legal form of organization (Corporation, LLC, SARL, NGO, Association, etc.)",
+      "example": "Corporation"
+    },
+    {
+      "name": "activities",
+      "type": "BusinessActivity[]",
+      "description": "Business activities and industry sectors (primary and secondary). Supports multiple activity codes from different classification systems"
+    },
+    {
+      "name": "bankAccounts",
+      "type": "BankAccount[]",
+      "description": "Bank accounts of the organization (main, payroll, international, etc.)"
+    },
+    {
+      "name": "contacts",
+      "type": "OrganizationContact[]",
+      "description": "Professional contacts within the organization (sales representatives, managers, support agents, etc.)"
+    },
+    {
+      "name": "slug",
+      "type": "string",
+      "description": "URL-friendly identifier for the organization",
+      "example": "acme-corporation"
+    },
+    {
+      "name": "metadata",
+      "type": "object",
+      "description": "Additional metadata for extensibility and custom fields"
     }
   ],
   "examples": [
     {
       "@type": "Organization",
       "name": "Acme Corp",
+      "alias": ["Acme", "Acme Corporation"],
       "legalName": "Acme Corporation Inc.",
-      "taxID": "US123456789",
-      "email": "contact@acme.com",
-      "telephone": "+1-555-0100",
-      "address": {
-        "@type": "PostalAddress",
-        "streetAddress": "123 Main Street",
-        "addressLocality": "San Francisco",
-        "addressRegion": "CA",
-        "postalCode": "94105",
-        "addressCountry": "US"
-      },
+      "status": "active",
+      "identifier": [
+        {
+          "@type": "Identifier",
+          "system": "EIN",
+          "value": "12-3456789",
+          "type": "tax",
+          "country": "US",
+          "label": "US Employer Identification Number",
+          "use": "official"
+        },
+        {
+          "@type": "Identifier",
+          "system": "DUNS",
+          "value": "123456789",
+          "type": "financial",
+          "label": "D-U-N-S Number"
+        }
+      ],
+      "telecoms": [
+        {
+          "@type": "ContactPoint",
+          "system": "phone",
+          "value": "+1-555-0100",
+          "use": "work",
+          "rank": 1,
+          "label": "Main Office"
+        },
+        {
+          "@type": "ContactPoint",
+          "system": "email",
+          "value": "contact@acme.com",
+          "use": "work",
+          "rank": 1,
+          "label": "General Inquiries"
+        },
+        {
+          "@type": "ContactPoint",
+          "system": "email",
+          "value": "sales@acme.com",
+          "use": "work",
+          "rank": 2,
+          "label": "Sales Department"
+        },
+        {
+          "@type": "ContactPoint",
+          "system": "fax",
+          "value": "+1-555-0101",
+          "use": "work"
+        }
+      ],
+      "onlinePresence": [
+        {
+          "@type": "OnlinePresence",
+          "platform": "website",
+          "url": "https://acme.com",
+          "primary": true
+        }
+      ],
+      "address": [
+        {
+          "@type": "PostalAddress",
+          "use": "headquarters",
+          "label": "Head Office",
+          "streetAddress": "123 Main Street",
+          "addressLocality": "San Francisco",
+          "addressRegion": "CA",
+          "postalCode": "94105",
+          "addressCountry": "US",
+          "latitude": 37.7749,
+          "longitude": -122.4194
+        },
+        {
+          "@type": "PostalAddress",
+          "use": "mailing",
+          "label": "Mailing Address",
+          "postOfficeBoxNumber": "PO Box 5000",
+          "addressLocality": "San Francisco",
+          "addressRegion": "CA",
+          "postalCode": "94105",
+          "addressCountry": "US"
+        }
+      ],
       "foundingDate": "2010-05-15",
       "numberOfEmployees": 250,
-      "website": "https://acme.com"
+      "organizationType": "Corporation",
+      "slug": "acme-corp"
+    },
+    {
+      "@type": "Organization",
+      "name": "City Hospital",
+      "legalName": "City General Hospital LLC",
+      "status": "active",
+      "telecoms": [
+        {
+          "@type": "ContactPoint",
+          "system": "phone",
+          "value": "+1-555-0200",
+          "use": "work",
+          "label": "Main Reception"
+        },
+        {
+          "@type": "ContactPoint",
+          "system": "phone",
+          "value": "+1-555-0911",
+          "use": "emergency",
+          "rank": 1,
+          "label": "Emergency Room"
+        },
+        {
+          "@type": "ContactPoint",
+          "system": "email",
+          "value": "info@cityhospital.org",
+          "use": "work"
+        },
+        {
+          "@type": "ContactPoint",
+          "system": "email",
+          "value": "appointments@cityhospital.org",
+          "use": "work",
+          "label": "Appointments"
+        }
+      ],
+      "onlinePresence": [
+        {
+          "@type": "OnlinePresence",
+          "platform": "website",
+          "url": "https://cityhospital.org",
+          "primary": true
+        }
+      ],
+      "address": [
+        {
+          "@type": "PostalAddress",
+          "use": "work",
+          "label": "Main Hospital",
+          "streetAddress": "456 Health Avenue",
+          "addressLocality": "Boston",
+          "addressRegion": "MA",
+          "postalCode": "02115",
+          "addressCountry": "US"
+        }
+      ],
+      "organizationType": "Healthcare",
+      "numberOfEmployees": 1200
+    },
+    {
+      "@type": "Organization",
+      "name": "TechStart SARL",
+      "legalName": "TechStart Société à Responsabilité Limitée",
+      "status": "active",
+      "identifier": [
+        {
+          "@type": "Identifier",
+          "system": "SIREN",
+          "value": "123456789",
+          "type": "registration",
+          "country": "FR",
+          "issuer": "INSEE France",
+          "label": "Numéro SIREN",
+          "use": "official"
+        },
+        {
+          "@type": "Identifier",
+          "system": "SIRET",
+          "value": "12345678900012",
+          "type": "registration",
+          "country": "FR",
+          "label": "Numéro SIRET"
+        },
+        {
+          "@type": "Identifier",
+          "system": "VAT",
+          "value": "FR12345678901",
+          "type": "tax",
+          "country": "FR",
+          "label": "Numéro TVA Intracommunautaire"
+        }
+      ],
+      "telecoms": [
+        {
+          "@type": "ContactPoint",
+          "system": "phone",
+          "value": "+33 1 42 00 00 00",
+          "use": "work",
+          "label": "Standard"
+        },
+        {
+          "@type": "ContactPoint",
+          "system": "email",
+          "value": "contact@techstart.fr",
+          "use": "work"
+        }
+      ],
+      "onlinePresence": [
+        {
+          "@type": "OnlinePresence",
+          "platform": "website",
+          "url": "https://techstart.fr",
+          "primary": true
+        },
+        {
+          "@type": "OnlinePresence",
+          "platform": "linkedin",
+          "url": "https://linkedin.com/company/techstart",
+          "handle": "techstart",
+          "verified": true
+        }
+      ],
+      "address": [
+        {
+          "@type": "PostalAddress",
+          "use": "headquarters",
+          "label": "Siège Social",
+          "streetAddress": "10 Rue de la Paix",
+          "addressLocality": "Paris",
+          "postalCode": "75002",
+          "addressCountry": "FR",
+          "latitude": 48.8698,
+          "longitude": 2.3308
+        }
+      ],
+      "foundingDate": "2015-03-20",
+      "numberOfEmployees": 45,
+      "organizationType": "Corporation",
+      "slug": "techstart-sarl"
     }
   ]
 }

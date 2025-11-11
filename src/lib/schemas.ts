@@ -65,13 +65,81 @@ function loadSchemasByCategory(): Record<string, Record<string, SchemaDefinition
 }
 
 /**
+ * Recursively collect all properties from inheritance chain
+ */
+function collectInheritedProperties(
+  schema: SchemaDefinition,
+  allSchemas: Record<string, Record<string, SchemaDefinition>>,
+  visited: Set<string> = new Set()
+): SchemaProperty[] {
+  if (!schema.extends || visited.has(schema.extends)) {
+    return [];
+  }
+
+  visited.add(schema.extends);
+
+  // Find parent schema
+  let parentSchema: SchemaDefinition | undefined;
+  for (const categorySchemas of Object.values(allSchemas)) {
+    if (categorySchemas[schema.extends]) {
+      parentSchema = categorySchemas[schema.extends];
+      break;
+    }
+  }
+
+  if (!parentSchema) {
+    return [];
+  }
+
+  // Recursively collect from grandparent first
+  const grandparentProps = collectInheritedProperties(parentSchema, allSchemas, visited);
+
+  // Then add parent's own properties
+  const parentProps = parentSchema.properties.map(prop => ({
+    ...prop,
+    source: schema.extends
+  })) as SchemaProperty[];
+
+  // Return grandparent properties first, then parent (maintains hierarchy order)
+  return [...grandparentProps, ...parentProps];
+}
+
+/**
+ * Resolve schema inheritance by loading parent schema properties recursively
+ */
+function resolveInheritance(schema: SchemaDefinition, allSchemas: Record<string, Record<string, SchemaDefinition>>): SchemaDefinition {
+  if (!schema.extends) {
+    // No inheritance - return as is (no source needed)
+    return schema;
+  }
+
+  // Collect all inherited properties (recursive)
+  const inheritedProps = collectInheritedProperties(schema, allSchemas);
+
+  // Mark own properties with source
+  const ownProps = schema.properties.map(prop => ({
+    ...prop,
+    source: prop.source || schema.name
+  })) as SchemaProperty[];
+
+  // Merge all properties: inherited first, then own
+  const allProperties = [...inheritedProps, ...ownProps];
+
+  return {
+    ...schema,
+    properties: allProperties,
+    inheritedProperties: inheritedProps
+  };
+}
+
+/**
  * Get a schema by name (reloads from disk in dev for hot reload)
  */
 export function getSchema(name: string): SchemaDefinition | undefined {
   const allSchemas = loadSchemasByCategory();
   for (const categorySchemas of Object.values(allSchemas)) {
     if (categorySchemas[name]) {
-      return categorySchemas[name];
+      return resolveInheritance(categorySchemas[name], allSchemas);
     }
   }
   return undefined;

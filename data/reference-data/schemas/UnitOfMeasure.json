@@ -1,0 +1,123 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "UnitOfMeasure",
+  "description": "Unit of measure reference data - supports UN/CEFACT codes and common business units",
+  "properties": [
+    {
+      "name": "code",
+      "type": "string",
+      "description": "Unit code (UN/CEFACT Recommendation 20 or custom)",
+      "required": true,
+      "example": "PCE"
+    },
+    {
+      "name": "symbol",
+      "type": "string",
+      "description": "Unit symbol",
+      "example": "pc"
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "description": "Unit name",
+      "required": true,
+      "example": "Piece"
+    },
+    {
+      "name": "category",
+      "type": "string",
+      "description": "Category of measurement (quantity, length, weight, volume, time, etc.)",
+      "example": "quantity"
+    },
+    {
+      "name": "system",
+      "type": "string",
+      "description": "Measurement system (metric, imperial, custom)",
+      "example": "metric"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "UnitOfMeasure",
+      "code": "PCE",
+      "symbol": "pc",
+      "name": "Piece",
+      "category": "quantity"
+    },
+    {
+      "@type": "UnitOfMeasure",
+      "code": "HUR",
+      "symbol": "h",
+      "name": "Hour",
+      "category": "time"
+    },
+    {
+      "@type": "UnitOfMeasure",
+      "code": "KGM",
+      "symbol": "kg",
+      "name": "Kilogram",
+      "category": "weight",
+      "system": "metric"
+    },
+    {
+      "@type": "UnitOfMeasure",
+      "code": "LTR",
+      "symbol": "L",
+      "name": "Liter",
+      "category": "volume",
+      "system": "metric"
+    },
+    {
+      "@type": "UnitOfMeasure",
+      "code": "MTR",
+      "symbol": "m",
+      "name": "Meter",
+      "category": "length",
+      "system": "metric"
+    },
+    {
+      "@type": "UnitOfMeasure",
+      "code": "DAY",
+      "symbol": "d",
+      "name": "Day",
+      "category": "time"
+    },
+    {
+      "@type": "UnitOfMeasure",
+      "code": "BOX",
+      "symbol": "box",
+      "name": "Box",
+      "category": "packaging"
+    },
+    {
+      "@type": "UnitOfMeasure",
+      "code": "BPM",
+      "symbol": "bpm",
+      "name": "Beats Per Minute",
+      "category": "medical"
+    },
+    {
+      "@type": "UnitOfMeasure",
+      "code": "CEL",
+      "symbol": "°C",
+      "name": "Celsius",
+      "category": "temperature",
+      "system": "metric"
+    },
+    {
+      "@type": "UnitOfMeasure",
+      "code": "MMT",
+      "symbol": "mmHg",
+      "name": "Millimeter of Mercury",
+      "category": "medical"
+    },
+    {
+      "@type": "UnitOfMeasure",
+      "code": "GLI",
+      "symbol": "mg/dL",
+      "name": "Milligrams per Deciliter",
+      "category": "medical"
+    }
+  ]
+}

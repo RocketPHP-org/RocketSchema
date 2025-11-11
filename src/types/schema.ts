@@ -19,6 +19,7 @@ export interface SchemaProperty {
   required?: boolean;
   format?: string;
   example?: any;
+  source?: string; // Which schema this property comes from (for inheritance)
 }
 
 /**
@@ -30,6 +31,7 @@ export interface SchemaDefinition {
   name: string;
   description: string;
   extends?: string;
+  inheritedProperties?: SchemaProperty[];
   properties: SchemaProperty[];
   examples?: any[];
 }

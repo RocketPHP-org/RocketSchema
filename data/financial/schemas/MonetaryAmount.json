@@ -13,41 +13,38 @@
     },
     {
       "name": "currency",
-      "type": "string",
-      "description": "ISO 4217 currency code",
-      "required": true,
-      "format": "iso-currency-code",
-      "example": "USD"
-    },
-    {
-      "name": "minValue",
-      "type": "number",
-      "description": "Minimum value (for ranges)",
-      "example": 100.00
-    },
-    {
-      "name": "maxValue",
-      "type": "number",
-      "description": "Maximum value (for ranges)",
-      "example": 500.00
+      "type": "Currency",
+      "description": "Currency of the amount (reference to Currency entity)",
+      "required": true
     }
   ],
   "examples": [
     {
       "@type": "MonetaryAmount",
       "value": 1299.99,
-      "currency": "USD"
+      "currency": {
+        "@type": "Currency",
+        "code": "USD",
+        "symbol": "$"
+      }
     },
     {
       "@type": "MonetaryAmount",
-      "value": 999.99,
-      "currency": "EUR"
+      "value": 999.50,
+      "currency": {
+        "@type": "Currency",
+        "code": "EUR",
+        "symbol": "€"
+      }
     },
     {
       "@type": "MonetaryAmount",
-      "minValue": 100.00,
-      "maxValue": 500.00,
-      "currency": "USD"
+      "value": 850.00,
+      "currency": {
+        "@type": "Currency",
+        "code": "GBP",
+        "symbol": "£"
+      }
     }
   ]
 }

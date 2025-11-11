@@ -1,0 +1,95 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "Country",
+  "description": "Country reference data with ISO codes",
+  "properties": [
+    {
+      "name": "code",
+      "type": "string",
+      "description": "ISO 3166-1 alpha-2 country code",
+      "required": true,
+      "format": "iso-country-code",
+      "example": "US"
+    },
+    {
+      "name": "code3",
+      "type": "string",
+      "description": "ISO 3166-1 alpha-3 country code",
+      "format": "iso-country-code",
+      "example": "USA"
+    },
+    {
+      "name": "numericCode",
+      "type": "string",
+      "description": "ISO 3166-1 numeric country code",
+      "example": "840"
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "description": "Official country name",
+      "required": true,
+      "example": "United States of America"
+    },
+    {
+      "name": "nativeName",
+      "type": "string",
+      "description": "Country name in native language",
+      "example": "United States"
+    },
+    {
+      "name": "region",
+      "type": "string",
+      "description": "Geographic region (Europe, Asia, Americas, Africa, Oceania)",
+      "example": "Americas"
+    },
+    {
+      "name": "subregion",
+      "type": "string",
+      "description": "Geographic subregion",
+      "example": "Northern America"
+    },
+    {
+      "name": "demonym",
+      "type": "string",
+      "description": "Nationality/citizenship demonym (Algerian, American, French, British, etc.)",
+      "example": "American"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "Country",
+      "code": "US",
+      "code3": "USA",
+      "numericCode": "840",
+      "name": "United States of America",
+      "nativeName": "United States",
+      "region": "Americas",
+      "subregion": "Northern America",
+      "demonym": "American"
+    },
+    {
+      "@type": "Country",
+      "code": "FR",
+      "code3": "FRA",
+      "numericCode": "250",
+      "name": "France",
+      "nativeName": "France",
+      "region": "Europe",
+      "subregion": "Western Europe",
+      "demonym": "French"
+    },
+    {
+      "@type": "Country",
+      "code": "GB",
+      "code3": "GBR",
+      "numericCode": "826",
+      "name": "United Kingdom",
+      "nativeName": "United Kingdom",
+      "region": "Europe",
+      "subregion": "Northern Europe",
+      "demonym": "British"
+    }
+  ]
+}

@@ -1,0 +1,72 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "OrganizationContact",
+  "description": "A professional contact within an organization (sales rep, manager, support agent, etc.) - extends Person with organizational role and context",
+  "extends": "Person",
+  "properties": [
+    {
+      "name": "role",
+      "type": "string",
+      "description": "Role or position of the contact person in the organization",
+      "example": "Sales Manager"
+    },
+    {
+      "name": "department",
+      "type": "string",
+      "description": "Department or division within the organization",
+      "example": "Sales"
+    },
+    {
+      "name": "isPrimary",
+      "type": "boolean",
+      "description": "Whether this is the primary contact for the organization",
+      "example": true
+    },
+    {
+      "name": "contactPurpose",
+      "type": "string",
+      "description": "Purpose of contact (billing, technical, administrative, sales, support, emergency)",
+      "example": "sales"
+    },
+    {
+      "name": "availability",
+      "type": "string",
+      "description": "Availability information or hours",
+      "example": "Monday-Friday, 9AM-5PM EST"
+    },
+    {
+      "name": "preferredContactMethod",
+      "type": "string",
+      "description": "Preferred method of contact (email, phone, sms)",
+      "example": "email"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "OrganizationContact",
+      "givenName": "Jane",
+      "familyName": "Smith",
+      "email": "jane.smith@acme.com",
+      "telephone": "+1-555-0150",
+      "jobTitle": "Sales Manager",
+      "role": "Sales Manager",
+      "department": "Sales",
+      "isPrimary": true,
+      "contactPurpose": "sales",
+      "preferredContactMethod": "email"
+    },
+    {
+      "@type": "OrganizationContact",
+      "givenName": "John",
+      "familyName": "Doe",
+      "email": "john.doe@acme.com",
+      "telephone": "+1-555-0175",
+      "jobTitle": "CFO",
+      "role": "Chief Financial Officer",
+      "department": "Finance",
+      "contactPurpose": "billing",
+      "availability": "Monday-Friday, 9AM-5PM EST"
+    }
+  ]
+}

@@ -1,0 +1,176 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "Identifier",
+  "description": "A unique identifier issued by a specific system for organizations or persons - business IDs, tax numbers, social security numbers, passport numbers, etc. Supports all country-specific identification systems",
+  "properties": [
+    {
+      "name": "system",
+      "type": "string",
+      "description": "Identification system or authority (Organizations: 'SIREN', 'SIRET', 'VAT', 'EIN', 'DUNS', 'LEI' | Persons: 'SSN', 'NIN', 'PASSPORT', 'DRIVERS_LICENSE')",
+      "required": true,
+      "example": "SIREN"
+    },
+    {
+      "name": "value",
+      "type": "string",
+      "description": "The actual identifier value",
+      "required": true,
+      "example": "123456789"
+    },
+    {
+      "name": "type",
+      "type": "string",
+      "description": "Type or category of identifier (e.g., 'tax', 'registration', 'legal', 'financial')",
+      "example": "registration"
+    },
+    {
+      "name": "country",
+      "type": "Country",
+      "description": "Country where this identifier is valid (reference to Country entity)"
+    },
+    {
+      "name": "issuer",
+      "type": "string",
+      "description": "Organization or authority that issued the identifier",
+      "example": "INSEE France"
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "description": "Human-readable label for this identifier",
+      "example": "French Business Registration Number"
+    },
+    {
+      "name": "period",
+      "type": "Period",
+      "description": "Period during which this identifier is valid"
+    },
+    {
+      "name": "use",
+      "type": "string",
+      "description": "Purpose of this identifier (official, temp, secondary)",
+      "example": "official"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "Identifier",
+      "system": "SIREN",
+      "value": "123456789",
+      "type": "registration",
+      "country": {
+        "@type": "Country",
+        "code": "FR",
+        "name": "France"
+      },
+      "issuer": "INSEE France",
+      "label": "French Business Registration Number",
+      "use": "official"
+    },
+    {
+      "@type": "Identifier",
+      "system": "SIRET",
+      "value": "12345678900012",
+      "type": "registration",
+      "country": {
+        "@type": "Country",
+        "code": "FR",
+        "name": "France"
+      },
+      "label": "French Establishment Number"
+    },
+    {
+      "@type": "Identifier",
+      "system": "VAT",
+      "value": "FR12345678901",
+      "type": "tax",
+      "country": {
+        "@type": "Country",
+        "code": "FR",
+        "name": "France"
+      },
+      "label": "EU VAT Number"
+    },
+    {
+      "@type": "Identifier",
+      "system": "EIN",
+      "value": "12-3456789",
+      "type": "tax",
+      "country": {
+        "@type": "Country",
+        "code": "US",
+        "name": "United States of America"
+      },
+      "issuer": "IRS",
+      "label": "US Employer Identification Number"
+    },
+    {
+      "@type": "Identifier",
+      "system": "DUNS",
+      "value": "123456789",
+      "type": "financial",
+      "issuer": "Dun & Bradstreet",
+      "label": "D-U-N-S Number"
+    },
+    {
+      "@type": "Identifier",
+      "system": "LEI",
+      "value": "123456789012ABCDEFGH12",
+      "type": "financial",
+      "label": "Legal Entity Identifier"
+    },
+    {
+      "@type": "Identifier",
+      "system": "SSN",
+      "value": "123-45-6789",
+      "type": "national-id",
+      "country": {
+        "@type": "Country",
+        "code": "US",
+        "name": "United States of America"
+      },
+      "issuer": "Social Security Administration",
+      "label": "US Social Security Number"
+    },
+    {
+      "@type": "Identifier",
+      "system": "PASSPORT",
+      "value": "AB1234567",
+      "type": "travel-document",
+      "country": {
+        "@type": "Country",
+        "code": "FR",
+        "name": "France"
+      },
+      "issuer": "République Française",
+      "label": "French Passport"
+    },
+    {
+      "@type": "Identifier",
+      "system": "DRIVERS_LICENSE",
+      "value": "D1234567",
+      "type": "license",
+      "country": {
+        "@type": "Country",
+        "code": "US",
+        "name": "United States of America"
+      },
+      "issuer": "California DMV",
+      "label": "California Driver's License"
+    },
+    {
+      "@type": "Identifier",
+      "system": "NIN",
+      "value": "AB123456C",
+      "type": "national-id",
+      "country": {
+        "@type": "Country",
+        "code": "GB",
+        "name": "United Kingdom"
+      },
+      "issuer": "HMRC",
+      "label": "UK National Insurance Number"
+    }
+  ]
+}

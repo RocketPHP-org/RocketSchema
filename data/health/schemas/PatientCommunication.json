@@ -1,0 +1,48 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "PatientCommunication",
+  "description": "Language which may be used to communicate with the patient about their health. Based on FHIR R4 Patient.communication element.",
+  "properties": [
+    {
+      "name": "language",
+      "type": "Language",
+      "description": "Language with ISO 639-1 code (e.g., en, fr, es, de)",
+      "required": true
+    },
+    {
+      "name": "preferred",
+      "type": "boolean",
+      "description": "Language preference indicator for healthcare communication",
+      "example": true
+    },
+    {
+      "name": "proficiency",
+      "type": "string",
+      "description": "Level of proficiency (native, fluent, intermediate, basic)",
+      "example": "fluent"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "PatientCommunication",
+      "language": {
+        "@type": "Language",
+        "code": "fr",
+        "name": "French"
+      },
+      "preferred": true,
+      "proficiency": "native"
+    },
+    {
+      "@type": "PatientCommunication",
+      "language": {
+        "@type": "Language",
+        "code": "en",
+        "name": "English"
+      },
+      "preferred": false,
+      "proficiency": "fluent"
+    }
+  ]
+}

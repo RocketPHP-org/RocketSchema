@@ -1,0 +1,118 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "Currency",
+  "description": "Currency reference data with ISO codes and country association",
+  "properties": [
+    {
+      "name": "code",
+      "type": "string",
+      "description": "ISO 4217 three-letter currency code",
+      "required": true,
+      "format": "iso-currency-code",
+      "example": "USD"
+    },
+    {
+      "name": "numericCode",
+      "type": "string",
+      "description": "ISO 4217 numeric currency code",
+      "example": "840"
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "description": "Currency name",
+      "required": true,
+      "example": "United States Dollar"
+    },
+    {
+      "name": "symbol",
+      "type": "string",
+      "description": "Currency symbol",
+      "example": "$"
+    },
+    {
+      "name": "decimalDigits",
+      "type": "number",
+      "description": "Number of decimal places typically used",
+      "example": 2
+    },
+    {
+      "name": "countries",
+      "type": "Country[]",
+      "description": "Countries that use this currency"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "Currency",
+      "code": "USD",
+      "numericCode": "840",
+      "name": "United States Dollar",
+      "symbol": "$",
+      "decimalDigits": 2,
+      "countries": [
+        {
+          "@type": "Country",
+          "code": "US",
+          "name": "United States of America",
+          "demonym": "American"
+        }
+      ]
+    },
+    {
+      "@type": "Currency",
+      "code": "EUR",
+      "numericCode": "978",
+      "name": "Euro",
+      "symbol": "€",
+      "decimalDigits": 2,
+      "countries": [
+        {
+          "@type": "Country",
+          "code": "FR",
+          "name": "France",
+          "demonym": "French"
+        },
+        {
+          "@type": "Country",
+          "code": "DE",
+          "name": "Germany",
+          "demonym": "German"
+        }
+      ]
+    },
+    {
+      "@type": "Currency",
+      "code": "GBP",
+      "numericCode": "826",
+      "name": "British Pound Sterling",
+      "symbol": "£",
+      "decimalDigits": 2,
+      "countries": [
+        {
+          "@type": "Country",
+          "code": "GB",
+          "name": "United Kingdom",
+          "demonym": "British"
+        }
+      ]
+    },
+    {
+      "@type": "Currency",
+      "code": "JPY",
+      "numericCode": "392",
+      "name": "Japanese Yen",
+      "symbol": "¥",
+      "decimalDigits": 0,
+      "countries": [
+        {
+          "@type": "Country",
+          "code": "JP",
+          "name": "Japan",
+          "demonym": "Japanese"
+        }
+      ]
+    }
+  ]
+}

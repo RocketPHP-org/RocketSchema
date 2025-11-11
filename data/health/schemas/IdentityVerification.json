@@ -1,0 +1,132 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "IdentityVerification",
+  "description": "Identity verification status and traits for patient identification. Supports French INS (Identité Nationale de Santé), European eIDAS, and other regional identity verification systems.",
+  "properties": [
+    {
+      "name": "verified",
+      "type": "boolean",
+      "description": "Whether the patient identity has been verified against an authoritative source",
+      "required": true,
+      "example": true
+    },
+    {
+      "name": "verificationMethod",
+      "type": "string",
+      "description": "Method used for verification (INS, eIDAS, national-id, passport, etc.)",
+      "required": true,
+      "example": "INS"
+    },
+    {
+      "name": "verificationDate",
+      "type": "Date",
+      "description": "Date when identity was verified",
+      "example": "2024-11-15"
+    },
+    {
+      "name": "verifiedBy",
+      "type": "Organization",
+      "description": "Organization or authority that verified the identity"
+    },
+    {
+      "name": "identityTraits",
+      "type": "object",
+      "description": "Core identity traits used for verification. For French INS: birthName (nom de naissance), birthGivenNames (prénoms de naissance), birthDate, sex, birthPlace (lieu de naissance - code INSEE)",
+      "required": true
+    },
+    {
+      "name": "nationalIdentifier",
+      "type": "string",
+      "description": "National health identifier. For France: NIR (Numéro d'Inscription au Répertoire) or NIA (Numéro Identifiant d'Attente)",
+      "example": "1 75 08 75 123 456 78"
+    },
+    {
+      "name": "qualificationLevel",
+      "type": "string",
+      "description": "Quality level of identity verification. France: 'identité qualifiée' (qualified), 'identité récupérée' (recovered), 'identité provisoire' (provisional)",
+      "example": "identité qualifiée"
+    },
+    {
+      "name": "eIDASLevel",
+      "type": "string",
+      "description": "European eIDAS assurance level (low, substantial, high) for cross-border authentication",
+      "example": "high"
+    },
+    {
+      "name": "documentType",
+      "type": "string",
+      "description": "Type of identity document used (national-id-card, passport, residence-permit, birth-certificate, carte-vitale)",
+      "example": "carte-vitale"
+    },
+    {
+      "name": "documentNumber",
+      "type": "string",
+      "description": "Document number or reference"
+    },
+    {
+      "name": "issuingAuthority",
+      "type": "string",
+      "description": "Authority that issued the identity document",
+      "example": "République Française"
+    },
+    {
+      "name": "expirationDate",
+      "type": "Date",
+      "description": "Expiration date of identity document or verification",
+      "example": "2030-12-31"
+    },
+    {
+      "name": "metadata",
+      "type": "object",
+      "description": "Additional verification metadata (session ID, operator ID, confidence score, etc.)"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "IdentityVerification",
+      "verified": true,
+      "verificationMethod": "INS",
+      "verificationDate": "2024-11-15",
+      "verifiedBy": {
+        "@type": "Organization",
+        "name": "Agence du Numérique en Santé (ANS)"
+      },
+      "identityTraits": {
+        "birthName": "MARTIN",
+        "birthGivenNames": ["Marie", "Louise"],
+        "birthDate": "1985-03-20",
+        "sex": "F",
+        "birthPlace": "75112",
+        "birthPlaceLabel": "Paris 12e"
+      },
+      "nationalIdentifier": "2 85 03 75 112 123 45",
+      "qualificationLevel": "identité qualifiée",
+      "documentType": "carte-vitale",
+      "documentNumber": "123456789012345",
+      "issuingAuthority": "Assurance Maladie",
+      "metadata": {
+        "insVersion": "2.1",
+        "verificationSession": "VS-2024-001234",
+        "confidenceScore": 0.99
+      }
+    },
+    {
+      "@type": "IdentityVerification",
+      "verified": true,
+      "verificationMethod": "eIDAS",
+      "verificationDate": "2024-11-10",
+      "eIDASLevel": "high",
+      "identityTraits": {
+        "surname": "Schmidt",
+        "givenNames": ["Hans", "Peter"],
+        "birthDate": "1978-06-15",
+        "placeOfBirth": "Berlin, Germany"
+      },
+      "documentType": "national-id-card",
+      "documentNumber": "T220001293",
+      "issuingAuthority": "Federal Republic of Germany",
+      "expirationDate": "2029-06-14"
+    }
+  ]
+}
