@@ -1,4 +1,4 @@
-import { SchemaDefinition } from '@/types/schema';
+import { SchemaDefinition, SchemaProperty } from '@/types/schema';
 import { CategoryMetadata } from '@/types/category';
 import fs from 'fs';
 import path from 'path';
