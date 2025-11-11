@@ -46,5 +46,13 @@
     "tags": ["support", "utilities", "types", "helpers"],
     "icon": "wrench",
     "order": 6
+  },
+  {
+    "name": "health",
+    "label": "Health & Medical",
+    "description": "Healthcare entities - patients, practitioners, medical records, and clinical data",
+    "tags": ["health", "medical", "healthcare", "clinical", "patients"],
+    "icon": "heart-pulse",
+    "order": 7
   }
 ]

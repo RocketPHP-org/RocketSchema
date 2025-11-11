@@ -1,0 +1,82 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "PatientContact",
+  "description": "Contact party for a patient (e.g., guardian, partner, friend, emergency contact). Based on FHIR R4 Patient.contact element.",
+  "properties": [
+    {
+      "name": "relationship",
+      "type": "string[]",
+      "description": "Nature of the relationship (emergency, guardian, partner, family, parent, child, etc.)",
+      "required": true,
+      "example": ["Emergency Contact", "Spouse"]
+    },
+    {
+      "name": "name",
+      "type": "object",
+      "description": "Name of the contact person with givenName and familyName",
+      "required": true
+    },
+    {
+      "name": "telecom",
+      "type": "ContactPoint[]",
+      "description": "Contact details (phone, email, etc.)"
+    },
+    {
+      "name": "address",
+      "type": "PostalAddress",
+      "description": "Address of the contact person"
+    },
+    {
+      "name": "gender",
+      "type": "Gender",
+      "description": "Gender of the contact person"
+    },
+    {
+      "name": "organization",
+      "type": "Organization",
+      "description": "Organization that is associated with the contact (e.g., guardian organization)"
+    },
+    {
+      "name": "period",
+      "type": "object",
+      "description": "Period during which this contact person or organization is valid (start and end dates)"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "PatientContact",
+      "relationship": ["Emergency Contact", "Spouse"],
+      "name": {
+        "givenName": "Michael",
+        "familyName": "Johnson"
+      },
+      "telecom": [
+        {
+          "@type": "ContactPoint",
+          "system": "phone",
+          "value": "+1-555-0123",
+          "use": "mobile"
+        },
+        {
+          "@type": "ContactPoint",
+          "system": "email",
+          "value": "michael.johnson@email.com"
+        }
+      ],
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "456 Maple Avenue",
+        "addressLocality": "Springfield",
+        "addressRegion": "IL",
+        "postalCode": "62701",
+        "addressCountry": "US"
+      },
+      "gender": {
+        "@type": "Gender",
+        "code": "M",
+        "label": "Male"
+      }
+    }
+  ]
+}
