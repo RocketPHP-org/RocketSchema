@@ -1,0 +1,1462 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "Customer",
+  "description": "A person or organization that purchases goods or services from a business. Supports both B2C (individual consumers) and B2B (business customers) with financial tracking, loyalty programs, and segmentation capabilities.",
+  "properties": [
+    {
+      "name": "customerNumber",
+      "type": "string",
+      "mode": "stored",
+      "description": "Unique customer identifier or account number assigned by the business",
+      "required": true,
+      "example": "CUST-2024-00123"
+    },
+    {
+      "name": "customerType",
+      "type": "string",
+      "mode": "enum",
+      "enum": [
+        "individual",
+        "business"
+      ],
+      "description": "Type of customer - 'individual' for B2C (person), 'business' for B2B (organization)",
+      "required": true,
+      "example": "individual"
+    },
+    {
+      "name": "person",
+      "type": "Person",
+      "mode": "stored",
+      "description": "Reference to Person entity for B2C customers (when customerType is 'individual')"
+    },
+    {
+      "name": "organization",
+      "type": "Organization",
+      "mode": "stored",
+      "description": "Reference to Organization entity for B2B customers (when customerType is 'business')"
+    },
+    {
+      "name": "status",
+      "type": "string",
+      "mode": "enum",
+      "enum": [
+        "active",
+        "inactive",
+        "suspended",
+        "pending",
+        "blacklisted"
+      ],
+      "description": "Current customer account status (active, inactive, suspended, pending, blacklisted)",
+      "required": true,
+      "example": "active"
+    },
+    {
+      "name": "registrationDate",
+      "type": "Date",
+      "description": "Date when the customer account was created",
+      "required": true,
+      "example": "2024-01-15",
+      "mode": "stored"
+    },
+    {
+      "name": "lastModifiedDate",
+      "type": "DateTime",
+      "description": "Date and time when the customer record was last modified",
+      "example": "2024-11-10T14:30:00Z",
+      "mode": "stored"
+    },
+    {
+      "name": "isGuest",
+      "type": "boolean",
+      "description": "Whether this is a guest checkout customer (no account registration required for purchase). Found in 30-60% of e-commerce transactions",
+      "example": false,
+      "mode": "stored"
+    },
+    {
+      "name": "guestConvertedAt",
+      "type": "DateTime",
+      "description": "Date and time when a guest customer was converted to a registered customer account",
+      "mode": "stored"
+    },
+    {
+      "name": "firstPurchaseDate",
+      "type": "Date",
+      "description": "Date of the customer's first purchase",
+      "example": "2024-01-20",
+      "mode": "stored"
+    },
+    {
+      "name": "lastPurchaseDate",
+      "type": "Date",
+      "description": "Date of the customer's most recent purchase",
+      "example": "2024-10-15",
+      "mode": "stored"
+    },
+    {
+      "name": "totalOrders",
+      "type": "number",
+      "description": "Total number of orders placed by the customer",
+      "example": 47,
+      "mode": "computed"
+    },
+    {
+      "name": "totalRevenue",
+      "type": "MonetaryAmount",
+      "description": "Total lifetime revenue from this customer",
+      "mode": "computed"
+    },
+    {
+      "name": "averageOrderValue",
+      "type": "MonetaryAmount",
+      "description": "Average value per order",
+      "mode": "computed"
+    },
+    {
+      "name": "billingAddress",
+      "type": "PostalAddress",
+      "description": "Primary billing address for invoices and payments",
+      "mode": "stored"
+    },
+    {
+      "name": "shippingAddresses",
+      "type": "PostalAddress[]",
+      "description": "List of shipping addresses for order delivery",
+      "mode": "stored"
+    },
+    {
+      "name": "telecoms",
+      "type": "ContactPoint[]",
+      "description": "Contact points - phone numbers, emails, etc.",
+      "mode": "stored"
+    },
+    {
+      "name": "preferredLanguage",
+      "type": "Language",
+      "description": "Customer's preferred language for communication",
+      "mode": "stored"
+    },
+    {
+      "name": "preferredCurrency",
+      "type": "Currency",
+      "description": "Customer's preferred currency for pricing and invoices",
+      "mode": "stored"
+    },
+    {
+      "name": "timezone",
+      "type": "string",
+      "description": "Customer's timezone in IANA format (e.g., 'America/New_York', 'Europe/Paris') for scheduling and time-sensitive communications",
+      "example": "America/New_York",
+      "mode": "stored"
+    },
+    {
+      "name": "authentication",
+      "type": "object",
+      "description": "Authentication and security information for customer account access (P0 - Critical for account security)",
+      "properties": {
+        "passwordHash": {
+          "type": "string",
+          "description": "Hashed password (bcrypt, argon2, etc.). NEVER store plain text passwords",
+          "sensitive": true,
+          "mode": "stored"
+        },
+        "passwordLastChanged": {
+          "type": "DateTime",
+          "description": "Timestamp when password was last changed",
+          "mode": "stored"
+        },
+        "resetPasswordToken": {
+          "type": "string",
+          "description": "Temporary token for password reset functionality (SHA256 hash recommended)",
+          "mode": "stored"
+        },
+        "resetPasswordExpiry": {
+          "type": "DateTime",
+          "description": "Expiration timestamp for password reset token",
+          "mode": "stored"
+        },
+        "secureKey": {
+          "type": "string",
+          "description": "Unique security key for additional authentication validation (MD5/SHA1 hash)",
+          "mode": "stored"
+        },
+        "emailConfirmed": {
+          "type": "boolean",
+          "description": "Whether the customer's email address has been verified",
+          "example": true,
+          "mode": "stored"
+        },
+        "emailConfirmedAt": {
+          "type": "DateTime",
+          "description": "Timestamp when email was confirmed",
+          "mode": "stored"
+        },
+        "lastConfirmEmailRequest": {
+          "type": "DateTime",
+          "description": "Timestamp of last email confirmation request (rate limiting)",
+          "mode": "stored"
+        },
+        "phoneConfirmed": {
+          "type": "boolean",
+          "description": "Whether the customer's phone number has been verified",
+          "example": false,
+          "mode": "stored"
+        },
+        "twoFactorEnabled": {
+          "type": "boolean",
+          "description": "Whether two-factor authentication (2FA) is enabled",
+          "example": false,
+          "mode": "stored"
+        },
+        "twoFactorMethod": {
+          "type": "string",
+          "description": "2FA method: 'sms', 'authenticator_app', 'email', 'hardware_token'",
+          "example": "authenticator_app",
+          "mode": "enum",
+          "enum": [
+            "sms",
+            "authenticator_app",
+            "email",
+            "hardware_token"
+          ]
+        },
+        "accountLocked": {
+          "type": "boolean",
+          "description": "Whether account is temporarily locked due to security concerns",
+          "example": false,
+          "mode": "stored"
+        },
+        "accountLockedUntil": {
+          "type": "DateTime",
+          "description": "Timestamp when account lock expires (null if not locked)",
+          "mode": "stored"
+        },
+        "failedLoginAttempts": {
+          "type": "number",
+          "description": "Count of consecutive failed login attempts",
+          "example": 0,
+          "mode": "stored"
+        },
+        "lastFailedLoginAt": {
+          "type": "DateTime",
+          "description": "Timestamp of last failed login attempt",
+          "mode": "stored"
+        },
+        "lastSuccessfulLoginAt": {
+          "type": "DateTime",
+          "description": "Timestamp of last successful login",
+          "mode": "stored"
+        },
+        "loginCount": {
+          "type": "number",
+          "description": "Total number of successful logins",
+          "example": 142,
+          "mode": "stored"
+        }
+      },
+      "mode": "stored"
+    },
+    {
+      "name": "creditLimit",
+      "type": "MonetaryAmount",
+      "description": "Maximum credit allowed for B2B customers (null for B2C or unlimited credit)",
+      "mode": "stored"
+    },
+    {
+      "name": "currentBalance",
+      "type": "MonetaryAmount",
+      "description": "Current outstanding balance owed by the customer",
+      "mode": "stored"
+    },
+    {
+      "name": "paymentTerms",
+      "type": "PaymentTerm",
+      "description": "Default payment terms for B2B customers (Net 30, Net 60, COD, etc.)",
+      "mode": "stored"
+    },
+    {
+      "name": "taxExempt",
+      "type": "boolean",
+      "description": "Whether the customer is exempt from sales tax",
+      "example": false,
+      "mode": "stored"
+    },
+    {
+      "name": "taxExemptionCertificate",
+      "type": "string",
+      "description": "Tax exemption certificate number if applicable",
+      "example": "TAX-EXEMPT-12345",
+      "mode": "stored"
+    },
+    {
+      "name": "loyaltyTier",
+      "type": "string",
+      "description": "Customer loyalty program tier (Bronze, Silver, Gold, Platinum, VIP)",
+      "example": "Gold",
+      "mode": "enum",
+      "enum": [
+        "Bronze",
+        "Silver",
+        "Gold",
+        "Platinum",
+        "VIP"
+      ]
+    },
+    {
+      "name": "loyaltyPoints",
+      "type": "number",
+      "description": "Current loyalty points balance",
+      "example": 2450,
+      "mode": "stored"
+    },
+    {
+      "name": "loyaltyMemberSince",
+      "type": "Date",
+      "description": "Date when customer joined the loyalty program",
+      "example": "2024-01-15",
+      "mode": "stored"
+    },
+    {
+      "name": "customerSegment",
+      "type": "string",
+      "description": "Marketing or business segment classification (VIP, Regular, New, Dormant, At-Risk, High-Value, etc.)",
+      "example": "High-Value",
+      "mode": "enum",
+      "enum": [
+        "VIP",
+        "Regular",
+        "New",
+        "Dormant",
+        "At-Risk",
+        "High-Value",
+        "Enterprise"
+      ]
+    },
+    {
+      "name": "referralCode",
+      "type": "string",
+      "description": "Unique referral code for this customer to share with others",
+      "example": "REF-SMITH-2024",
+      "mode": "stored"
+    },
+    {
+      "name": "referredBy",
+      "type": "Customer",
+      "description": "Reference to the customer who referred this customer",
+      "mode": "stored"
+    },
+    {
+      "name": "marketingConsent",
+      "type": "object",
+      "description": "GDPR-compliant marketing communication consent tracking with timestamps and IP addresses for audit trail (P0 - Critical for GDPR Article 7 compliance)",
+      "properties": {
+        "email": {
+          "granted": "boolean",
+          "grantedAt": "DateTime",
+          "ipAddress": "string",
+          "source": "string",
+          "withdrawnAt": "DateTime",
+          "mode": "stored"
+        },
+        "sms": {
+          "granted": "boolean",
+          "grantedAt": "DateTime",
+          "ipAddress": "string",
+          "source": "string",
+          "withdrawnAt": "DateTime",
+          "mode": "stored"
+        },
+        "phone": {
+          "granted": "boolean",
+          "grantedAt": "DateTime",
+          "ipAddress": "string",
+          "source": "string",
+          "withdrawnAt": "DateTime",
+          "mode": "stored"
+        },
+        "mail": {
+          "granted": "boolean",
+          "grantedAt": "DateTime",
+          "ipAddress": "string",
+          "source": "string",
+          "withdrawnAt": "DateTime",
+          "mode": "stored"
+        },
+        "push": {
+          "granted": "boolean",
+          "grantedAt": "DateTime",
+          "source": "string",
+          "withdrawnAt": "DateTime",
+          "mode": "stored"
+        }
+      },
+      "example": {
+        "email": {
+          "granted": true,
+          "grantedAt": "2024-01-15T10:30:00Z",
+          "ipAddress": "192.168.1.100",
+          "source": "registration_form"
+        },
+        "sms": {
+          "granted": false
+        },
+        "phone": {
+          "granted": false
+        },
+        "mail": {
+          "granted": true,
+          "grantedAt": "2024-01-15T10:30:00Z",
+          "ipAddress": "192.168.1.100",
+          "source": "registration_form"
+        }
+      },
+      "mode": "stored"
+    },
+    {
+      "name": "newsletter",
+      "type": "object",
+      "description": "Newsletter subscription tracking (separate from general marketing consent)",
+      "properties": {
+        "subscribed": "boolean",
+        "subscribedAt": "DateTime",
+        "subscribedIp": "string",
+        "unsubscribedAt": "DateTime",
+        "unsubscribeToken": "string"
+      },
+      "example": {
+        "subscribed": true,
+        "subscribedAt": "2024-01-15T10:30:00Z",
+        "subscribedIp": "192.168.1.100",
+        "unsubscribeToken": "a1b2c3d4e5f6g7h8"
+      },
+      "mode": "stored"
+    },
+    {
+      "name": "gdprConsent",
+      "type": "object",
+      "description": "GDPR data processing consent and rights tracking (P0 - Critical for GDPR compliance)",
+      "properties": {
+        "privacyPolicyVersion": "string",
+        "privacyPolicyAcceptedAt": "DateTime",
+        "privacyPolicyAcceptedIp": "string",
+        "termsOfServiceVersion": "string",
+        "termsOfServiceAcceptedAt": "DateTime",
+        "termsOfServiceAcceptedIp": "string",
+        "dataProcessingConsent": "boolean",
+        "dataProcessingConsentAt": "DateTime",
+        "rightToBeForgottenRequested": "boolean",
+        "rightToBeForgottenRequestedAt": "DateTime",
+        "dataPortabilityRequested": "boolean",
+        "dataPortabilityRequestedAt": "DateTime",
+        "dataRetentionPreference": "string"
+      },
+      "example": {
+        "privacyPolicyVersion": "2.1",
+        "privacyPolicyAcceptedAt": "2024-01-15T10:30:00Z",
+        "privacyPolicyAcceptedIp": "192.168.1.100",
+        "termsOfServiceVersion": "1.5",
+        "termsOfServiceAcceptedAt": "2024-01-15T10:30:00Z",
+        "termsOfServiceAcceptedIp": "192.168.1.100",
+        "dataProcessingConsent": true,
+        "dataProcessingConsentAt": "2024-01-15T10:30:00Z"
+      },
+      "mode": "stored"
+    },
+    {
+      "name": "communicationPreferences",
+      "type": "object",
+      "description": "Preferred communication channels and frequency",
+      "example": {
+        "channel": "email",
+        "frequency": "weekly",
+        "timezone": "America/New_York"
+      },
+      "mode": "stored"
+    },
+    {
+      "name": "salesRepresentative",
+      "type": "Employee",
+      "description": "Assigned sales representative for B2B customers",
+      "mode": "stored"
+    },
+    {
+      "name": "accountManager",
+      "type": "Employee",
+      "description": "Assigned account manager for B2B customers",
+      "mode": "stored"
+    },
+    {
+      "name": "pricingTier",
+      "type": "string",
+      "description": "Pricing tier for special customer pricing (Standard, Volume, Wholesale, Partner)",
+      "example": "Volume",
+      "mode": "enum",
+      "enum": [
+        "Standard",
+        "Volume",
+        "Wholesale",
+        "Partner"
+      ]
+    },
+    {
+      "name": "discountPercentage",
+      "type": "number",
+      "description": "Default discount percentage applied to orders (0-100)",
+      "example": 15,
+      "mode": "stored"
+    },
+    {
+      "name": "annualRevenueTier",
+      "type": "string",
+      "description": "Annual revenue tier for B2B segmentation (0-1M, 1M-10M, 10M-100M, 100M+)",
+      "example": "1M-10M",
+      "mode": "enum",
+      "enum": [
+        "0-1M",
+        "1M-10M",
+        "10M-100M",
+        "100M+"
+      ]
+    },
+    {
+      "name": "notes",
+      "type": "string",
+      "description": "Internal notes about the customer, preferences, or special requirements",
+      "example": "Prefers morning deliveries. Requires invoice by email only.",
+      "mode": "stored"
+    },
+    {
+      "name": "tags",
+      "type": "string[]",
+      "description": "Freeform tags for categorization and filtering",
+      "example": [
+        "wholesale",
+        "priority",
+        "tech-industry"
+      ],
+      "mode": "stored"
+    },
+    {
+      "name": "hierarchy",
+      "type": "object",
+      "description": "Parent-child customer relationships for corporate structures and subsidiaries (P1 - High value for B2B)",
+      "properties": {
+        "parentCustomerId": "string",
+        "parentCustomerName": "string",
+        "childCustomerIds": "string[]",
+        "hierarchyLevel": "number",
+        "commercialEntityId": "string"
+      },
+      "example": {
+        "parentCustomerId": "CUST-2023-00100",
+        "parentCustomerName": "Innovatech Global Corporation",
+        "hierarchyLevel": 2,
+        "commercialEntityId": "CUST-2020-00001"
+      },
+      "mode": "stored"
+    },
+    {
+      "name": "auditTrail",
+      "type": "object",
+      "description": "Audit trail for tracking changes and compliance (P1 - High value for governance)",
+      "properties": {
+        "createdBy": "User",
+        "createdAt": "DateTime",
+        "modifiedBy": "User",
+        "modifiedAt": "DateTime",
+        "deleted": "boolean",
+        "deletedBy": "User",
+        "deletedAt": "DateTime",
+        "deletionReason": "string"
+      },
+      "example": {
+        "createdBy": {
+          "@type": "User",
+          "userId": "admin_001",
+          "name": "System Administrator"
+        },
+        "createdAt": "2024-01-15T10:00:00Z",
+        "modifiedBy": {
+          "@type": "User",
+          "userId": "support_042",
+          "name": "Customer Support Agent"
+        },
+        "modifiedAt": "2024-11-10T14:30:00Z",
+        "deleted": false
+      },
+      "mode": "stored"
+    },
+    {
+      "name": "externalReferences",
+      "type": "object[]",
+      "description": "References to customer records in external systems for integration purposes (P1 - High value for integrations)",
+      "example": [
+        {
+          "system": "Salesforce",
+          "externalId": "0031234567890ABC",
+          "syncedAt": "2024-11-10T10:00:00Z"
+        },
+        {
+          "system": "SAP",
+          "externalId": "1000123",
+          "syncedAt": "2024-11-10T10:05:00Z"
+        }
+      ],
+      "mode": "stored"
+    },
+    {
+      "name": "industryClassification",
+      "type": "object",
+      "description": "Industry classification for B2B segmentation and analytics (P1 - High value for B2B)",
+      "properties": {
+        "naicsCode": "string",
+        "naicsDescription": "string",
+        "sicCode": "string",
+        "sicDescription": "string",
+        "customIndustry": "string"
+      },
+      "example": {
+        "naicsCode": "541511",
+        "naicsDescription": "Custom Computer Programming Services",
+        "sicCode": "7371",
+        "sicDescription": "Computer Programming Services",
+        "customIndustry": "Technology - Software Development"
+      },
+      "mode": "stored"
+    },
+    {
+      "name": "dataQuality",
+      "type": "object",
+      "description": "Data quality metrics and duplicate management (P1 - High value for data governance)",
+      "properties": {
+        "qualityScore": "number",
+        "lastVerifiedAt": "DateTime",
+        "isDuplicate": "boolean",
+        "masterRecordId": "string",
+        "mergedIntoId": "string",
+        "mergedAt": "DateTime"
+      },
+      "example": {
+        "qualityScore": 95,
+        "lastVerifiedAt": "2024-11-01T00:00:00Z",
+        "isDuplicate": false
+      },
+      "mode": "stored"
+    },
+    {
+      "name": "metadata",
+      "type": "object",
+      "description": "Additional metadata for extensibility and custom fields",
+      "mode": "stored"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "Customer",
+      "customerNumber": "CUST-2024-00123",
+      "customerType": "individual",
+      "person": {
+        "@type": "Person",
+        "givenName": "Emily",
+        "middleName": "Rose",
+        "familyName": "Thompson",
+        "gender": {
+          "@type": "Gender",
+          "code": "F",
+          "label": "Female"
+        },
+        "birthDate": "1988-06-15",
+        "telecoms": [
+          {
+            "@type": "ContactPoint",
+            "system": "email",
+            "value": "emily.thompson@email.com",
+            "use": "home",
+            "rank": 1
+          },
+          {
+            "@type": "ContactPoint",
+            "system": "phone",
+            "value": "+1-555-0167",
+            "use": "mobile"
+          }
+        ]
+      },
+      "status": "active",
+      "registrationDate": "2024-01-15",
+      "lastModifiedDate": "2024-11-10T14:30:00Z",
+      "isGuest": false,
+      "firstPurchaseDate": "2024-01-20",
+      "lastPurchaseDate": "2024-10-15",
+      "totalOrders": 47,
+      "totalRevenue": {
+        "@type": "MonetaryAmount",
+        "value": 12450.5,
+        "currency": {
+          "@type": "Currency",
+          "code": "USD",
+          "symbol": "$"
+        }
+      },
+      "averageOrderValue": {
+        "@type": "MonetaryAmount",
+        "value": 264.9,
+        "currency": {
+          "@type": "Currency",
+          "code": "USD",
+          "symbol": "$"
+        }
+      },
+      "billingAddress": {
+        "@type": "PostalAddress",
+        "use": "billing",
+        "label": "Home",
+        "streetAddress": "456 Oak Avenue",
+        "addressLocality": "Portland",
+        "addressRegion": "OR",
+        "postalCode": "97201",
+        "addressCountry": "US"
+      },
+      "shippingAddresses": [
+        {
+          "@type": "PostalAddress",
+          "use": "shipping",
+          "label": "Home",
+          "streetAddress": "456 Oak Avenue",
+          "addressLocality": "Portland",
+          "addressRegion": "OR",
+          "postalCode": "97201",
+          "addressCountry": "US"
+        },
+        {
+          "@type": "PostalAddress",
+          "use": "shipping",
+          "label": "Work",
+          "streetAddress": "789 Business Park Drive",
+          "addressLocality": "Portland",
+          "addressRegion": "OR",
+          "postalCode": "97203",
+          "addressCountry": "US"
+        }
+      ],
+      "telecoms": [
+        {
+          "@type": "ContactPoint",
+          "system": "email",
+          "value": "emily.thompson@email.com",
+          "use": "home",
+          "rank": 1
+        },
+        {
+          "@type": "ContactPoint",
+          "system": "phone",
+          "value": "+1-555-0167",
+          "use": "mobile",
+          "rank": 1
+        }
+      ],
+      "preferredLanguage": {
+        "@type": "Language",
+        "code": "en",
+        "name": "English"
+      },
+      "preferredCurrency": {
+        "@type": "Currency",
+        "code": "USD",
+        "symbol": "$"
+      },
+      "timezone": "America/Los_Angeles",
+      "authentication": {
+        "emailConfirmed": true,
+        "emailConfirmedAt": "2024-01-15T10:35:00Z",
+        "phoneConfirmed": true,
+        "twoFactorEnabled": true,
+        "twoFactorMethod": "authenticator_app",
+        "accountLocked": false,
+        "failedLoginAttempts": 0,
+        "lastSuccessfulLoginAt": "2024-11-10T14:30:00Z",
+        "loginCount": 142
+      },
+      "taxExempt": false,
+      "loyaltyTier": "Gold",
+      "loyaltyPoints": 2450,
+      "loyaltyMemberSince": "2024-01-15",
+      "customerSegment": "High-Value",
+      "referralCode": "REF-EMILY-2024",
+      "marketingConsent": {
+        "email": {
+          "granted": true,
+          "grantedAt": "2024-01-15T10:30:00Z",
+          "ipAddress": "192.168.1.100",
+          "source": "registration_form"
+        },
+        "sms": {
+          "granted": false
+        },
+        "phone": {
+          "granted": false
+        },
+        "mail": {
+          "granted": true,
+          "grantedAt": "2024-01-15T10:30:00Z",
+          "ipAddress": "192.168.1.100",
+          "source": "registration_form"
+        }
+      },
+      "newsletter": {
+        "subscribed": true,
+        "subscribedAt": "2024-01-15T10:30:00Z",
+        "subscribedIp": "192.168.1.100",
+        "unsubscribeToken": "a1b2c3d4e5f6g7h8"
+      },
+      "gdprConsent": {
+        "privacyPolicyVersion": "2.1",
+        "privacyPolicyAcceptedAt": "2024-01-15T10:30:00Z",
+        "privacyPolicyAcceptedIp": "192.168.1.100",
+        "termsOfServiceVersion": "1.5",
+        "termsOfServiceAcceptedAt": "2024-01-15T10:30:00Z",
+        "termsOfServiceAcceptedIp": "192.168.1.100",
+        "dataProcessingConsent": true,
+        "dataProcessingConsentAt": "2024-01-15T10:30:00Z"
+      },
+      "communicationPreferences": {
+        "channel": "email",
+        "frequency": "weekly",
+        "timezone": "America/Los_Angeles"
+      },
+      "pricingTier": "Standard",
+      "discountPercentage": 0,
+      "notes": "Loyal customer. Prefers eco-friendly packaging.",
+      "tags": [
+        "loyal",
+        "eco-conscious",
+        "frequent-buyer"
+      ],
+      "auditTrail": {
+        "createdBy": {
+          "@type": "User",
+          "userId": "system",
+          "name": "System Registration"
+        },
+        "createdAt": "2024-01-15T10:00:00Z",
+        "modifiedBy": {
+          "@type": "User",
+          "userId": "support_042",
+          "name": "Customer Support Agent"
+        },
+        "modifiedAt": "2024-11-10T14:30:00Z",
+        "deleted": false
+      },
+      "dataQuality": {
+        "qualityScore": 95,
+        "lastVerifiedAt": "2024-11-01T00:00:00Z",
+        "isDuplicate": false
+      }
+    },
+    {
+      "@type": "Customer",
+      "customerNumber": "CUST-2024-00789",
+      "customerType": "business",
+      "organization": {
+        "@type": "Organization",
+        "name": "Northwest Tech Solutions",
+        "legalName": "Northwest Tech Solutions Inc.",
+        "status": "active",
+        "identifier": [
+          {
+            "@type": "Identifier",
+            "system": "EIN",
+            "value": "98-7654321",
+            "type": "tax",
+            "country": "US",
+            "label": "US Employer Identification Number"
+          },
+          {
+            "@type": "Identifier",
+            "system": "DUNS",
+            "value": "987654321",
+            "type": "financial",
+            "label": "D-U-N-S Number"
+          }
+        ],
+        "address": [
+          {
+            "@type": "PostalAddress",
+            "use": "headquarters",
+            "label": "Head Office",
+            "streetAddress": "2500 Technology Boulevard",
+            "addressLocality": "Seattle",
+            "addressRegion": "WA",
+            "postalCode": "98101",
+            "addressCountry": "US"
+          }
+        ],
+        "numberOfEmployees": 450,
+        "organizationType": "Corporation"
+      },
+      "status": "active",
+      "registrationDate": "2023-06-10",
+      "lastModifiedDate": "2024-10-20T16:45:00Z",
+      "isGuest": false,
+      "firstPurchaseDate": "2023-06-15",
+      "lastPurchaseDate": "2024-10-20",
+      "totalOrders": 124,
+      "totalRevenue": {
+        "@type": "MonetaryAmount",
+        "value": 487650.0,
+        "currency": {
+          "@type": "Currency",
+          "code": "USD",
+          "symbol": "$"
+        }
+      },
+      "averageOrderValue": {
+        "@type": "MonetaryAmount",
+        "value": 3932.66,
+        "currency": {
+          "@type": "Currency",
+          "code": "USD",
+          "symbol": "$"
+        }
+      },
+      "billingAddress": {
+        "@type": "PostalAddress",
+        "use": "billing",
+        "label": "Accounts Payable",
+        "streetAddress": "2500 Technology Boulevard",
+        "addressLocality": "Seattle",
+        "addressRegion": "WA",
+        "postalCode": "98101",
+        "addressCountry": "US"
+      },
+      "shippingAddresses": [
+        {
+          "@type": "PostalAddress",
+          "use": "shipping",
+          "label": "Main Warehouse",
+          "streetAddress": "2500 Technology Boulevard",
+          "addressLocality": "Seattle",
+          "addressRegion": "WA",
+          "postalCode": "98101",
+          "addressCountry": "US"
+        },
+        {
+          "@type": "PostalAddress",
+          "use": "shipping",
+          "label": "Portland Branch",
+          "streetAddress": "1800 Industrial Way",
+          "addressLocality": "Portland",
+          "addressRegion": "OR",
+          "postalCode": "97209",
+          "addressCountry": "US"
+        }
+      ],
+      "telecoms": [
+        {
+          "@type": "ContactPoint",
+          "system": "email",
+          "value": "procurement@nwtech.com",
+          "use": "work",
+          "rank": 1,
+          "label": "Procurement Department"
+        },
+        {
+          "@type": "ContactPoint",
+          "system": "phone",
+          "value": "+1-206-555-0100",
+          "use": "work",
+          "rank": 1,
+          "label": "Main Office"
+        }
+      ],
+      "preferredLanguage": {
+        "@type": "Language",
+        "code": "en",
+        "name": "English"
+      },
+      "preferredCurrency": {
+        "@type": "Currency",
+        "code": "USD",
+        "symbol": "$"
+      },
+      "timezone": "America/Los_Angeles",
+      "authentication": {
+        "emailConfirmed": true,
+        "emailConfirmedAt": "2023-06-10T15:20:00Z",
+        "phoneConfirmed": true,
+        "twoFactorEnabled": false,
+        "accountLocked": false,
+        "failedLoginAttempts": 0,
+        "lastSuccessfulLoginAt": "2024-10-20T09:15:00Z",
+        "loginCount": 387
+      },
+      "creditLimit": {
+        "@type": "MonetaryAmount",
+        "value": 100000.0,
+        "currency": {
+          "@type": "Currency",
+          "code": "USD",
+          "symbol": "$"
+        }
+      },
+      "currentBalance": {
+        "@type": "MonetaryAmount",
+        "value": 15650.0,
+        "currency": {
+          "@type": "Currency",
+          "code": "USD",
+          "symbol": "$"
+        }
+      },
+      "paymentTerms": {
+        "@type": "PaymentTerm",
+        "code": "NET_30",
+        "label": "Net 30 days",
+        "daysUntilDue": 30
+      },
+      "taxExempt": false,
+      "loyaltyTier": "Platinum",
+      "loyaltyPoints": 48765,
+      "loyaltyMemberSince": "2023-06-10",
+      "customerSegment": "Enterprise",
+      "referralCode": "REF-NWTECH-2023",
+      "marketingConsent": {
+        "email": {
+          "granted": true,
+          "grantedAt": "2023-06-10T15:00:00Z",
+          "ipAddress": "203.0.113.50",
+          "source": "b2b_contract_signup"
+        },
+        "sms": {
+          "granted": false
+        },
+        "phone": {
+          "granted": true,
+          "grantedAt": "2023-06-10T15:00:00Z",
+          "ipAddress": "203.0.113.50",
+          "source": "b2b_contract_signup"
+        },
+        "mail": {
+          "granted": true,
+          "grantedAt": "2023-06-10T15:00:00Z",
+          "ipAddress": "203.0.113.50",
+          "source": "b2b_contract_signup"
+        }
+      },
+      "newsletter": {
+        "subscribed": true,
+        "subscribedAt": "2023-06-10T15:00:00Z",
+        "subscribedIp": "203.0.113.50",
+        "unsubscribeToken": "b2b9876xyz"
+      },
+      "gdprConsent": {
+        "privacyPolicyVersion": "2.0",
+        "privacyPolicyAcceptedAt": "2023-06-10T15:00:00Z",
+        "privacyPolicyAcceptedIp": "203.0.113.50",
+        "termsOfServiceVersion": "1.3",
+        "termsOfServiceAcceptedAt": "2023-06-10T15:00:00Z",
+        "termsOfServiceAcceptedIp": "203.0.113.50",
+        "dataProcessingConsent": true,
+        "dataProcessingConsentAt": "2023-06-10T15:00:00Z"
+      },
+      "communicationPreferences": {
+        "channel": "email",
+        "frequency": "monthly",
+        "timezone": "America/Los_Angeles"
+      },
+      "salesRepresentative": {
+        "@type": "Employee",
+        "givenName": "Michael",
+        "familyName": "Chen",
+        "employeeId": "EMP-2024-0042",
+        "jobTitle": "Senior Sales Executive"
+      },
+      "accountManager": {
+        "@type": "Employee",
+        "givenName": "Sarah",
+        "familyName": "Williams",
+        "employeeId": "EMP-2024-0015",
+        "jobTitle": "Account Manager"
+      },
+      "pricingTier": "Volume",
+      "discountPercentage": 15,
+      "annualRevenueTier": "10M-100M",
+      "notes": "Key account. Quarterly business reviews scheduled. Prefers consolidated monthly invoicing.",
+      "tags": [
+        "enterprise",
+        "tech-industry",
+        "strategic-account",
+        "volume-buyer"
+      ],
+      "industryClassification": {
+        "naicsCode": "541511",
+        "naicsDescription": "Custom Computer Programming Services",
+        "sicCode": "7371",
+        "sicDescription": "Computer Programming Services",
+        "customIndustry": "Technology - Software Development"
+      },
+      "auditTrail": {
+        "createdBy": {
+          "@type": "User",
+          "userId": "sales_028",
+          "name": "Sales Executive"
+        },
+        "createdAt": "2023-06-10T14:00:00Z",
+        "modifiedBy": {
+          "@type": "User",
+          "userId": "account_mgr_015",
+          "name": "Account Manager"
+        },
+        "modifiedAt": "2024-10-20T16:45:00Z",
+        "deleted": false
+      },
+      "externalReferences": [
+        {
+          "system": "Salesforce",
+          "externalId": "0061234567890ABC",
+          "syncedAt": "2024-10-20T10:00:00Z"
+        }
+      ],
+      "dataQuality": {
+        "qualityScore": 98,
+        "lastVerifiedAt": "2024-10-01T00:00:00Z",
+        "isDuplicate": false
+      }
+    },
+    {
+      "@type": "Customer",
+      "customerNumber": "CLIENT-2024-00456",
+      "customerType": "individual",
+      "person": {
+        "@type": "Person",
+        "givenName": "Sophie",
+        "middleName": "Marie",
+        "familyName": "DUBOIS",
+        "gender": {
+          "@type": "Gender",
+          "code": "F",
+          "label": "Femme"
+        },
+        "birthDate": "1992-04-22",
+        "telecoms": [
+          {
+            "@type": "ContactPoint",
+            "system": "email",
+            "value": "sophie.dubois@email.fr",
+            "use": "home",
+            "rank": 1
+          },
+          {
+            "@type": "ContactPoint",
+            "system": "phone",
+            "value": "+33 6 12 34 56 78",
+            "use": "mobile"
+          }
+        ]
+      },
+      "status": "active",
+      "registrationDate": "2024-03-10",
+      "firstPurchaseDate": "2024-03-15",
+      "lastPurchaseDate": "2024-10-25",
+      "totalOrders": 28,
+      "totalRevenue": {
+        "@type": "MonetaryAmount",
+        "value": 3845.8,
+        "currency": {
+          "@type": "Currency",
+          "code": "EUR",
+          "symbol": "€"
+        }
+      },
+      "averageOrderValue": {
+        "@type": "MonetaryAmount",
+        "value": 137.35,
+        "currency": {
+          "@type": "Currency",
+          "code": "EUR",
+          "symbol": "€"
+        }
+      },
+      "billingAddress": {
+        "@type": "PostalAddress",
+        "use": "billing",
+        "label": "Domicile",
+        "streetAddress": "25 Rue de la République",
+        "addressLocality": "Lyon",
+        "addressRegion": "Auvergne-Rhône-Alpes",
+        "postalCode": "69002",
+        "addressCountry": "FR"
+      },
+      "shippingAddresses": [
+        {
+          "@type": "PostalAddress",
+          "use": "shipping",
+          "label": "Domicile",
+          "streetAddress": "25 Rue de la République",
+          "addressLocality": "Lyon",
+          "addressRegion": "Auvergne-Rhône-Alpes",
+          "postalCode": "69002",
+          "addressCountry": "FR"
+        }
+      ],
+      "telecoms": [
+        {
+          "@type": "ContactPoint",
+          "system": "email",
+          "value": "sophie.dubois@email.fr",
+          "use": "home",
+          "rank": 1
+        },
+        {
+          "@type": "ContactPoint",
+          "system": "phone",
+          "value": "+33 6 12 34 56 78",
+          "use": "mobile",
+          "rank": 1
+        }
+      ],
+      "preferredLanguage": {
+        "@type": "Language",
+        "code": "fr",
+        "name": "Français"
+      },
+      "preferredCurrency": {
+        "@type": "Currency",
+        "code": "EUR",
+        "symbol": "€"
+      },
+      "taxExempt": false,
+      "loyaltyTier": "Silver",
+      "loyaltyPoints": 785,
+      "loyaltyMemberSince": "2024-03-10",
+      "customerSegment": "Regular",
+      "referralCode": "REF-SOPHIE-2024",
+      "marketingConsent": {
+        "email": true,
+        "sms": true,
+        "phone": false,
+        "mail": false
+      },
+      "communicationPreferences": {
+        "channel": "email",
+        "frequency": "bi-weekly",
+        "timezone": "Europe/Paris"
+      },
+      "pricingTier": "Standard",
+      "discountPercentage": 0,
+      "notes": "Cliente fidèle. Apprécie les produits bio et locaux.",
+      "tags": [
+        "fidele",
+        "bio",
+        "local"
+      ],
+      "metadata": {
+        "newsletterSubscribed": true,
+        "preferredDeliveryTime": "afternoon",
+        "ecoFriendlyPackaging": true
+      }
+    },
+    {
+      "@type": "Customer",
+      "customerNumber": "CLIENT-2023-01234",
+      "customerType": "business",
+      "organization": {
+        "@type": "Organization",
+        "name": "Innovatech France",
+        "legalName": "Innovatech France SAS",
+        "status": "active",
+        "identifier": [
+          {
+            "@type": "Identifier",
+            "system": "SIREN",
+            "value": "987654321",
+            "type": "registration",
+            "country": "FR",
+            "label": "Numéro SIREN"
+          },
+          {
+            "@type": "Identifier",
+            "system": "SIRET",
+            "value": "98765432100015",
+            "type": "registration",
+            "country": "FR",
+            "label": "Numéro SIRET"
+          },
+          {
+            "@type": "Identifier",
+            "system": "VAT",
+            "value": "FR98987654321",
+            "type": "tax",
+            "country": "FR",
+            "label": "Numéro TVA Intracommunautaire"
+          }
+        ],
+        "address": [
+          {
+            "@type": "PostalAddress",
+            "use": "headquarters",
+            "label": "Siège Social",
+            "streetAddress": "15 Avenue des Champs-Élysées",
+            "addressLocality": "Paris",
+            "postalCode": "75008",
+            "addressCountry": "FR"
+          }
+        ],
+        "numberOfEmployees": 280,
+        "organizationType": "SAS"
+      },
+      "status": "active",
+      "registrationDate": "2023-02-15",
+      "firstPurchaseDate": "2023-03-01",
+      "lastPurchaseDate": "2024-10-18",
+      "totalOrders": 96,
+      "totalRevenue": {
+        "@type": "MonetaryAmount",
+        "value": 285750.0,
+        "currency": {
+          "@type": "Currency",
+          "code": "EUR",
+          "symbol": "€"
+        }
+      },
+      "averageOrderValue": {
+        "@type": "MonetaryAmount",
+        "value": 2976.56,
+        "currency": {
+          "@type": "Currency",
+          "code": "EUR",
+          "symbol": "€"
+        }
+      },
+      "billingAddress": {
+        "@type": "PostalAddress",
+        "use": "billing",
+        "label": "Comptabilité",
+        "streetAddress": "15 Avenue des Champs-Élysées",
+        "addressLocality": "Paris",
+        "postalCode": "75008",
+        "addressCountry": "FR"
+      },
+      "shippingAddresses": [
+        {
+          "@type": "PostalAddress",
+          "use": "shipping",
+          "label": "Siège Social",
+          "streetAddress": "15 Avenue des Champs-Élysées",
+          "addressLocality": "Paris",
+          "postalCode": "75008",
+          "addressCountry": "FR"
+        },
+        {
+          "@type": "PostalAddress",
+          "use": "shipping",
+          "label": "Entrepôt Lyon",
+          "streetAddress": "50 Rue de l'Industrie",
+          "addressLocality": "Lyon",
+          "addressRegion": "Auvergne-Rhône-Alpes",
+          "postalCode": "69100",
+          "addressCountry": "FR"
+        }
+      ],
+      "telecoms": [
+        {
+          "@type": "ContactPoint",
+          "system": "email",
+          "value": "achats@innovatech.fr",
+          "use": "work",
+          "rank": 1,
+          "label": "Service Achats"
+        },
+        {
+          "@type": "ContactPoint",
+          "system": "phone",
+          "value": "+33 1 42 00 00 00",
+          "use": "work",
+          "rank": 1,
+          "label": "Standard"
+        }
+      ],
+      "preferredLanguage": {
+        "@type": "Language",
+        "code": "fr",
+        "name": "Français"
+      },
+      "preferredCurrency": {
+        "@type": "Currency",
+        "code": "EUR",
+        "symbol": "€"
+      },
+      "creditLimit": {
+        "@type": "MonetaryAmount",
+        "value": 75000.0,
+        "currency": {
+          "@type": "Currency",
+          "code": "EUR",
+          "symbol": "€"
+        }
+      },
+      "currentBalance": {
+        "@type": "MonetaryAmount",
+        "value": 8920.0,
+        "currency": {
+          "@type": "Currency",
+          "code": "EUR",
+          "symbol": "€"
+        }
+      },
+      "paymentTerms": {
+        "@type": "PaymentTerm",
+        "code": "NET_60",
+        "label": "Net 60 jours",
+        "daysUntilDue": 60
+      },
+      "taxExempt": false,
+      "loyaltyTier": "Platinum",
+      "loyaltyPoints": 28575,
+      "loyaltyMemberSince": "2023-02-15",
+      "customerSegment": "Compte Stratégique",
+      "referralCode": "REF-INNOVATECH-2023",
+      "marketingConsent": {
+        "email": true,
+        "sms": false,
+        "phone": true,
+        "mail": true
+      },
+      "communicationPreferences": {
+        "channel": "email",
+        "frequency": "monthly",
+        "timezone": "Europe/Paris"
+      },
+      "salesRepresentative": {
+        "@type": "Employee",
+        "givenName": "Pierre",
+        "familyName": "MARTIN",
+        "employeeId": "EMP-2023-0028",
+        "jobTitle": "Responsable Commercial"
+      },
+      "accountManager": {
+        "@type": "Employee",
+        "givenName": "Marie",
+        "familyName": "BERNARD",
+        "employeeId": "EMP-2023-0012",
+        "jobTitle": "Gestionnaire de Compte"
+      },
+      "pricingTier": "Volume",
+      "discountPercentage": 12,
+      "annualRevenueTier": "10M-100M",
+      "notes": "Compte stratégique. Réunions trimestrielles. Préfère la facturation mensuelle consolidée.",
+      "tags": [
+        "entreprise",
+        "tech",
+        "compte-strategique",
+        "volume"
+      ],
+      "metadata": {
+        "contractExpiryDate": "2025-02-28",
+        "annualReviewDate": "2024-12-15",
+        "preferredCarrier": "Chronopost",
+        "billingContact": "comptabilite@innovatech.fr"
+      }
+    }
+  ]
+}

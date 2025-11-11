@@ -1,0 +1,7 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "Payment",
+  "description": "Payment transaction for an order",
+  "properties": []
+}

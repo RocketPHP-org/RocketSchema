@@ -1,0 +1,7 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "Allergy",
+  "description": "Patient allergy or intolerance to substances",
+  "properties": []
+}

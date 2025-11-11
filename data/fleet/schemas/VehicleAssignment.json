@@ -1,0 +1,7 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "VehicleAssignment",
+  "description": "Assignment of a vehicle to a driver or department",
+  "properties": []
+}

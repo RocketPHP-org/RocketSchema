@@ -1,0 +1,7 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "Department",
+  "description": "An organizational unit or division within an organization",
+  "properties": []
+}

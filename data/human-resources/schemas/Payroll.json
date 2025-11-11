@@ -1,0 +1,7 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "Payroll",
+  "description": "Payroll entry or salary payment",
+  "properties": []
+}

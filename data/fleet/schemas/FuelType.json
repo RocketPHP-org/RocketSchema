@@ -1,0 +1,7 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "FuelType",
+  "description": "Type of fuel - gasoline, diesel, electric, hybrid, etc.",
+  "properties": []
+}

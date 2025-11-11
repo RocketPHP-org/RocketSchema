@@ -1,0 +1,7 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "CarePlan",
+  "description": "Treatment plan or care plan for a patient",
+  "properties": []
+}

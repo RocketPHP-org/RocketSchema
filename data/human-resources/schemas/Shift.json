@@ -1,0 +1,7 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "Shift",
+  "description": "Work shift schedule for employees",
+  "properties": []
+}

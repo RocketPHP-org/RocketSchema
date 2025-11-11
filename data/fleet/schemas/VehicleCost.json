@@ -1,0 +1,7 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "VehicleCost",
+  "description": "Vehicle-related costs and expenses tracking",
+  "properties": []
+}

@@ -1,0 +1,7 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "ProductAttribute",
+  "description": "Product variations and attributes - color, size, material, etc.",
+  "properties": []
+}

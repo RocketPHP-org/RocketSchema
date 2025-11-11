@@ -1,0 +1,7 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "Procedure",
+  "description": "Medical procedure or intervention performed on a patient",
+  "properties": []
+}

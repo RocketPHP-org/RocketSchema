@@ -1,0 +1,7 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "MaintenanceType",
+  "description": "Type of maintenance - oil change, tire rotation, inspection, etc.",
+  "properties": []
+}

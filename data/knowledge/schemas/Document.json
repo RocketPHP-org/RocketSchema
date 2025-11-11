@@ -1,0 +1,7 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "Document",
+  "description": "A document or file in the knowledge base",
+  "properties": []
+}

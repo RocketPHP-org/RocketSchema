@@ -1,0 +1,7 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "Diagnosis",
+  "description": "Medical diagnosis or condition identified for a patient",
+  "properties": []
+}

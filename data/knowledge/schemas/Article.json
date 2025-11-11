@@ -1,0 +1,7 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "Article",
+  "description": "Knowledge base article or help documentation",
+  "properties": []
+}

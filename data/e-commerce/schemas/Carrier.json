@@ -1,0 +1,7 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "Carrier",
+  "description": "Shipping carrier or delivery service provider",
+  "properties": []
+}

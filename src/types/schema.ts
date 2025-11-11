@@ -15,10 +15,12 @@ export interface BaseSchema {
 export interface SchemaProperty {
   name: string;
   type: string | string[];
+  mode?: 'stored' | 'computed' | 'enum'; // How the property is managed
   description: string;
   required?: boolean;
   format?: string;
   example?: any;
+  enum?: string[]; // Possible values when mode is 'enum'
   source?: string; // Which schema this property comes from (for inheritance)
 }
 

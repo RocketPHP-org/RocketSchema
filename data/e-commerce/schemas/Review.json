@@ -1,0 +1,7 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "Review",
+  "description": "Customer product review and rating",
+  "properties": []
+}

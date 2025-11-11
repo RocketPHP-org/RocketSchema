@@ -1,0 +1,7 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "Maintenance",
+  "description": "Vehicle maintenance record or service log",
+  "properties": []
+}

@@ -1,0 +1,7 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "JobPosition",
+  "description": "A job position or role within an organization",
+  "properties": []
+}

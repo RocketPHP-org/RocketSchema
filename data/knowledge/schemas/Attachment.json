@@ -1,0 +1,7 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "Attachment",
+  "description": "File attachment linked to documents or records",
+  "properties": []
+}

@@ -1,0 +1,7 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "LabTest",
+  "description": "Laboratory test or diagnostic examination",
+  "properties": []
+}

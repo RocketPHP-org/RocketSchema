@@ -1,0 +1,7 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "Training",
+  "description": "Training program or event for employee development",
+  "properties": []
+}

@@ -1,0 +1,7 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "Vehicle",
+  "description": "A vehicle in the fleet - car, truck, van, etc.",
+  "properties": []
+}

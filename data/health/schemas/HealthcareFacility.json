@@ -1,0 +1,7 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "HealthcareFacility",
+  "description": "Healthcare facility - hospital, clinic, medical center, etc.",
+  "properties": []
+}

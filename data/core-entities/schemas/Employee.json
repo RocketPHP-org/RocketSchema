@@ -1,0 +1,7 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "Employee",
+  "description": "A person employed by an organization - extends Person with employment-related information",
+  "properties": []
+}

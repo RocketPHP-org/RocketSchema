@@ -1,0 +1,7 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "Wishlist",
+  "description": "Customer wishlist of desired products",
+  "properties": []
+}

@@ -1,0 +1,7 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "VehicleCategory",
+  "description": "Category or type of vehicle - sedan, truck, SUV, etc.",
+  "properties": []
+}

@@ -1,0 +1,7 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "Product",
+  "description": "A product available for sale - physical goods, digital products, or services",
+  "properties": []
+}

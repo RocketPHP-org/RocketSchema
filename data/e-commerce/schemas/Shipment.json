@@ -1,0 +1,7 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "Shipment",
+  "description": "Delivery and shipping information for an order",
+  "properties": []
+}

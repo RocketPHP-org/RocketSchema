@@ -1,0 +1,7 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "Insurance",
+  "description": "Health insurance coverage information",
+  "properties": []
+}

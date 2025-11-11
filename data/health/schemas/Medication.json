@@ -1,0 +1,7 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "Medication",
+  "description": "A pharmaceutical drug or medication",
+  "properties": []
+}

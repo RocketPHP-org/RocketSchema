@@ -1,0 +1,7 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "Inventory",
+  "description": "Stock levels and inventory tracking for products",
+  "properties": []
+}

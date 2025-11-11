@@ -1,0 +1,7 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "Observation",
+  "description": "Clinical observations and measurements - vital signs, lab results, etc.",
+  "properties": []
+}

@@ -1,0 +1,7 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "JobApplication",
+  "description": "Job application submitted by a candidate",
+  "properties": []
+}

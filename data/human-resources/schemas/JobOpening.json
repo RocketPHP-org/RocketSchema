@@ -1,0 +1,7 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "JobOpening",
+  "description": "Available job opening for recruitment",
+  "properties": []
+}

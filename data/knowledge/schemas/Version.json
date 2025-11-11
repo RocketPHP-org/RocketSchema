@@ -1,0 +1,7 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "Version",
+  "description": "Document version history tracking",
+  "properties": []
+}

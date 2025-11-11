@@ -1,0 +1,7 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "DocumentCategory",
+  "description": "Category or classification for organizing documents",
+  "properties": []
+}

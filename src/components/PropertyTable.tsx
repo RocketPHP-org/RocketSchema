@@ -77,6 +77,7 @@ export default function PropertyTable({ properties }: PropertyTableProps) {
         <TableRow>
           <TableHead className="w-[200px]">Property</TableHead>
           <TableHead className="w-[250px]">Type</TableHead>
+          <TableHead className="w-[100px]">Mode</TableHead>
           <TableHead>Description</TableHead>
           <TableHead className="w-[120px]">Required</TableHead>
           {hasInheritance && <TableHead className="w-[150px]">Source</TableHead>}
@@ -92,8 +93,30 @@ export default function PropertyTable({ properties }: PropertyTableProps) {
               {renderType(property.type)}
             </TableCell>
             <TableCell>
+              {property.mode && (
+                <Badge
+                  variant={
+                    property.mode === 'computed' ? 'default' :
+                    property.mode === 'enum' ? 'outline' :
+                    'secondary'
+                  }
+                  className="font-mono text-xs"
+                >
+                  {property.mode}
+                </Badge>
+              )}
+            </TableCell>
+            <TableCell>
               <div className="space-y-1">
                 <p className="text-sm">{property.description}</p>
+                {property.enum && (
+                  <p className="text-xs text-muted-foreground">
+                    Values:{' '}
+                    <code className="bg-muted px-1.5 py-0.5 rounded font-mono">
+                      {property.enum.join(', ')}
+                    </code>
+                  </p>
+                )}
                 {property.example && (
                   <p className="text-xs text-muted-foreground">
                     Example:{' '}

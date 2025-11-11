@@ -1,0 +1,7 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "OrderItem",
+  "description": "Individual line item within an order",
+  "properties": []
+}

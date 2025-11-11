@@ -1,0 +1,7 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "Folder",
+  "description": "Folder for organizing documents hierarchically",
+  "properties": []
+}

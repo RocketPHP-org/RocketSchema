@@ -1,0 +1,7 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "Supplier",
+  "description": "Vendor or supplier providing products",
+  "properties": []
+}

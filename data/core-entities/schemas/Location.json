@@ -1,0 +1,7 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "Location",
+  "description": "A physical location or facility - office, warehouse, store, building, room, etc.",
+  "properties": []
+}

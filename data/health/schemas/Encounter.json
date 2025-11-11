@@ -1,0 +1,7 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "Encounter",
+  "description": "A clinical encounter or visit between a patient and healthcare provider",
+  "properties": []
+}

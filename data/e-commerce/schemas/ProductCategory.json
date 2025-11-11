@@ -1,0 +1,7 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "ProductCategory",
+  "description": "A category or classification for organizing products hierarchically",
+  "properties": []
+}

@@ -1,0 +1,7 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "LeaveType",
+  "description": "Type of leave - vacation, sick, maternity, etc.",
+  "properties": []
+}

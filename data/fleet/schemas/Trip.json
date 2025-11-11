@@ -1,0 +1,7 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "Trip",
+  "description": "Vehicle trip or journey record",
+  "properties": []
+}

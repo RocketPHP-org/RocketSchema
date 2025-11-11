@@ -1,0 +1,7 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "VehicleInsurance",
+  "description": "Vehicle insurance policy information",
+  "properties": []
+}
