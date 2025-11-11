@@ -1,4 +1,7 @@
+'use client';
+
 import { SchemaDefinition } from '@/types/schema';
+import { useTranslations, useLocale } from 'next-intl';
 import Link from 'next/link';
 import { Card, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -9,8 +12,11 @@ interface SchemaCardProps {
 }
 
 export default function SchemaCard({ schema }: SchemaCardProps) {
+  const t = useTranslations('schema');
+  const locale = useLocale();
+
   return (
-    <Link href={`/schemas/${schema.name}`} className="block transition-transform hover:scale-105">
+    <Link href={`/${locale}/schemas/${schema.name}`} className="block transition-transform hover:scale-105">
       <Card className="h-full hover:shadow-lg transition-shadow bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
         <CardHeader>
           <CardTitle className="text-xl">{schema.name}</CardTitle>
@@ -18,10 +24,10 @@ export default function SchemaCard({ schema }: SchemaCardProps) {
         </CardHeader>
         <CardFooter className="flex items-center justify-between">
           <Badge variant="secondary">
-            {schema.properties.length} properties
+            {t('propertiesCount', { count: schema.properties.length })}
           </Badge>
           <div className="flex items-center gap-1 text-sm font-medium text-primary">
-            View details
+            {t('viewDetails')}
             <ArrowRight className="h-4 w-4" />
           </div>
         </CardFooter>

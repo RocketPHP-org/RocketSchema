@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { useTranslations } from 'next-intl';
 import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
 
@@ -10,6 +11,7 @@ interface SchemaSearchProps {
 }
 
 export function SchemaSearch({ value, onChange }: SchemaSearchProps) {
+  const t = useTranslations('home.search');
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -23,7 +25,7 @@ export function SchemaSearch({ value, onChange }: SchemaSearchProps) {
       <Input
         ref={inputRef}
         type="text"
-        placeholder="Search schemas by name, description, or properties..."
+        placeholder={t('placeholder')}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         className="h-14 pl-12 text-lg rounded-full shadow-lg border-2 focus-visible:ring-2 focus-visible:ring-primary"

@@ -27,14 +27,30 @@
   },
   "schema": {
     "properties": "Properties",
+    "propertiesCount": "{count} properties",
+    "totalProperties": "{count} properties",
     "examples": "Examples",
+    "exampleNumber": "Example {number}",
     "extends": "Extends",
+    "extendsLabel": "Extends: {parent}",
     "inheritedFrom": "Inherited from {source}",
+    "includesInherited": "Includes inherited properties from {parent}",
     "required": "Required",
+    "optional": "Optional",
     "description": "Description",
     "type": "Type",
+    "property": "Property",
+    "source": "Source",
+    "own": "Own",
     "example": "Example",
+    "exampleLabel": "Example:",
     "format": "Format",
-    "backToHome": "Back to Home"
+    "back": "Back",
+    "backToHome": "Back to Home",
+    "viewDetails": "View details"
+  },
+  "search": {
+    "noResults": "No schemas found for \"{query}\"",
+    "tryDifferent": "Try a different search term"
   }
 }

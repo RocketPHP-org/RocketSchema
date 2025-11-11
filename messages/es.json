@@ -27,14 +27,30 @@
   },
   "schema": {
     "properties": "Propiedades",
+    "propertiesCount": "{count} propiedades",
+    "totalProperties": "{count} propiedades",
     "examples": "Ejemplos",
+    "exampleNumber": "Ejemplo {number}",
     "extends": "Extiende",
+    "extendsLabel": "Extiende: {parent}",
     "inheritedFrom": "Heredado de {source}",
+    "includesInherited": "Incluye propiedades heredadas de {parent}",
     "required": "Requerido",
+    "optional": "Opcional",
     "description": "Descripción",
     "type": "Tipo",
+    "property": "Propiedad",
+    "source": "Fuente",
+    "own": "Propio",
     "example": "Ejemplo",
+    "exampleLabel": "Ejemplo:",
     "format": "Formato",
-    "backToHome": "Volver al inicio"
+    "back": "Volver",
+    "backToHome": "Volver al inicio",
+    "viewDetails": "Ver detalles"
+  },
+  "search": {
+    "noResults": "No se encontraron esquemas para \"{query}\"",
+    "tryDifferent": "Prueba con otro término de búsqueda"
   }
 }

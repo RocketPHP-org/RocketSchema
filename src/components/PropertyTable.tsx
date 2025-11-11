@@ -1,4 +1,7 @@
+'use client';
+
 import { SchemaProperty } from '@/types/schema';
+import { useTranslations } from 'next-intl';
 import {
   Table,
   TableBody,
@@ -9,10 +12,11 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
-import { getAllSchemaNames } from '@/lib/schemas';
+import { useLocale } from 'next-intl';
 
 interface PropertyTableProps {
   properties: SchemaProperty[];
+  allSchemaNames: string[];
 }
 
 // Helper function to check if a type is a schema reference
@@ -22,8 +26,7 @@ function isSchemaType(type: string): boolean {
 }
 
 // Helper function to render type with links
-function renderType(type: string | string[]) {
-  const allSchemas = getAllSchemaNames();
+function renderType(type: string | string[], allSchemas: string[], locale: string) {
 
   if (Array.isArray(type)) {
     return type.map((t, index) => {
@@ -36,7 +39,7 @@ function renderType(type: string | string[]) {
           {index > 0 && ' | '}
           {isSchema ? (
             <Link
-              href={`/schemas/${cleanType}`}
+              href={`/${locale}/schemas/${cleanType}`}
               className="hover:underline text-primary font-semibold"
             >
               {t}
@@ -56,7 +59,7 @@ function renderType(type: string | string[]) {
   if (isSchema) {
     return (
       <Link
-        href={`/schemas/${cleanType}`}
+        href={`/${locale}/schemas/${cleanType}`}
         className="hover:underline text-primary font-semibold"
       >
         {type}
@@ -67,7 +70,9 @@ function renderType(type: string | string[]) {
   return <span>{type}</span>;
 }
 
-export default function PropertyTable({ properties }: PropertyTableProps) {
+export default function PropertyTable({ properties, allSchemaNames }: PropertyTableProps) {
+  const t = useTranslations('schema');
+  const locale = useLocale();
   // Check if any property has a source (inheritance)
   const hasInheritance = properties.some(prop => prop.source);
 
@@ -75,11 +80,11 @@ export default function PropertyTable({ properties }: PropertyTableProps) {
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead className="w-[200px]">Property</TableHead>
-          <TableHead className="w-[250px]">Type</TableHead>
-          <TableHead>Description</TableHead>
-          <TableHead className="w-[120px]">Required</TableHead>
-          {hasInheritance && <TableHead className="w-[150px]">Source</TableHead>}
+          <TableHead className="w-[200px]">{t('property')}</TableHead>
+          <TableHead className="w-[250px]">{t('type')}</TableHead>
+          <TableHead>{t('description')}</TableHead>
+          <TableHead className="w-[120px]">{t('required')}</TableHead>
+          {hasInheritance && <TableHead className="w-[150px]">{t('source')}</TableHead>}
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -89,14 +94,14 @@ export default function PropertyTable({ properties }: PropertyTableProps) {
               {property.name}
             </TableCell>
             <TableCell className="font-mono text-sm">
-              {renderType(property.type)}
+              {renderType(property.type, allSchemaNames, locale)}
             </TableCell>
             <TableCell>
               <div className="space-y-1">
                 <p className="text-sm">{property.description}</p>
                 {property.example && (
                   <p className="text-xs text-muted-foreground">
-                    Example:{' '}
+                    {t('exampleLabel')}{' '}
                     <code className="bg-muted px-1.5 py-0.5 rounded font-mono">
                       {JSON.stringify(property.example)}
                     </code>
@@ -106,13 +111,13 @@ export default function PropertyTable({ properties }: PropertyTableProps) {
             </TableCell>
             <TableCell>
               <Badge variant={property.required ? "destructive" : "secondary"}>
-                {property.required ? 'Required' : 'Optional'}
+                {property.required ? t('required') : t('optional')}
               </Badge>
             </TableCell>
             {hasInheritance && (
               <TableCell>
                 <Badge variant="outline" className="font-mono text-xs">
-                  {property.source || 'Own'}
+                  {property.source || t('own')}
                 </Badge>
               </TableCell>
             )}
