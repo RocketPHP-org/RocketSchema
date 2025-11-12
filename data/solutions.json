@@ -108,9 +108,13 @@
       "reference-data",
       "core-entities",
       "transverse",
-      "health",
-      "financial",
-      "tax"
+      "patient-management",
+      "clinical-care",
+      "medical-providers",
+      "pharmacy",
+      "medical-records",
+      "healthcare-admin",
+      "financial"
     ],
     "features": [
       "Patient Records",

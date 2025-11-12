@@ -124,18 +124,85 @@
     "order": 9
   },
   {
-    "name": "health",
-    "label": "Health & Medical",
-    "description": "Healthcare entities - patients, practitioners, medical records, and clinical data",
+    "name": "patient-management",
+    "label": "Patient Management",
+    "description": "Patient demographics, contacts, identity verification, and patient relationship management",
     "tags": [
-      "health",
-      "medical",
-      "healthcare",
-      "clinical",
-      "patients"
+      "patient",
+      "demographics",
+      "identity",
+      "contacts"
     ],
-    "icon": "heart-pulse",
+    "icon": "user-round",
     "order": 10
+  },
+  {
+    "name": "clinical-care",
+    "label": "Clinical Care",
+    "description": "Care plans, clinical encounters, observations, procedures, and diagnosis",
+    "tags": [
+      "clinical",
+      "care",
+      "diagnosis",
+      "procedures",
+      "encounters"
+    ],
+    "icon": "stethoscope",
+    "order": 11
+  },
+  {
+    "name": "medical-providers",
+    "label": "Medical Providers",
+    "description": "Healthcare practitioners and facilities providing medical services",
+    "tags": [
+      "practitioners",
+      "providers",
+      "facilities",
+      "hospitals",
+      "clinics"
+    ],
+    "icon": "hospital",
+    "order": 12
+  },
+  {
+    "name": "pharmacy",
+    "label": "Pharmacy",
+    "description": "Medication management and prescription tracking",
+    "tags": [
+      "pharmacy",
+      "medication",
+      "prescriptions",
+      "drugs"
+    ],
+    "icon": "pill",
+    "order": 13
+  },
+  {
+    "name": "medical-records",
+    "label": "Medical Records",
+    "description": "Electronic health records, allergies, immunizations, and lab test results",
+    "tags": [
+      "ehr",
+      "medical-records",
+      "allergies",
+      "immunizations",
+      "lab-tests"
+    ],
+    "icon": "file-text",
+    "order": 14
+  },
+  {
+    "name": "healthcare-admin",
+    "label": "Healthcare Administration",
+    "description": "Appointment scheduling, insurance, and healthcare administrative functions",
+    "tags": [
+      "admin",
+      "appointments",
+      "insurance",
+      "scheduling"
+    ],
+    "icon": "calendar-check",
+    "order": 15
   },
   {
     "name": "fleet",
@@ -148,7 +215,7 @@
       "logistics"
     ],
     "icon": "truck",
-    "order": 11
+    "order": 16
   },
   {
     "name": "knowledge",
@@ -161,6 +228,6 @@
       "content"
     ],
     "icon": "book-open",
-    "order": 12
+    "order": 17
   }
 ]
