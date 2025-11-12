@@ -1,0 +1,72 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "TaxWithholding",
+  "description": "Withholding tax configuration for payments to vendors, contractors, and non-residents. Defines withholding rates, types, and thresholds.",
+  "properties": [
+    {
+      "name": "tax",
+      "type": "Tax",
+      "mode": "stored",
+      "description": "Reference to the base Tax entity",
+      "required": true
+    },
+    {
+      "name": "withholdingType",
+      "type": "string",
+      "mode": "enum",
+      "enum": [
+        "dividends",
+        "interest",
+        "royalties",
+        "professional_services",
+        "technical_services",
+        "management_fees",
+        "consulting_fees",
+        "rent",
+        "commissions",
+        "contractor_payments",
+        "non_resident_services"
+      ],
+      "description": "Type of payment subject to withholding",
+      "required": true,
+      "example": "professional_services"
+    },
+    {
+      "name": "withholdingRate",
+      "type": "number",
+      "mode": "stored",
+      "description": "Withholding tax rate as percentage",
+      "required": true,
+      "example": 15
+    },
+    {
+      "name": "thresholdAmount",
+      "type": "MonetaryAmount",
+      "mode": "stored",
+      "description": "Minimum payment amount for withholding to apply"
+    },
+    {
+      "name": "isResident",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this applies to resident or non-resident recipients",
+      "example": false
+    },
+    {
+      "name": "treatyCountry",
+      "type": "string",
+      "mode": "stored",
+      "description": "Country code if reduced rate applies due to tax treaty",
+      "example": "US"
+    },
+    {
+      "name": "treatyRate",
+      "type": "number",
+      "mode": "stored",
+      "description": "Reduced withholding rate under tax treaty",
+      "example": 10
+    }
+  ],
+  "examples": []
+}

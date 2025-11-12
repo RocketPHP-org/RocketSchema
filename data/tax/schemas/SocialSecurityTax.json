@@ -1,0 +1,61 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "SocialSecurityTax",
+  "description": "Social security and payroll tax configuration. Defines employer and employee contribution rates, wage bases, and caps.",
+  "properties": [
+    {
+      "name": "tax",
+      "type": "Tax",
+      "mode": "stored",
+      "description": "Reference to the base Tax entity",
+      "required": true
+    },
+    {
+      "name": "socialSecurityType",
+      "type": "string",
+      "mode": "enum",
+      "enum": [
+        "old_age_pension",
+        "disability_insurance",
+        "health_insurance",
+        "unemployment_insurance",
+        "workers_compensation",
+        "family_benefits",
+        "general"
+      ],
+      "description": "Type of social security contribution",
+      "required": true,
+      "example": "old_age_pension"
+    },
+    {
+      "name": "employerRate",
+      "type": "number",
+      "mode": "stored",
+      "description": "Employer contribution rate as percentage",
+      "required": true,
+      "example": 6.2
+    },
+    {
+      "name": "employeeRate",
+      "type": "number",
+      "mode": "stored",
+      "description": "Employee contribution rate as percentage",
+      "required": true,
+      "example": 6.2
+    },
+    {
+      "name": "annualWageBase",
+      "type": "MonetaryAmount",
+      "mode": "stored",
+      "description": "Maximum annual wages subject to this tax (cap)"
+    },
+    {
+      "name": "taxCapPerEmployee",
+      "type": "MonetaryAmount",
+      "mode": "computed",
+      "description": "Maximum tax amount per employee (computed from annualWageBase * rate)"
+    }
+  ],
+  "examples": []
+}

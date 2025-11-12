@@ -1,0 +1,187 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "Tax",
+  "description": "Core tax definition entity. Represents a tax type with its basic configuration (rate, type, jurisdiction). Base entity for tax management system.",
+  "properties": [
+    {
+      "name": "code",
+      "type": "string",
+      "mode": "stored",
+      "description": "Unique tax code identifier",
+      "required": true,
+      "example": "VAT-STD-20"
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "mode": "stored",
+      "description": "Display name of the tax",
+      "required": true,
+      "example": "VAT Standard Rate"
+    },
+    {
+      "name": "description",
+      "type": "string",
+      "mode": "stored",
+      "description": "Detailed description of the tax and when it applies",
+      "example": "Standard VAT rate applicable to most goods and services"
+    },
+    {
+      "name": "taxType",
+      "type": "string",
+      "mode": "enum",
+      "enum": [
+        "vat",
+        "sales_tax",
+        "gst",
+        "pst",
+        "hst",
+        "use_tax",
+        "withholding",
+        "excise",
+        "customs",
+        "service_tax",
+        "luxury_tax",
+        "import_duty",
+        "export_duty",
+        "carbon_tax",
+        "environmental_tax",
+        "digital_services_tax",
+        "financial_transaction_tax",
+        "stamp_duty",
+        "tourism_tax",
+        "hotel_tax",
+        "gambling_tax",
+        "payroll_tax",
+        "social_security_tax",
+        "property_tax",
+        "zakat",
+        "other"
+      ],
+      "description": "Category of tax",
+      "required": true,
+      "example": "vat"
+    },
+    {
+      "name": "rate",
+      "type": "number",
+      "mode": "stored",
+      "description": "Tax rate as percentage (e.g., 20 for 20%)",
+      "required": true,
+      "example": 20
+    },
+    {
+      "name": "calculationMethod",
+      "type": "string",
+      "mode": "enum",
+      "enum": [
+        "percentage",
+        "percentage_tax_included",
+        "fixed_amount",
+        "tiered",
+        "progressive",
+        "compound"
+      ],
+      "description": "Method used to calculate the tax",
+      "required": true,
+      "example": "percentage"
+    },
+    {
+      "name": "jurisdiction",
+      "type": "string",
+      "mode": "stored",
+      "description": "Tax jurisdiction code (ISO country code, state, province, city)",
+      "required": true,
+      "example": "FR"
+    },
+    {
+      "name": "jurisdictionLevel",
+      "type": "string",
+      "mode": "enum",
+      "enum": [
+        "federal",
+        "country",
+        "state",
+        "province",
+        "city",
+        "district",
+        "postal_code"
+      ],
+      "description": "Level of the tax jurisdiction",
+      "example": "country"
+    },
+    {
+      "name": "isActive",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this tax is currently active",
+      "example": true
+    },
+    {
+      "name": "effectiveFrom",
+      "type": "Date",
+      "mode": "stored",
+      "description": "Date from which this tax rate is effective",
+      "required": true,
+      "example": "2024-01-01"
+    },
+    {
+      "name": "effectiveUntil",
+      "type": "Date",
+      "mode": "stored",
+      "description": "Date until which this tax rate is valid (null if indefinite)",
+      "example": "2024-12-31"
+    },
+    {
+      "name": "displayOrder",
+      "type": "number",
+      "mode": "stored",
+      "description": "Order in which to display this tax on documents",
+      "example": 1
+    }
+  ],
+  "examples": [
+    {
+      "@type": "Tax",
+      "code": "VAT-STD-20",
+      "name": "VAT Standard Rate",
+      "description": "Standard VAT rate in France",
+      "taxType": "vat",
+      "rate": 20,
+      "calculationMethod": "percentage",
+      "jurisdiction": "FR",
+      "jurisdictionLevel": "country",
+      "isActive": true,
+      "effectiveFrom": "2014-01-01",
+      "displayOrder": 1
+    },
+    {
+      "@type": "Tax",
+      "code": "NY-SALES-8.875",
+      "name": "New York Sales Tax",
+      "taxType": "sales_tax",
+      "rate": 8.875,
+      "calculationMethod": "percentage",
+      "jurisdiction": "NY",
+      "jurisdictionLevel": "state",
+      "isActive": true,
+      "effectiveFrom": "2024-01-01",
+      "displayOrder": 1
+    },
+    {
+      "@type": "Tax",
+      "code": "DZ-TVA-19",
+      "name": "TVA Algérie",
+      "description": "Taxe sur la Valeur Ajoutée en Algérie",
+      "taxType": "vat",
+      "rate": 19,
+      "calculationMethod": "percentage",
+      "jurisdiction": "DZ",
+      "jurisdictionLevel": "country",
+      "isActive": true,
+      "effectiveFrom": "2024-01-01",
+      "displayOrder": 1
+    }
+  ]
+}

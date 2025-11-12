@@ -1,0 +1,105 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "TaxRule",
+  "description": "Tax application rules defining when and how a tax applies. Specifies conditions for tax applicability based on products, services, customer types, amounts, and locations.",
+  "properties": [
+    {
+      "name": "tax",
+      "type": "Tax",
+      "mode": "stored",
+      "description": "Reference to the Tax entity",
+      "required": true
+    },
+    {
+      "name": "priority",
+      "type": "number",
+      "mode": "stored",
+      "description": "Priority order for tax rule evaluation (lower number = higher priority)",
+      "example": 1
+    },
+    {
+      "name": "taxScope",
+      "type": "string",
+      "mode": "enum",
+      "enum": [
+        "goods",
+        "services",
+        "digital_goods",
+        "digital_services",
+        "shipping",
+        "handling",
+        "all"
+      ],
+      "description": "What this tax applies to",
+      "example": "goods"
+    },
+    {
+      "name": "applicableToProducts",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this tax applies to physical products",
+      "example": true
+    },
+    {
+      "name": "applicableToServices",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this tax applies to services",
+      "example": true
+    },
+    {
+      "name": "productCategories",
+      "type": "string[]",
+      "mode": "stored",
+      "description": "List of product categories this tax applies to (empty = all)",
+      "example": ["food", "books", "medicine"]
+    },
+    {
+      "name": "customerTypes",
+      "type": "string[]",
+      "mode": "stored",
+      "description": "Customer types this tax applies to (B2C, B2B, government, etc.)",
+      "example": ["B2C", "B2B"]
+    },
+    {
+      "name": "minimumAmount",
+      "type": "MonetaryAmount",
+      "mode": "stored",
+      "description": "Minimum transaction amount for tax to apply"
+    },
+    {
+      "name": "maximumAmount",
+      "type": "MonetaryAmount",
+      "mode": "stored",
+      "description": "Maximum tax amount cap"
+    },
+    {
+      "name": "postalCodeFrom",
+      "type": "string",
+      "mode": "stored",
+      "description": "Starting postal code for range-based tax (US sales tax)",
+      "example": "10001"
+    },
+    {
+      "name": "postalCodeTo",
+      "type": "string",
+      "mode": "stored",
+      "description": "Ending postal code for range-based tax",
+      "example": "10999"
+    },
+    {
+      "name": "addressType",
+      "type": "string",
+      "mode": "enum",
+      "enum": [
+        "billing",
+        "shipping",
+        "origin"
+      ],
+      "description": "Which address to use for tax determination",
+      "example": "shipping"
+    }
+  ],
+  "examples": []
+}

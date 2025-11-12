@@ -1,0 +1,70 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "TaxJurisdiction",
+  "description": "Geographic tax jurisdiction with hierarchical structure. Represents countries, states, provinces, cities, or postal code zones with their tax authority information.",
+  "properties": [
+    {
+      "name": "code",
+      "type": "string",
+      "mode": "stored",
+      "description": "Unique jurisdiction code (ISO country, state code, city code)",
+      "required": true,
+      "example": "FR-75"
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "mode": "stored",
+      "description": "Name of the jurisdiction",
+      "required": true,
+      "example": "Paris"
+    },
+    {
+      "name": "level",
+      "type": "string",
+      "mode": "enum",
+      "enum": [
+        "federal",
+        "country",
+        "state",
+        "province",
+        "city",
+        "district",
+        "postal_code"
+      ],
+      "description": "Level of jurisdiction",
+      "required": true,
+      "example": "city"
+    },
+    {
+      "name": "parentJurisdiction",
+      "type": "TaxJurisdiction",
+      "mode": "stored",
+      "description": "Parent jurisdiction for hierarchical structure (e.g., Paris → Île-de-France → France)"
+    },
+    {
+      "name": "countryCode",
+      "type": "string",
+      "mode": "stored",
+      "description": "ISO 3166-1 alpha-2 country code",
+      "required": true,
+      "example": "FR"
+    },
+    {
+      "name": "taxAuthorityName",
+      "type": "string",
+      "mode": "stored",
+      "description": "Name of the tax authority for this jurisdiction",
+      "example": "Direction Générale des Finances Publiques (DGFiP)"
+    },
+    {
+      "name": "taxAuthorityWebsite",
+      "type": "string",
+      "mode": "stored",
+      "description": "Official website of the tax authority",
+      "example": "https://www.impots.gouv.fr"
+    }
+  ],
+  "examples": []
+}

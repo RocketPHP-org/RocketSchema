@@ -95,6 +95,21 @@
     "order": 7
   },
   {
+    "name": "tax",
+    "label": "Tax & Compliance",
+    "description": "Tax configuration, calculation rules, jurisdictions, and compliance across all countries and tax systems (VAT, GST, sales tax, withholding, social security, etc.)",
+    "tags": [
+      "tax",
+      "vat",
+      "gst",
+      "compliance",
+      "jurisdiction",
+      "fiscal"
+    ],
+    "icon": "receipt",
+    "order": 8
+  },
+  {
     "name": "human-resources",
     "label": "Human Resources",
     "description": "Employee management, recruitment, attendance, performance, training, and payroll",
@@ -106,7 +121,7 @@
       "performance"
     ],
     "icon": "user-check",
-    "order": 8
+    "order": 9
   },
   {
     "name": "health",
@@ -120,7 +135,7 @@
       "patients"
     ],
     "icon": "heart-pulse",
-    "order": 9
+    "order": 10
   },
   {
     "name": "fleet",
@@ -133,7 +148,7 @@
       "logistics"
     ],
     "icon": "truck",
-    "order": 10
+    "order": 11
   },
   {
     "name": "knowledge",
@@ -146,6 +161,6 @@
       "content"
     ],
     "icon": "book-open",
-    "order": 11
+    "order": 12
   }
 ]

@@ -1,0 +1,73 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "TaxExemption",
+  "description": "Tax exemption rules for products, services, or customers. Defines conditions under which taxes do not apply.",
+  "properties": [
+    {
+      "name": "tax",
+      "type": "Tax",
+      "mode": "stored",
+      "description": "Reference to the Tax that can be exempted",
+      "required": true
+    },
+    {
+      "name": "exemptionType",
+      "type": "string",
+      "mode": "enum",
+      "enum": [
+        "category_based",
+        "customer_based",
+        "amount_threshold",
+        "certificate_based",
+        "location_based",
+        "temporary"
+      ],
+      "description": "Type of exemption",
+      "required": true,
+      "example": "category_based"
+    },
+    {
+      "name": "exemptionCategories",
+      "type": "string[]",
+      "mode": "stored",
+      "description": "Product/service categories that are exempt",
+      "example": ["essential_goods", "education", "healthcare"]
+    },
+    {
+      "name": "customerTypes",
+      "type": "string[]",
+      "mode": "stored",
+      "description": "Customer types that are exempt (non_profit, government, diplomatic, etc.)",
+      "example": ["non_profit", "government", "diplomatic"]
+    },
+    {
+      "name": "thresholdAmount",
+      "type": "MonetaryAmount",
+      "mode": "stored",
+      "description": "Amount threshold for exemption"
+    },
+    {
+      "name": "certificateRequired",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether a tax exemption certificate is required",
+      "example": true
+    },
+    {
+      "name": "validFrom",
+      "type": "Date",
+      "mode": "stored",
+      "description": "Date from which this exemption is valid",
+      "example": "2024-01-01"
+    },
+    {
+      "name": "validUntil",
+      "type": "Date",
+      "mode": "stored",
+      "description": "Date until which this exemption is valid",
+      "example": "2024-12-31"
+    }
+  ],
+  "examples": []
+}

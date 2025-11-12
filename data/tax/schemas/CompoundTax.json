@@ -1,0 +1,45 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "CompoundTax",
+  "description": "Compound tax configuration for taxes calculated on top of other taxes (e.g., Quebec PST on GST, cascading taxes). Defines calculation sequence and base inclusion rules.",
+  "properties": [
+    {
+      "name": "tax",
+      "type": "Tax",
+      "mode": "stored",
+      "description": "Reference to the compound Tax entity",
+      "required": true
+    },
+    {
+      "name": "baseTaxes",
+      "type": "Tax[]",
+      "mode": "stored",
+      "description": "List of taxes to include in the calculation base",
+      "required": true
+    },
+    {
+      "name": "compoundSequence",
+      "type": "number",
+      "mode": "stored",
+      "description": "Order in which compound taxes are calculated (1, 2, 3...)",
+      "required": true,
+      "example": 2
+    },
+    {
+      "name": "includeSubtotal",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether to include the original subtotal in the base",
+      "example": true
+    },
+    {
+      "name": "includeBaseTaxes",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether to include base tax amounts in calculation",
+      "example": true
+    }
+  ],
+  "examples": []
+}
