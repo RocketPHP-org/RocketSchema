@@ -35,20 +35,6 @@
       "example": "goods"
     },
     {
-      "name": "applicableToProducts",
-      "type": "boolean",
-      "mode": "stored",
-      "description": "Whether this tax applies to physical products",
-      "example": true
-    },
-    {
-      "name": "applicableToServices",
-      "type": "boolean",
-      "mode": "stored",
-      "description": "Whether this tax applies to services",
-      "example": true
-    },
-    {
       "name": "productCategories",
       "type": "string[]",
       "mode": "stored",
@@ -101,5 +87,32 @@
       "example": "shipping"
     }
   ],
-  "examples": []
+  "examples": [
+    {
+      "@type": "TaxRule",
+      "tax": {
+        "@type": "Tax",
+        "code": "VAT-EU-DIGITAL-20"
+      },
+      "priority": 1,
+      "taxScope": "digital_services",
+      "productCategories": ["software", "streaming", "e-books"],
+      "customerTypes": ["B2C"],
+      "addressType": "billing"
+    },
+    {
+      "@type": "TaxRule",
+      "tax": {
+        "@type": "Tax",
+        "code": "US-CA-SALES-7.25"
+      },
+      "priority": 2,
+      "taxScope": "goods",
+      "productCategories": [],
+      "customerTypes": ["B2C", "B2B"],
+      "postalCodeFrom": "90001",
+      "postalCodeTo": "96162",
+      "addressType": "shipping"
+    }
+  ]
 }

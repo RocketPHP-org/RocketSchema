@@ -55,19 +55,57 @@
       "example": true
     },
     {
-      "name": "validFrom",
+      "name": "effectiveFrom",
       "type": "Date",
       "mode": "stored",
-      "description": "Date from which this exemption is valid",
+      "description": "Date from which this exemption is effective",
       "example": "2024-01-01"
     },
     {
-      "name": "validUntil",
+      "name": "effectiveUntil",
       "type": "Date",
       "mode": "stored",
-      "description": "Date until which this exemption is valid",
+      "description": "Date until which this exemption is effective (null if indefinite)",
       "example": "2024-12-31"
     }
   ],
-  "examples": []
+  "examples": [
+    {
+      "@type": "TaxExemption",
+      "tax": {
+        "@type": "Tax",
+        "code": "VAT-STD-20"
+      },
+      "exemptionType": "category_based",
+      "exemptionCategories": ["essential_goods", "basic_food", "medicine"],
+      "certificateRequired": false,
+      "effectiveFrom": "2024-01-01"
+    },
+    {
+      "@type": "TaxExemption",
+      "tax": {
+        "@type": "Tax",
+        "code": "US-SALES-TAX"
+      },
+      "exemptionType": "customer_based",
+      "customerTypes": ["non_profit", "government", "diplomatic"],
+      "certificateRequired": true,
+      "effectiveFrom": "2024-01-01"
+    },
+    {
+      "@type": "TaxExemption",
+      "tax": {
+        "@type": "Tax",
+        "code": "IMPORT-DUTY"
+      },
+      "exemptionType": "amount_threshold",
+      "thresholdAmount": {
+        "value": 150,
+        "currency": "EUR"
+      },
+      "certificateRequired": false,
+      "effectiveFrom": "2024-01-01",
+      "effectiveUntil": "2024-12-31"
+    }
+  ]
 }

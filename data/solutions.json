@@ -41,7 +41,8 @@
       "transverse",
       "crm",
       "e-commerce",
-      "financial"
+      "financial",
+      "tax"
     ],
     "features": [
       "Product Catalog",
@@ -74,9 +75,9 @@
       "transverse",
       "crm",
       "financial",
+      "tax",
       "human-resources",
       "fleet",
-      "tax",
       "e-commerce"
     ],
     "features": [
@@ -108,7 +109,8 @@
       "core-entities",
       "transverse",
       "health",
-      "financial"
+      "financial",
+      "tax"
     ],
     "features": [
       "Patient Records",
@@ -139,7 +141,8 @@
       "core-entities",
       "transverse",
       "human-resources",
-      "financial"
+      "financial",
+      "tax"
     ],
     "features": [
       "Employee Records",
@@ -170,7 +173,8 @@
       "core-entities",
       "transverse",
       "fleet",
-      "financial"
+      "financial",
+      "tax"
     ],
     "features": [
       "Vehicle Tracking",
@@ -231,7 +235,8 @@
       "core-entities",
       "transverse",
       "crm",
-      "financial"
+      "financial",
+      "tax"
     ],
     "features": [
       "User Management",

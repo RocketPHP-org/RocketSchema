@@ -66,5 +66,45 @@
       "example": "https://www.impots.gouv.fr"
     }
   ],
-  "examples": []
+  "examples": [
+    {
+      "@type": "TaxJurisdiction",
+      "code": "FR-75",
+      "name": "Paris",
+      "level": "city",
+      "parentJurisdiction": {
+        "@type": "TaxJurisdiction",
+        "code": "FR-IDF"
+      },
+      "countryCode": "FR",
+      "taxAuthorityName": "Direction Générale des Finances Publiques (DGFiP)",
+      "taxAuthorityWebsite": "https://www.impots.gouv.fr"
+    },
+    {
+      "@type": "TaxJurisdiction",
+      "code": "US-NY",
+      "name": "New York",
+      "level": "state",
+      "parentJurisdiction": {
+        "@type": "TaxJurisdiction",
+        "code": "US"
+      },
+      "countryCode": "US",
+      "taxAuthorityName": "New York State Department of Taxation and Finance",
+      "taxAuthorityWebsite": "https://www.tax.ny.gov"
+    },
+    {
+      "@type": "TaxJurisdiction",
+      "code": "CA-ON",
+      "name": "Ontario",
+      "level": "province",
+      "parentJurisdiction": {
+        "@type": "TaxJurisdiction",
+        "code": "CA"
+      },
+      "countryCode": "CA",
+      "taxAuthorityName": "Canada Revenue Agency (CRA)",
+      "taxAuthorityWebsite": "https://www.canada.ca/en/revenue-agency.html"
+    }
+  ]
 }

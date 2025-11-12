@@ -22,6 +22,7 @@
         "unemployment_insurance",
         "workers_compensation",
         "family_benefits",
+        "training_contribution",
         "general"
       ],
       "description": "Type of social security contribution",
@@ -57,5 +58,44 @@
       "description": "Maximum tax amount per employee (computed from annualWageBase * rate)"
     }
   ],
-  "examples": []
+  "examples": [
+    {
+      "@type": "SocialSecurityTax",
+      "tax": {
+        "@type": "Tax",
+        "code": "US-SOCIAL-SECURITY"
+      },
+      "socialSecurityType": "old_age_pension",
+      "employerRate": 6.2,
+      "employeeRate": 6.2,
+      "annualWageBase": {
+        "value": 160200,
+        "currency": "USD"
+      }
+    },
+    {
+      "@type": "SocialSecurityTax",
+      "tax": {
+        "@type": "Tax",
+        "code": "FR-URSSAF-HEALTH"
+      },
+      "socialSecurityType": "health_insurance",
+      "employerRate": 13.0,
+      "employeeRate": 0.0,
+      "annualWageBase": {
+        "value": 999999,
+        "currency": "EUR"
+      }
+    },
+    {
+      "@type": "SocialSecurityTax",
+      "tax": {
+        "@type": "Tax",
+        "code": "DZ-CNAS"
+      },
+      "socialSecurityType": "general",
+      "employerRate": 26.0,
+      "employeeRate": 9.0
+    }
+  ]
 }

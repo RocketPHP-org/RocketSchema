@@ -56,6 +56,9 @@
         "payroll_tax",
         "social_security_tax",
         "property_tax",
+        "inheritance_tax",
+        "gift_tax",
+        "capital_gains_tax",
         "zakat",
         "other"
       ],
@@ -81,18 +84,25 @@
         "fixed_amount",
         "tiered",
         "progressive",
-        "compound"
+        "compound",
+        "per_unit"
       ],
       "description": "Method used to calculate the tax",
       "required": true,
       "example": "percentage"
     },
     {
+      "name": "jurisdictionRef",
+      "type": "TaxJurisdiction",
+      "mode": "stored",
+      "description": "Reference to the tax jurisdiction entity with authority details and hierarchy",
+      "required": true
+    },
+    {
       "name": "jurisdiction",
       "type": "string",
       "mode": "stored",
-      "description": "Tax jurisdiction code (ISO country code, state, province, city)",
-      "required": true,
+      "description": "Tax jurisdiction code (ISO country code, state, province, city) - Deprecated: use jurisdictionRef",
       "example": "FR"
     },
     {
@@ -108,7 +118,7 @@
         "district",
         "postal_code"
       ],
-      "description": "Level of the tax jurisdiction",
+      "description": "Level of the tax jurisdiction - Deprecated: use jurisdictionRef.level",
       "example": "country"
     },
     {

@@ -2,77 +2,61 @@
   "@type": "Schema",
   "@context": "https://rocketschema.org/context",
   "name": "TaxEntry",
-  "description": "Tax calculation and breakdown for commercial documents. Represents a single tax component (VAT, sales tax, GST, etc.) with rate, amount, and jurisdiction information.",
+  "description": "Tax calculation entry for a specific line item or document. References a Tax definition and calculates the actual tax amount applied. Used in CommercialDocument.taxDetails[].",
   "properties": [
     {
-      "name": "taxName",
-      "type": "string",
+      "name": "tax",
+      "type": "Tax",
       "mode": "stored",
-      "description": "Name of the tax (e.g., 'VAT', 'Sales Tax', 'GST', 'State Tax')",
-      "required": true,
-      "example": "VAT"
-    },
-    {
-      "name": "taxType",
-      "type": "string",
-      "mode": "enum",
-      "enum": [
-        "vat",
-        "sales_tax",
-        "gst",
-        "pst",
-        "hst",
-        "withholding",
-        "excise",
-        "customs",
-        "other"
-      ],
-      "description": "Type of tax",
-      "required": true,
-      "example": "vat"
-    },
-    {
-      "name": "taxRate",
-      "type": "number",
-      "mode": "stored",
-      "description": "Tax rate as percentage (e.g., 20 for 20%)",
-      "required": true,
-      "example": 20
+      "description": "Reference to the Tax entity (contains code, name, type, rate, jurisdiction)",
+      "required": true
     },
     {
       "name": "taxableAmount",
       "type": "MonetaryAmount",
       "mode": "stored",
-      "description": "Amount subject to this tax",
+      "description": "Amount subject to this tax (base for calculation)",
       "required": true
     },
     {
       "name": "taxAmount",
       "type": "MonetaryAmount",
       "mode": "computed",
-      "description": "Calculated tax amount (taxableAmount * taxRate / 100)"
+      "description": "Calculated tax amount (taxableAmount * tax.rate / 100 or per tax.calculationMethod)"
     },
     {
-      "name": "jurisdiction",
-      "type": "string",
+      "name": "appliedRate",
+      "type": "number",
       "mode": "stored",
-      "description": "Tax jurisdiction (country, state, province, city)",
-      "example": "FR"
+      "description": "Actual rate applied (may differ from tax.rate due to exemptions or overrides)",
+      "example": 20
     },
     {
-      "name": "taxCode",
+      "name": "isExempt",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this line is tax exempt (overrides normal tax application)",
+      "example": false
+    },
+    {
+      "name": "exemptionReason",
       "type": "string",
       "mode": "stored",
-      "description": "Official tax code or identifier",
-      "example": "VAT-STD-20"
+      "description": "Reason for tax exemption if isExempt is true",
+      "example": "Essential goods exemption"
     }
   ],
   "examples": [
     {
       "@type": "TaxEntry",
-      "taxName": "VAT",
-      "taxType": "vat",
-      "taxRate": 20,
+      "tax": {
+        "@type": "Tax",
+        "code": "VAT-STD-20",
+        "name": "VAT Standard Rate",
+        "taxType": "vat",
+        "rate": 20,
+        "jurisdiction": "FR"
+      },
       "taxableAmount": {
         "@type": "MonetaryAmount",
         "value": 1000.00,
@@ -91,14 +75,19 @@
           "symbol": "€"
         }
       },
-      "jurisdiction": "FR",
-      "taxCode": "VAT-STD-20"
+      "appliedRate": 20,
+      "isExempt": false
     },
     {
       "@type": "TaxEntry",
-      "taxName": "Sales Tax",
-      "taxType": "sales_tax",
-      "taxRate": 8.875,
+      "tax": {
+        "@type": "Tax",
+        "code": "NY-SALES-8.875",
+        "name": "New York Sales Tax",
+        "taxType": "sales_tax",
+        "rate": 8.875,
+        "jurisdiction": "NY"
+      },
       "taxableAmount": {
         "@type": "MonetaryAmount",
         "value": 500.00,
@@ -117,8 +106,41 @@
           "symbol": "$"
         }
       },
-      "jurisdiction": "NY",
-      "taxCode": "NY-SALES-TAX"
+      "appliedRate": 8.875,
+      "isExempt": false
+    },
+    {
+      "@type": "TaxEntry",
+      "tax": {
+        "@type": "Tax",
+        "code": "VAT-RED-5.5",
+        "name": "VAT Reduced Rate",
+        "taxType": "vat",
+        "rate": 5.5,
+        "jurisdiction": "FR"
+      },
+      "taxableAmount": {
+        "@type": "MonetaryAmount",
+        "value": 100.00,
+        "currency": {
+          "@type": "Currency",
+          "code": "EUR",
+          "symbol": "€"
+        }
+      },
+      "taxAmount": {
+        "@type": "MonetaryAmount",
+        "value": 0.00,
+        "currency": {
+          "@type": "Currency",
+          "code": "EUR",
+          "symbol": "€"
+        }
+      },
+      "appliedRate": 0,
+      "isExempt": true,
+      "exemptionReason": "Essential food product - exempt from VAT"
     }
   ]
 }
+

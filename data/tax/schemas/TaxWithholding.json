@@ -26,7 +26,9 @@
         "rent",
         "commissions",
         "contractor_payments",
-        "non_resident_services"
+        "non_resident_services",
+        "prize_winnings",
+        "entertainment_payments"
       ],
       "description": "Type of payment subject to withholding",
       "required": true,
@@ -68,5 +70,42 @@
       "example": 10
     }
   ],
-  "examples": []
+  "examples": [
+    {
+      "@type": "TaxWithholding",
+      "tax": {
+        "@type": "Tax",
+        "code": "US-1099-WHT"
+      },
+      "withholdingType": "professional_services",
+      "withholdingRate": 30,
+      "isResident": false,
+      "treatyCountry": "CA",
+      "treatyRate": 15
+    },
+    {
+      "@type": "TaxWithholding",
+      "tax": {
+        "@type": "Tax",
+        "code": "FR-WHT-ROYALTIES"
+      },
+      "withholdingType": "royalties",
+      "withholdingRate": 25,
+      "thresholdAmount": {
+        "value": 1000,
+        "currency": "EUR"
+      },
+      "isResident": false
+    },
+    {
+      "@type": "TaxWithholding",
+      "tax": {
+        "@type": "Tax",
+        "code": "DZ-WHT-SERVICES"
+      },
+      "withholdingType": "technical_services",
+      "withholdingRate": 24,
+      "isResident": true
+    }
+  ]
 }

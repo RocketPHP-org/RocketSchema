@@ -41,5 +41,42 @@
       "example": true
     }
   ],
-  "examples": []
+  "examples": [
+    {
+      "@type": "CompoundTax",
+      "tax": {
+        "@type": "Tax",
+        "code": "CA-QC-PST-9.975"
+      },
+      "baseTaxes": [
+        {
+          "@type": "Tax",
+          "code": "CA-GST-5"
+        }
+      ],
+      "compoundSequence": 2,
+      "includeSubtotal": true,
+      "includeBaseTaxes": true
+    },
+    {
+      "@type": "CompoundTax",
+      "tax": {
+        "@type": "Tax",
+        "code": "CASCADING-TAX"
+      },
+      "baseTaxes": [
+        {
+          "@type": "Tax",
+          "code": "BASE-TAX-1"
+        },
+        {
+          "@type": "Tax",
+          "code": "BASE-TAX-2"
+        }
+      ],
+      "compoundSequence": 3,
+      "includeSubtotal": true,
+      "includeBaseTaxes": true
+    }
+  ]
 }
