@@ -2,11 +2,12 @@
   "@type": "Schema",
   "@context": "https://rocketschema.org/context",
   "name": "BankAccount",
-  "description": "Bank account information for an organization or person",
+  "description": "Bank account information for an organization or person with full normalization and type safety",
   "properties": [
     {
       "name": "accountNumber",
       "type": "string",
+      "mode": "stored",
       "description": "Bank account number",
       "required": true,
       "example": "123456789"
@@ -14,68 +15,128 @@
     {
       "name": "accountType",
       "type": "string",
-      "description": "Type of account (checking, savings, business, payment)",
+      "mode": "enum",
+      "enum": [
+        "checking",
+        "savings",
+        "business",
+        "money_market",
+        "payment",
+        "escrow",
+        "trust"
+      ],
+      "description": "Type of account - checking (US current account), savings, business checking, money market, payment service, escrow, or trust account",
+      "required": true,
       "example": "business"
     },
     {
       "name": "iban",
       "type": "string",
-      "description": "International Bank Account Number",
+      "mode": "stored",
+      "description": "International Bank Account Number (ISO 13616)",
+      "format": "iban",
+      "pattern": "^[A-Z]{2}[0-9]{2}[A-Z0-9]+$",
+      "minLength": 15,
+      "maxLength": 34,
       "example": "GB82WEST12345698765432"
     },
     {
       "name": "swift",
       "type": "string",
-      "description": "SWIFT/BIC code",
+      "mode": "stored",
+      "description": "SWIFT/BIC code (ISO 9362) - 8 or 11 characters",
+      "format": "swift",
+      "pattern": "^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$",
+      "minLength": 8,
+      "maxLength": 11,
       "example": "DEUTDEFF"
     },
     {
       "name": "routingNumber",
       "type": "string",
-      "description": "Routing number (US) or sort code (UK)",
+      "mode": "stored",
+      "description": "Routing number (US: 9 digits) or sort code (UK: 6 digits)",
+      "pattern": "^[0-9]{6,9}$",
       "example": "026009593"
     },
     {
       "name": "bankName",
       "type": "string",
-      "description": "Name of the bank",
+      "mode": "stored",
+      "description": "Name of the bank (pragmatic denormalization - consider Bank entity if managing >50 banks)",
+      "maxLength": 255,
       "example": "Wells Fargo Bank"
     },
     {
       "name": "bankAddress",
       "type": "PostalAddress",
-      "description": "Address of the bank branch"
+      "mode": "stored",
+      "description": "Address of the bank branch (pragmatic denormalization)"
     },
     {
-      "name": "accountHolderName",
-      "type": "string",
-      "description": "Name of the account holder",
-      "example": "Acme Corporation Inc."
+      "name": "accountHolder",
+      "type": "Person | Organization",
+      "mode": "stored",
+      "description": "The person or organization that owns this account. Must reference exactly one entity.",
+      "required": true
     },
     {
       "name": "currency",
-      "type": "string",
-      "description": "Primary currency for this account (ISO 4217)",
-      "format": "iso-currency-code",
-      "example": "USD"
+      "type": "Currency",
+      "mode": "stored",
+      "description": "Primary currency for this account (reference to Currency entity)",
+      "required": true
     },
     {
       "name": "use",
       "type": "string",
-      "description": "Purpose of this account (main, payroll, operational, savings, international)",
+      "mode": "enum",
+      "enum": [
+        "main",
+        "payroll",
+        "operational",
+        "savings",
+        "investment",
+        "international",
+        "tax",
+        "expense",
+        "receivables"
+      ],
+      "description": "Purpose of this account within the organization - how this account is used in business operations",
       "example": "main"
     },
     {
       "name": "label",
       "type": "string",
+      "mode": "stored",
       "description": "Human-readable label for this account",
+      "maxLength": 100,
       "example": "Main Operating Account"
     },
     {
       "name": "active",
       "type": "boolean",
-      "description": "Whether this account is currently active",
+      "mode": "stored",
+      "description": "Whether this account is currently active and available for transactions",
       "example": true
+    },
+    {
+      "name": "verifiedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When this bank account was verified (via micro-deposits, Plaid, Stripe, etc.)"
+    },
+    {
+      "name": "verificationStatus",
+      "type": "string",
+      "mode": "enum",
+      "enum": [
+        "unverified",
+        "pending",
+        "verified",
+        "failed"
+      ],
+      "description": "Verification status of this bank account - used to track bank account ownership verification"
     }
   ],
   "examples": [
@@ -86,22 +147,87 @@
       "iban": "GB82WEST12345698765432",
       "swift": "WESTGB2L",
       "bankName": "Wells Fargo Bank",
-      "accountHolderName": "Acme Corporation Inc.",
-      "currency": "USD",
+      "bankAddress": {
+        "@type": "PostalAddress",
+        "streetAddress": "420 Montgomery Street",
+        "addressLocality": "San Francisco",
+        "addressRegion": "CA",
+        "postalCode": "94104",
+        "addressCountry": "US"
+      },
+      "accountHolder": {
+        "@type": "Organization",
+        "name": "Acme Corp",
+        "legalName": "Acme Corporation Inc."
+      },
+      "currency": {
+        "@type": "Currency",
+        "code": "USD",
+        "name": "United States Dollar",
+        "symbol": "$",
+        "decimalDigits": 2
+      },
       "use": "main",
       "label": "Main Operating Account",
-      "active": true
+      "active": true,
+      "verifiedAt": "2024-01-15T16:45:00Z",
+      "verificationStatus": "verified"
     },
     {
       "@type": "BankAccount",
       "accountNumber": "987654321",
+      "accountType": "checking",
       "iban": "FR7612345678901234567890189",
       "swift": "BNPAFRPP",
+      "routingNumber": "12345",
       "bankName": "BNP Paribas",
-      "accountHolderName": "TechStart SARL",
-      "currency": "EUR",
+      "bankAddress": {
+        "@type": "PostalAddress",
+        "streetAddress": "16 Boulevard des Italiens",
+        "addressLocality": "Paris",
+        "postalCode": "75009",
+        "addressCountry": "FR"
+      },
+      "accountHolder": {
+        "@type": "Person",
+        "givenName": "Marie",
+        "familyName": "Dubois"
+      },
+      "currency": {
+        "@type": "Currency",
+        "code": "EUR",
+        "name": "Euro",
+        "symbol": "€",
+        "decimalDigits": 2
+      },
       "use": "main",
-      "active": true
+      "label": "Personal Checking",
+      "active": true,
+      "verificationStatus": "verified"
+    },
+    {
+      "@type": "BankAccount",
+      "accountNumber": "555666777",
+      "accountType": "payroll",
+      "iban": "DE89370400440532013000",
+      "swift": "DEUTDEFF",
+      "bankName": "Deutsche Bank",
+      "accountHolder": {
+        "@type": "Organization",
+        "name": "TechStart SARL",
+        "legalName": "TechStart Société à Responsabilité Limitée"
+      },
+      "currency": {
+        "@type": "Currency",
+        "code": "EUR",
+        "name": "Euro",
+        "symbol": "€",
+        "decimalDigits": 2
+      },
+      "use": "payroll",
+      "label": "Payroll Account",
+      "active": true,
+      "verificationStatus": "pending"
     }
   ]
 }

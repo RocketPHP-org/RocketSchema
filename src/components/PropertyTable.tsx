@@ -57,8 +57,36 @@ function renderType(type: string | string[], solutionName?: string) {
     });
   }
 
-  // Single type
-  const cleanType = type.replace(/[\[\]]/g, '');
+  // Single type - check if it contains union (|) or array ([])
+  const typeString = String(type);
+
+  // Handle union types (e.g., "Person | Organization")
+  if (typeString.includes(' | ')) {
+    const unionTypes = typeString.split(' | ').map(t => t.trim());
+    return unionTypes.map((t, index) => {
+      const cleanType = t.replace(/[\[\]]/g, '');
+      const isSchema = allSchemas.includes(cleanType);
+
+      return (
+        <span key={index}>
+          {index > 0 && ' | '}
+          {isSchema ? (
+            <Link
+              href={getSchemaLink(cleanType)}
+              className="hover:underline text-primary font-semibold"
+            >
+              {t}
+            </Link>
+          ) : (
+            <span>{t}</span>
+          )}
+        </span>
+      );
+    });
+  }
+
+  // Single type with possible array brackets
+  const cleanType = typeString.replace(/[\[\]]/g, '');
   const isSchema = allSchemas.includes(cleanType);
 
   if (isSchema) {
@@ -67,12 +95,12 @@ function renderType(type: string | string[], solutionName?: string) {
         href={getSchemaLink(cleanType)}
         className="hover:underline text-primary font-semibold"
       >
-        {type}
+        {typeString}
       </Link>
     );
   }
 
-  return <span>{type}</span>;
+  return <span>{typeString}</span>;
 }
 
 export default function PropertyTable({ properties, solutionName }: PropertyTableProps) {
