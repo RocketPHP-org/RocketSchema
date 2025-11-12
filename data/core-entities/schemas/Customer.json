@@ -84,14 +84,14 @@
       "type": "Date",
       "description": "Date of the customer's first purchase",
       "example": "2024-01-20",
-      "mode": "stored"
+      "mode": "computed"
     },
     {
       "name": "lastPurchaseDate",
       "type": "Date",
       "description": "Date of the customer's most recent purchase",
       "example": "2024-10-15",
-      "mode": "stored"
+      "mode": "computed"
     },
     {
       "name": "totalOrders",
@@ -113,30 +113,6 @@
       "mode": "computed"
     },
     {
-      "name": "billingAddress",
-      "type": "PostalAddress",
-      "description": "Primary billing address for invoices and payments",
-      "mode": "stored"
-    },
-    {
-      "name": "shippingAddresses",
-      "type": "PostalAddress[]",
-      "description": "List of shipping addresses for order delivery",
-      "mode": "stored"
-    },
-    {
-      "name": "telecoms",
-      "type": "ContactPoint[]",
-      "description": "Contact points - phone numbers, emails, etc.",
-      "mode": "stored"
-    },
-    {
-      "name": "preferredLanguage",
-      "type": "Language",
-      "description": "Customer's preferred language for communication",
-      "mode": "stored"
-    },
-    {
       "name": "preferredCurrency",
       "type": "Currency",
       "description": "Customer's preferred currency for pricing and invoices",
@@ -150,113 +126,6 @@
       "mode": "stored"
     },
     {
-      "name": "authentication",
-      "type": "object",
-      "description": "Authentication and security information for customer account access (P0 - Critical for account security)",
-      "properties": {
-        "passwordHash": {
-          "type": "string",
-          "description": "Hashed password (bcrypt, argon2, etc.). NEVER store plain text passwords",
-          "sensitive": true,
-          "mode": "stored"
-        },
-        "passwordLastChanged": {
-          "type": "DateTime",
-          "description": "Timestamp when password was last changed",
-          "mode": "stored"
-        },
-        "resetPasswordToken": {
-          "type": "string",
-          "description": "Temporary token for password reset functionality (SHA256 hash recommended)",
-          "mode": "stored"
-        },
-        "resetPasswordExpiry": {
-          "type": "DateTime",
-          "description": "Expiration timestamp for password reset token",
-          "mode": "stored"
-        },
-        "secureKey": {
-          "type": "string",
-          "description": "Unique security key for additional authentication validation (MD5/SHA1 hash)",
-          "mode": "stored"
-        },
-        "emailConfirmed": {
-          "type": "boolean",
-          "description": "Whether the customer's email address has been verified",
-          "example": true,
-          "mode": "stored"
-        },
-        "emailConfirmedAt": {
-          "type": "DateTime",
-          "description": "Timestamp when email was confirmed",
-          "mode": "stored"
-        },
-        "lastConfirmEmailRequest": {
-          "type": "DateTime",
-          "description": "Timestamp of last email confirmation request (rate limiting)",
-          "mode": "stored"
-        },
-        "phoneConfirmed": {
-          "type": "boolean",
-          "description": "Whether the customer's phone number has been verified",
-          "example": false,
-          "mode": "stored"
-        },
-        "twoFactorEnabled": {
-          "type": "boolean",
-          "description": "Whether two-factor authentication (2FA) is enabled",
-          "example": false,
-          "mode": "stored"
-        },
-        "twoFactorMethod": {
-          "type": "string",
-          "description": "2FA method: 'sms', 'authenticator_app', 'email', 'hardware_token'",
-          "example": "authenticator_app",
-          "mode": "enum",
-          "enum": [
-            "sms",
-            "authenticator_app",
-            "email",
-            "hardware_token"
-          ]
-        },
-        "accountLocked": {
-          "type": "boolean",
-          "description": "Whether account is temporarily locked due to security concerns",
-          "example": false,
-          "mode": "stored"
-        },
-        "accountLockedUntil": {
-          "type": "DateTime",
-          "description": "Timestamp when account lock expires (null if not locked)",
-          "mode": "stored"
-        },
-        "failedLoginAttempts": {
-          "type": "number",
-          "description": "Count of consecutive failed login attempts",
-          "example": 0,
-          "mode": "stored"
-        },
-        "lastFailedLoginAt": {
-          "type": "DateTime",
-          "description": "Timestamp of last failed login attempt",
-          "mode": "stored"
-        },
-        "lastSuccessfulLoginAt": {
-          "type": "DateTime",
-          "description": "Timestamp of last successful login",
-          "mode": "stored"
-        },
-        "loginCount": {
-          "type": "number",
-          "description": "Total number of successful logins",
-          "example": 142,
-          "mode": "stored"
-        }
-      },
-      "mode": "stored"
-    },
-    {
       "name": "creditLimit",
       "type": "MonetaryAmount",
       "description": "Maximum credit allowed for B2B customers (null for B2C or unlimited credit)",
@@ -266,7 +135,7 @@
       "name": "currentBalance",
       "type": "MonetaryAmount",
       "description": "Current outstanding balance owed by the customer",
-      "mode": "stored"
+      "mode": "computed"
     },
     {
       "name": "paymentTerms",
@@ -307,7 +176,7 @@
       "type": "number",
       "description": "Current loyalty points balance",
       "example": 2450,
-      "mode": "stored"
+      "mode": "computed"
     },
     {
       "name": "loyaltyMemberSince",
@@ -346,70 +215,9 @@
       "mode": "stored"
     },
     {
-      "name": "marketingConsent",
-      "type": "object",
-      "description": "GDPR-compliant marketing communication consent tracking with timestamps and IP addresses for audit trail (P0 - Critical for GDPR Article 7 compliance)",
-      "properties": {
-        "email": {
-          "granted": "boolean",
-          "grantedAt": "DateTime",
-          "ipAddress": "string",
-          "source": "string",
-          "withdrawnAt": "DateTime",
-          "mode": "stored"
-        },
-        "sms": {
-          "granted": "boolean",
-          "grantedAt": "DateTime",
-          "ipAddress": "string",
-          "source": "string",
-          "withdrawnAt": "DateTime",
-          "mode": "stored"
-        },
-        "phone": {
-          "granted": "boolean",
-          "grantedAt": "DateTime",
-          "ipAddress": "string",
-          "source": "string",
-          "withdrawnAt": "DateTime",
-          "mode": "stored"
-        },
-        "mail": {
-          "granted": "boolean",
-          "grantedAt": "DateTime",
-          "ipAddress": "string",
-          "source": "string",
-          "withdrawnAt": "DateTime",
-          "mode": "stored"
-        },
-        "push": {
-          "granted": "boolean",
-          "grantedAt": "DateTime",
-          "source": "string",
-          "withdrawnAt": "DateTime",
-          "mode": "stored"
-        }
-      },
-      "example": {
-        "email": {
-          "granted": true,
-          "grantedAt": "2024-01-15T10:30:00Z",
-          "ipAddress": "192.168.1.100",
-          "source": "registration_form"
-        },
-        "sms": {
-          "granted": false
-        },
-        "phone": {
-          "granted": false
-        },
-        "mail": {
-          "granted": true,
-          "grantedAt": "2024-01-15T10:30:00Z",
-          "ipAddress": "192.168.1.100",
-          "source": "registration_form"
-        }
-      },
+      "name": "marketingConsents",
+      "type": "CustomerMarketingConsent[]",
+      "description": "Marketing communication consent tracking per channel (email, sms, phone, mail, push) with timestamps and IP addresses for GDPR compliance",
       "mode": "stored"
     },
     {
@@ -432,34 +240,9 @@
       "mode": "stored"
     },
     {
-      "name": "gdprConsent",
-      "type": "object",
-      "description": "GDPR data processing consent and rights tracking (P0 - Critical for GDPR compliance)",
-      "properties": {
-        "privacyPolicyVersion": "string",
-        "privacyPolicyAcceptedAt": "DateTime",
-        "privacyPolicyAcceptedIp": "string",
-        "termsOfServiceVersion": "string",
-        "termsOfServiceAcceptedAt": "DateTime",
-        "termsOfServiceAcceptedIp": "string",
-        "dataProcessingConsent": "boolean",
-        "dataProcessingConsentAt": "DateTime",
-        "rightToBeForgottenRequested": "boolean",
-        "rightToBeForgottenRequestedAt": "DateTime",
-        "dataPortabilityRequested": "boolean",
-        "dataPortabilityRequestedAt": "DateTime",
-        "dataRetentionPreference": "string"
-      },
-      "example": {
-        "privacyPolicyVersion": "2.1",
-        "privacyPolicyAcceptedAt": "2024-01-15T10:30:00Z",
-        "privacyPolicyAcceptedIp": "192.168.1.100",
-        "termsOfServiceVersion": "1.5",
-        "termsOfServiceAcceptedAt": "2024-01-15T10:30:00Z",
-        "termsOfServiceAcceptedIp": "192.168.1.100",
-        "dataProcessingConsent": true,
-        "dataProcessingConsentAt": "2024-01-15T10:30:00Z"
-      },
+      "name": "gdprConsents",
+      "type": "CustomerGdprConsent[]",
+      "description": "GDPR data processing consent and rights tracking with version history for privacy policy, terms of service, and data processing agreements",
       "mode": "stored"
     },
     {
@@ -527,8 +310,8 @@
     },
     {
       "name": "tags",
-      "type": "string[]",
-      "description": "Freeform tags for categorization and filtering",
+      "type": "CustomerTag[]",
+      "description": "Freeform tags for customer categorization and filtering",
       "example": [
         "wholesale",
         "priority",
@@ -537,59 +320,78 @@
       "mode": "stored"
     },
     {
-      "name": "hierarchy",
-      "type": "object",
-      "description": "Parent-child customer relationships for corporate structures and subsidiaries (P1 - High value for B2B)",
-      "properties": {
-        "parentCustomerId": "string",
-        "parentCustomerName": "string",
-        "childCustomerIds": "string[]",
-        "hierarchyLevel": "number",
-        "commercialEntityId": "string"
-      },
-      "example": {
-        "parentCustomerId": "CUST-2023-00100",
-        "parentCustomerName": "Innovatech Global Corporation",
-        "hierarchyLevel": 2,
-        "commercialEntityId": "CUST-2020-00001"
-      },
+      "name": "parentCustomer",
+      "type": "Customer",
+      "description": "Reference to parent customer in corporate hierarchy for B2B subsidiary relationships",
       "mode": "stored"
     },
     {
-      "name": "auditTrail",
-      "type": "object",
-      "description": "Audit trail for tracking changes and compliance (P1 - High value for governance)",
-      "properties": {
-        "createdBy": "User",
-        "createdAt": "DateTime",
-        "modifiedBy": "User",
-        "modifiedAt": "DateTime",
-        "deleted": "boolean",
-        "deletedBy": "User",
-        "deletedAt": "DateTime",
-        "deletionReason": "string"
-      },
-      "example": {
-        "createdBy": {
-          "@type": "User",
-          "userId": "admin_001",
-          "name": "System Administrator"
-        },
-        "createdAt": "2024-01-15T10:00:00Z",
-        "modifiedBy": {
-          "@type": "User",
-          "userId": "support_042",
-          "name": "Customer Support Agent"
-        },
-        "modifiedAt": "2024-11-10T14:30:00Z",
-        "deleted": false
-      },
+      "name": "hierarchyLevel",
+      "type": "number",
+      "description": "Depth level in customer hierarchy (0 = root/top-level customer, 1 = direct subsidiary, 2+ = nested subsidiaries)",
+      "example": 2,
+      "mode": "computed"
+    },
+    {
+      "name": "createdBy",
+      "type": "User",
+      "description": "User who created this customer record",
+      "mode": "stored"
+    },
+    {
+      "name": "createdAt",
+      "type": "DateTime",
+      "description": "Timestamp when customer record was created",
+      "required": true,
+      "mode": "stored"
+    },
+    {
+      "name": "modifiedBy",
+      "type": "User",
+      "description": "User who last modified this customer record",
+      "mode": "stored"
+    },
+    {
+      "name": "modifiedAt",
+      "type": "DateTime",
+      "description": "Timestamp of last modification",
+      "mode": "stored"
+    },
+    {
+      "name": "deleted",
+      "type": "boolean",
+      "description": "Soft delete flag for data retention compliance",
+      "example": false,
+      "mode": "computed"
+    },
+    {
+      "name": "deletedBy",
+      "type": "User",
+      "description": "User who soft-deleted this customer record",
+      "mode": "stored"
+    },
+    {
+      "name": "deletedAt",
+      "type": "DateTime",
+      "description": "Timestamp when customer record was soft-deleted",
+      "mode": "stored"
+    },
+    {
+      "name": "deletionReason",
+      "type": "string",
+      "description": "Business reason for customer deletion",
+      "mode": "stored"
+    },
+    {
+      "name": "changeHistory",
+      "type": "CustomerChangeHistory[]",
+      "description": "Comprehensive change log tracking all field-level modifications with before/after values for audit trail and regulatory compliance",
       "mode": "stored"
     },
     {
       "name": "externalReferences",
-      "type": "object[]",
-      "description": "References to customer records in external systems for integration purposes (P1 - High value for integrations)",
+      "type": "CustomerExternalReference[]",
+      "description": "References to customer records in external systems (Salesforce, SAP, etc.) for integration purposes",
       "example": [
         {
           "system": "Salesforce",
@@ -605,29 +407,9 @@
       "mode": "stored"
     },
     {
-      "name": "industryClassification",
-      "type": "object",
-      "description": "Industry classification for B2B segmentation and analytics (P1 - High value for B2B)",
-      "properties": {
-        "naicsCode": "string",
-        "naicsDescription": "string",
-        "sicCode": "string",
-        "sicDescription": "string",
-        "customIndustry": "string"
-      },
-      "example": {
-        "naicsCode": "541511",
-        "naicsDescription": "Custom Computer Programming Services",
-        "sicCode": "7371",
-        "sicDescription": "Computer Programming Services",
-        "customIndustry": "Technology - Software Development"
-      },
-      "mode": "stored"
-    },
-    {
       "name": "dataQuality",
       "type": "object",
-      "description": "Data quality metrics and duplicate management (P1 - High value for data governance)",
+      "description": "Data quality metrics and duplicate management",
       "properties": {
         "qualityScore": "number",
         "lastVerifiedAt": "DateTime",
@@ -707,76 +489,12 @@
           "symbol": "$"
         }
       },
-      "billingAddress": {
-        "@type": "PostalAddress",
-        "use": "billing",
-        "label": "Home",
-        "streetAddress": "456 Oak Avenue",
-        "addressLocality": "Portland",
-        "addressRegion": "OR",
-        "postalCode": "97201",
-        "addressCountry": "US"
-      },
-      "shippingAddresses": [
-        {
-          "@type": "PostalAddress",
-          "use": "shipping",
-          "label": "Home",
-          "streetAddress": "456 Oak Avenue",
-          "addressLocality": "Portland",
-          "addressRegion": "OR",
-          "postalCode": "97201",
-          "addressCountry": "US"
-        },
-        {
-          "@type": "PostalAddress",
-          "use": "shipping",
-          "label": "Work",
-          "streetAddress": "789 Business Park Drive",
-          "addressLocality": "Portland",
-          "addressRegion": "OR",
-          "postalCode": "97203",
-          "addressCountry": "US"
-        }
-      ],
-      "telecoms": [
-        {
-          "@type": "ContactPoint",
-          "system": "email",
-          "value": "emily.thompson@email.com",
-          "use": "home",
-          "rank": 1
-        },
-        {
-          "@type": "ContactPoint",
-          "system": "phone",
-          "value": "+1-555-0167",
-          "use": "mobile",
-          "rank": 1
-        }
-      ],
-      "preferredLanguage": {
-        "@type": "Language",
-        "code": "en",
-        "name": "English"
-      },
       "preferredCurrency": {
         "@type": "Currency",
         "code": "USD",
         "symbol": "$"
       },
       "timezone": "America/Los_Angeles",
-      "authentication": {
-        "emailConfirmed": true,
-        "emailConfirmedAt": "2024-01-15T10:35:00Z",
-        "phoneConfirmed": true,
-        "twoFactorEnabled": true,
-        "twoFactorMethod": "authenticator_app",
-        "accountLocked": false,
-        "failedLoginAttempts": 0,
-        "lastSuccessfulLoginAt": "2024-11-10T14:30:00Z",
-        "loginCount": 142
-      },
       "taxExempt": false,
       "loyaltyTier": "Gold",
       "loyaltyPoints": 2450,
