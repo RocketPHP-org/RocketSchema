@@ -1,0 +1,161 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "CustomerMarketingConsent",
+  "extends": "Consent",
+  "description": "Marketing communication consent tracking per channel for customers. Extends Consent entity with marketing-specific properties (channel, double opt-in). Supports GDPR Article 7 compliance.",
+  "properties": [
+    {
+      "name": "customer",
+      "type": "Customer",
+      "mode": "stored",
+      "description": "Reference to the customer who granted or withdrew consent (specialization of entityType/entityId from Consent)",
+      "required": true
+    },
+    {
+      "name": "channel",
+      "type": "string",
+      "mode": "enum",
+      "enum": [
+        "email",
+        "sms",
+        "phone",
+        "mail",
+        "push",
+        "whatsapp",
+        "social_media"
+      ],
+      "description": "Marketing communication channel for which consent applies",
+      "required": true,
+      "example": "email"
+    },
+    {
+      "name": "doubleOptIn",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether double opt-in confirmation was completed (email verification link clicked)",
+      "example": true
+    },
+    {
+      "name": "doubleOptInConfirmedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Timestamp when double opt-in was confirmed",
+      "example": "2024-01-15T10:35:00Z"
+    },
+    {
+      "name": "unsubscribeToken",
+      "type": "string",
+      "mode": "stored",
+      "description": "Unique token for one-click unsubscribe functionality",
+      "example": "unsub_a1b2c3d4e5f6g7h8"
+    },
+    {
+      "name": "campaignType",
+      "type": "string",
+      "mode": "enum",
+      "enum": [
+        "promotional",
+        "transactional",
+        "newsletter",
+        "product_updates",
+        "events",
+        "surveys"
+      ],
+      "description": "Type of marketing campaign this consent covers",
+      "example": "promotional"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "CustomerMarketingConsent",
+      "customer": {
+        "@type": "Customer",
+        "customerNumber": "CUST-2024-00123"
+      },
+      "channel": "email",
+      "granted": true,
+      "grantedAt": "2024-01-15T10:30:00Z",
+      "grantedIp": "192.168.1.100",
+      "consentSource": "registration_form",
+      "consentVersion": "2.1",
+      "language": {
+        "@type": "Language",
+        "code": "en",
+        "name": "English"
+      },
+      "doubleOptIn": true,
+      "doubleOptInConfirmedAt": "2024-01-15T10:35:00Z"
+    },
+    {
+      "@type": "CustomerMarketingConsent",
+      "customer": {
+        "@type": "Customer",
+        "customerNumber": "CUST-2024-00123"
+      },
+      "channel": "sms",
+      "granted": false,
+      "withdrawnAt": "2024-06-15T14:20:00Z",
+      "withdrawnIp": "192.168.1.105",
+      "withdrawalReason": "Too many promotional messages",
+      "consentVersion": "2.1"
+    },
+    {
+      "@type": "CustomerMarketingConsent",
+      "customer": {
+        "@type": "Customer",
+        "customerNumber": "CUST-2024-00789"
+      },
+      "channel": "email",
+      "granted": true,
+      "grantedAt": "2023-06-10T15:00:00Z",
+      "grantedIp": "203.0.113.50",
+      "consentSource": "checkout",
+      "consentVersion": "2.0",
+      "language": {
+        "@type": "Language",
+        "code": "en",
+        "name": "English"
+      },
+      "doubleOptIn": true,
+      "doubleOptInConfirmedAt": "2023-06-10T15:05:00Z"
+    },
+    {
+      "@type": "CustomerMarketingConsent",
+      "customer": {
+        "@type": "Customer",
+        "customerNumber": "CLIENT-2024-00456"
+      },
+      "channel": "whatsapp",
+      "granted": true,
+      "grantedAt": "2024-03-10T12:00:00Z",
+      "grantedIp": "89.156.23.45",
+      "consentSource": "preference_center",
+      "consentVersion": "2.1",
+      "language": {
+        "@type": "Language",
+        "code": "fr",
+        "name": "Français"
+      },
+      "doubleOptIn": false
+    },
+    {
+      "@type": "CustomerMarketingConsent",
+      "customer": {
+        "@type": "Customer",
+        "customerNumber": "CUST-2024-00789"
+      },
+      "channel": "phone",
+      "granted": true,
+      "grantedAt": "2023-06-10T15:00:00Z",
+      "grantedIp": "203.0.113.50",
+      "consentSource": "customer_service",
+      "consentVersion": "2.0",
+      "language": {
+        "@type": "Language",
+        "code": "en",
+        "name": "English"
+      }
+    }
+  ]
+}

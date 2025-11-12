@@ -1,0 +1,264 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "CustomerGdprConsent",
+  "extends": "Consent",
+  "description": "GDPR data processing consent with version history for privacy policies, terms of service, and data processing agreements. Extends Consent entity with GDPR-specific properties for regulatory compliance.",
+  "properties": [
+    {
+      "name": "customer",
+      "type": "Customer",
+      "mode": "stored",
+      "description": "Reference to the customer who accepted or revoked GDPR consent (specialization of entityType/entityId from Consent)",
+      "required": true
+    },
+    {
+      "name": "gdprConsentType",
+      "type": "string",
+      "mode": "enum",
+      "enum": [
+        "privacy_policy",
+        "terms_of_service",
+        "data_processing",
+        "right_to_be_forgotten",
+        "data_portability",
+        "data_rectification",
+        "processing_restriction",
+        "profiling_opt_out"
+      ],
+      "description": "Specific type of GDPR consent or data subject right",
+      "required": true,
+      "example": "privacy_policy"
+    },
+    {
+      "name": "policyVersion",
+      "type": "string",
+      "mode": "stored",
+      "description": "Version number of the policy document (privacy policy, terms, etc.)",
+      "required": true,
+      "example": "2.1"
+    },
+    {
+      "name": "policyUrl",
+      "type": "string",
+      "mode": "stored",
+      "description": "URL to the exact version of the policy document that was accepted",
+      "example": "https://example.com/privacy-policy-v2.1.pdf"
+    },
+    {
+      "name": "policyChecksum",
+      "type": "string",
+      "mode": "stored",
+      "description": "SHA-256 checksum of the policy document for tamper-proof verification",
+      "example": "a1b2c3d4e5f6...sha256"
+    },
+    {
+      "name": "isCurrentVersion",
+      "type": "boolean",
+      "mode": "computed",
+      "description": "Whether this is the current/latest version of the policy"
+    },
+    {
+      "name": "revokedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Timestamp when consent was revoked (for GDPR Article 17 Right to be Forgotten requests)",
+      "example": "2024-08-20T16:00:00Z"
+    },
+    {
+      "name": "revocationReason",
+      "type": "string",
+      "mode": "enum",
+      "enum": [
+        "right_to_be_forgotten",
+        "data_portability_request",
+        "processing_restriction",
+        "objection_to_processing",
+        "consent_withdrawal",
+        "other"
+      ],
+      "description": "GDPR Article under which consent was revoked",
+      "example": "right_to_be_forgotten"
+    },
+    {
+      "name": "requestFulfilledAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Timestamp when GDPR data subject request was completed",
+      "example": "2024-08-25T10:00:00Z"
+    },
+    {
+      "name": "dataRetentionUntil",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Date until which data will be retained per GDPR compliance (after which data must be deleted)",
+      "example": "2027-01-15T00:00:00Z"
+    },
+    {
+      "name": "legalBasis",
+      "type": "string",
+      "mode": "enum",
+      "enum": [
+        "consent",
+        "contract",
+        "legal_obligation",
+        "vital_interests",
+        "public_task",
+        "legitimate_interests"
+      ],
+      "description": "GDPR Article 6 legal basis for data processing",
+      "required": true,
+      "example": "consent"
+    },
+    {
+      "name": "dataCategories",
+      "type": "string[]",
+      "mode": "stored",
+      "description": "Categories of personal data covered by this consent",
+      "example": [
+        "identity",
+        "contact",
+        "financial",
+        "behavioral"
+      ]
+    },
+    {
+      "name": "processingPurposes",
+      "type": "string[]",
+      "mode": "stored",
+      "description": "Purposes for which data processing was consented",
+      "example": [
+        "service_delivery",
+        "marketing",
+        "analytics",
+        "fraud_prevention"
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "@type": "CustomerGdprConsent",
+      "customer": {
+        "@type": "Customer",
+        "customerNumber": "CUST-2024-00123"
+      },
+      "gdprConsentType": "privacy_policy",
+      "granted": true,
+      "grantedAt": "2024-01-15T10:30:00Z",
+      "grantedIp": "192.168.1.100",
+      "consentSource": "web_form",
+      "policyVersion": "2.1",
+      "policyUrl": "https://example.com/privacy-policy-v2.1.pdf",
+      "policyChecksum": "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6",
+      "isCurrentVersion": true,
+      "language": {
+        "@type": "Language",
+        "code": "en",
+        "name": "English"
+      },
+      "legalBasis": "consent",
+      "dataRetentionUntil": "2027-01-15T00:00:00Z",
+      "dataCategories": [
+        "identity",
+        "contact",
+        "financial"
+      ],
+      "processingPurposes": [
+        "service_delivery",
+        "marketing",
+        "fraud_prevention"
+      ]
+    },
+    {
+      "@type": "CustomerGdprConsent",
+      "customer": {
+        "@type": "Customer",
+        "customerNumber": "CUST-2024-00123"
+      },
+      "gdprConsentType": "terms_of_service",
+      "granted": true,
+      "grantedAt": "2024-01-15T10:30:00Z",
+      "grantedIp": "192.168.1.100",
+      "consentSource": "web_form",
+      "policyVersion": "1.5",
+      "policyUrl": "https://example.com/terms-v1.5.pdf",
+      "isCurrentVersion": false,
+      "language": {
+        "@type": "Language",
+        "code": "en",
+        "name": "English"
+      },
+      "legalBasis": "contract"
+    },
+    {
+      "@type": "CustomerGdprConsent",
+      "customer": {
+        "@type": "Customer",
+        "customerNumber": "CUST-2024-00123"
+      },
+      "gdprConsentType": "right_to_be_forgotten",
+      "granted": false,
+      "revokedAt": "2024-08-20T16:00:00Z",
+      "revocationReason": "right_to_be_forgotten",
+      "requestFulfilledAt": "2024-08-25T10:00:00Z",
+      "consentSource": "email",
+      "language": {
+        "@type": "Language",
+        "code": "en",
+        "name": "English"
+      }
+    },
+    {
+      "@type": "CustomerGdprConsent",
+      "customer": {
+        "@type": "Customer",
+        "customerNumber": "CLIENT-2024-00456"
+      },
+      "gdprConsentType": "data_processing",
+      "granted": true,
+      "grantedAt": "2024-03-10T11:00:00Z",
+      "grantedIp": "89.156.23.45",
+      "consentSource": "web_form",
+      "policyVersion": "2.1",
+      "policyUrl": "https://example.com/politique-confidentialite-v2.1.pdf",
+      "isCurrentVersion": true,
+      "language": {
+        "@type": "Language",
+        "code": "fr",
+        "name": "Français"
+      },
+      "legalBasis": "consent",
+      "dataRetentionUntil": "2027-03-10T00:00:00Z",
+      "dataCategories": [
+        "identity",
+        "contact",
+        "behavioral"
+      ],
+      "processingPurposes": [
+        "service_delivery",
+        "analytics"
+      ]
+    },
+    {
+      "@type": "CustomerGdprConsent",
+      "customer": {
+        "@type": "Customer",
+        "customerNumber": "CUST-2024-00789"
+      },
+      "gdprConsentType": "profiling_opt_out",
+      "granted": false,
+      "grantedAt": "2023-06-10T15:00:00Z",
+      "withdrawnAt": "2024-02-15T10:00:00Z",
+      "withdrawnIp": "203.0.113.60",
+      "revocationReason": "objection_to_processing",
+      "consentSource": "preference_center",
+      "policyVersion": "2.0",
+      "language": {
+        "@type": "Language",
+        "code": "en",
+        "name": "English"
+      },
+      "legalBasis": "legitimate_interests"
+    }
+  ]
+}

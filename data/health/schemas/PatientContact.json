@@ -9,7 +9,10 @@
       "type": "string[]",
       "description": "Nature of the relationship (emergency, guardian, partner, family, parent, child, etc.)",
       "required": true,
-      "example": ["Emergency Contact", "Spouse"]
+      "example": [
+        "Emergency Contact",
+        "Spouse"
+      ]
     },
     {
       "name": "name",
@@ -46,7 +49,10 @@
   "examples": [
     {
       "@type": "PatientContact",
-      "relationship": ["Emergency Contact", "Spouse"],
+      "relationship": [
+        "Emergency Contact",
+        "Spouse"
+      ],
       "name": {
         "givenName": "Michael",
         "familyName": "Johnson"

@@ -1,0 +1,7 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "CustomerTag",
+  "description": "Tag for customer categorization and filtering with many-to-many relationship support",
+  "properties": []
+}

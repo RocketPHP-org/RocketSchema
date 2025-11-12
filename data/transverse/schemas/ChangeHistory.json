@@ -1,0 +1,142 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "ChangeHistory",
+  "description": "Universal audit trail tracking all field-level modifications with before/after values for any entity type. Supports regulatory compliance (GDPR Article 30, SOX, HIPAA) across all business entities.",
+  "properties": [
+    {
+      "name": "entityType",
+      "type": "string",
+      "mode": "stored",
+      "description": "Type of entity that was modified (Customer, Employee, Order, Product, etc.)",
+      "required": true,
+      "example": "Customer"
+    },
+    {
+      "name": "entityId",
+      "type": "string",
+      "mode": "stored",
+      "description": "Unique identifier of the entity that was modified",
+      "required": true,
+      "example": "CUST-2024-00123"
+    },
+    {
+      "name": "fieldName",
+      "type": "string",
+      "mode": "stored",
+      "description": "Name of the field that was modified",
+      "required": true,
+      "example": "status"
+    },
+    {
+      "name": "oldValue",
+      "type": "string",
+      "mode": "stored",
+      "description": "Previous value before the change (serialized as string)",
+      "example": "active"
+    },
+    {
+      "name": "newValue",
+      "type": "string",
+      "mode": "stored",
+      "description": "New value after the change (serialized as string)",
+      "required": true,
+      "example": "inactive"
+    },
+    {
+      "name": "changeReason",
+      "type": "string",
+      "mode": "stored",
+      "description": "Business reason or justification for the change",
+      "example": "Customer requested account suspension"
+    },
+    {
+      "name": "changeType",
+      "type": "string",
+      "mode": "enum",
+      "enum": [
+        "create",
+        "update",
+        "delete"
+      ],
+      "description": "Type of change operation",
+      "required": true,
+      "example": "update"
+    },
+    {
+      "name": "ipAddress",
+      "type": "string",
+      "mode": "stored",
+      "description": "IP address from which the change was made",
+      "example": "192.168.1.100"
+    },
+    {
+      "name": "userAgent",
+      "type": "string",
+      "mode": "stored",
+      "description": "Browser/client user agent string for additional context",
+      "example": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)"
+    },
+    {
+      "name": "sessionId",
+      "type": "string",
+      "mode": "stored",
+      "description": "Session identifier for grouping related changes",
+      "example": "sess_abc123xyz"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "ChangeHistory",
+      "entityType": "Customer",
+      "entityId": "CUST-2024-00123",
+      "fieldName": "status",
+      "oldValue": "active",
+      "newValue": "suspended",
+      "changeReason": "Customer requested temporary account suspension",
+      "changeType": "update",
+      "ipAddress": "192.168.1.100",
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
+      "sessionId": "sess_abc123xyz"
+    },
+    {
+      "@type": "ChangeHistory",
+      "entityType": "Customer",
+      "entityId": "CUST-2024-00789",
+      "fieldName": "creditLimit",
+      "oldValue": "50000.00",
+      "newValue": "100000.00",
+      "changeReason": "Credit review approved - increased limit for enterprise customer",
+      "changeType": "update",
+      "ipAddress": "10.0.0.50",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/119.0.0.0",
+      "sessionId": "sess_xyz789abc"
+    },
+    {
+      "@type": "ChangeHistory",
+      "entityType": "Product",
+      "entityId": "PROD-2024-05678",
+      "fieldName": "price",
+      "oldValue": "99.99",
+      "newValue": "79.99",
+      "changeReason": "Black Friday promotion - 20% discount applied",
+      "changeType": "update",
+      "ipAddress": "10.0.0.25",
+      "userAgent": "PostmanRuntime/7.35.0",
+      "sessionId": "api_batch_001"
+    },
+    {
+      "@type": "ChangeHistory",
+      "entityType": "Employee",
+      "entityId": "EMP-2024-0042",
+      "fieldName": "department",
+      "oldValue": "Sales",
+      "newValue": "Marketing",
+      "changeReason": "Internal transfer approved by HR",
+      "changeType": "update",
+      "ipAddress": "192.168.10.50",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Edge/119.0.0.0",
+      "sessionId": "sess_hr_transfer_123"
+    }
+  ]
+}

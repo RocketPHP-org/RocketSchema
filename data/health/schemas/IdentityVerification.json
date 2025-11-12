@@ -94,7 +94,10 @@
       },
       "identityTraits": {
         "birthName": "MARTIN",
-        "birthGivenNames": ["Marie", "Louise"],
+        "birthGivenNames": [
+          "Marie",
+          "Louise"
+        ],
         "birthDate": "1985-03-20",
         "sex": "F",
         "birthPlace": "75112",
@@ -119,7 +122,10 @@
       "eIDASLevel": "high",
       "identityTraits": {
         "surname": "Schmidt",
-        "givenNames": ["Hans", "Peter"],
+        "givenNames": [
+          "Hans",
+          "Peter"
+        ],
         "birthDate": "1978-06-15",
         "placeOfBirth": "Berlin, Germany"
       },

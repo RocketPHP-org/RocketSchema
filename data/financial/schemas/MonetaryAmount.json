@@ -30,7 +30,7 @@
     },
     {
       "@type": "MonetaryAmount",
-      "value": 999.50,
+      "value": 999.5,
       "currency": {
         "@type": "Currency",
         "code": "EUR",
@@ -39,7 +39,7 @@
     },
     {
       "@type": "MonetaryAmount",
-      "value": 850.00,
+      "value": 850.0,
       "currency": {
         "@type": "Currency",
         "code": "GBP",

@@ -1,0 +1,218 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "ExternalReference",
+  "description": "Universal reference to records in external systems (Salesforce, SAP, Shopify, Stripe, QuickBooks, etc.) for integration purposes across all entity types",
+  "properties": [
+    {
+      "name": "entityType",
+      "type": "string",
+      "mode": "stored",
+      "description": "Type of entity being referenced (Customer, Product, Employee, Order, Invoice, Patient, etc.)",
+      "required": true,
+      "example": "Customer"
+    },
+    {
+      "name": "entityId",
+      "type": "string",
+      "mode": "stored",
+      "description": "Unique identifier of the entity in the local system",
+      "required": true,
+      "example": "CUST-2024-00123"
+    },
+    {
+      "name": "systemName",
+      "type": "string",
+      "mode": "stored",
+      "description": "Name of the external system",
+      "required": true,
+      "example": "Salesforce"
+    },
+    {
+      "name": "systemType",
+      "type": "string",
+      "mode": "enum",
+      "enum": [
+        "CRM",
+        "ERP",
+        "E-commerce",
+        "Payment",
+        "Accounting",
+        "HR",
+        "Healthcare",
+        "Marketing",
+        "Analytics",
+        "Other"
+      ],
+      "description": "Category of the external system",
+      "example": "CRM"
+    },
+    {
+      "name": "externalId",
+      "type": "string",
+      "mode": "stored",
+      "description": "Unique identifier in the external system",
+      "required": true,
+      "example": "0031234567890ABC"
+    },
+    {
+      "name": "externalUrl",
+      "type": "string",
+      "mode": "stored",
+      "description": "Direct URL to the record in the external system",
+      "example": "https://example.salesforce.com/0031234567890ABC"
+    },
+    {
+      "name": "syncStatus",
+      "type": "string",
+      "mode": "enum",
+      "enum": [
+        "synced",
+        "pending",
+        "failed",
+        "disabled"
+      ],
+      "description": "Current synchronization status",
+      "required": true,
+      "example": "synced"
+    },
+    {
+      "name": "syncedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Timestamp of last successful synchronization",
+      "example": "2024-11-12T10:00:00Z"
+    },
+    {
+      "name": "syncDirection",
+      "type": "string",
+      "mode": "enum",
+      "enum": [
+        "bidirectional",
+        "push_only",
+        "pull_only"
+      ],
+      "description": "Direction of data synchronization",
+      "example": "bidirectional"
+    },
+    {
+      "name": "lastSyncError",
+      "type": "string",
+      "mode": "stored",
+      "description": "Error message from last failed synchronization attempt",
+      "example": "Authentication failed: Invalid API key"
+    },
+    {
+      "name": "metadata",
+      "type": "object",
+      "mode": "stored",
+      "description": "Additional system-specific metadata (API version, region, etc.)",
+      "example": {
+        "apiVersion": "v52.0",
+        "region": "us-east-1",
+        "instanceUrl": "https://na1.salesforce.com"
+      }
+    }
+  ],
+  "examples": [
+    {
+      "@type": "ExternalReference",
+      "entityType": "Customer",
+      "entityId": "CUST-2024-00123",
+      "systemName": "Salesforce",
+      "systemType": "CRM",
+      "externalId": "0031234567890ABC",
+      "externalUrl": "https://example.salesforce.com/0031234567890ABC",
+      "syncStatus": "synced",
+      "syncedAt": "2024-11-12T10:00:00Z",
+      "syncDirection": "bidirectional",
+      "metadata": {
+        "apiVersion": "v52.0",
+        "region": "us-east-1",
+        "instanceUrl": "https://na1.salesforce.com"
+      }
+    },
+    {
+      "@type": "ExternalReference",
+      "entityType": "Product",
+      "entityId": "PROD-2024-05678",
+      "systemName": "Shopify",
+      "systemType": "E-commerce",
+      "externalId": "shopify_prod_7234567890",
+      "externalUrl": "https://admin.shopify.com/store/mystore/products/7234567890",
+      "syncStatus": "synced",
+      "syncedAt": "2024-11-12T10:15:00Z",
+      "syncDirection": "push_only",
+      "metadata": {
+        "storeName": "mystore",
+        "productHandle": "premium-widget"
+      }
+    },
+    {
+      "@type": "ExternalReference",
+      "entityType": "Order",
+      "entityId": "ORD-2024-9876",
+      "systemName": "Stripe",
+      "systemType": "Payment",
+      "externalId": "pi_3O4KqN2eZvKYlo2C1234abcd",
+      "externalUrl": "https://dashboard.stripe.com/payments/pi_3O4KqN2eZvKYlo2C1234abcd",
+      "syncStatus": "synced",
+      "syncedAt": "2024-11-12T10:30:00Z",
+      "syncDirection": "pull_only",
+      "metadata": {
+        "paymentIntent": "pi_3O4KqN2eZvKYlo2C1234abcd",
+        "stripeAccount": "acct_1234567890"
+      }
+    },
+    {
+      "@type": "ExternalReference",
+      "entityType": "Invoice",
+      "entityId": "INV-2024-5432",
+      "systemName": "QuickBooks",
+      "systemType": "Accounting",
+      "externalId": "145",
+      "externalUrl": "https://app.qbo.intuit.com/app/invoice?txnId=145",
+      "syncStatus": "failed",
+      "syncedAt": "2024-11-12T09:00:00Z",
+      "syncDirection": "bidirectional",
+      "lastSyncError": "Rate limit exceeded: 429 Too Many Requests",
+      "metadata": {
+        "realmId": "1234567890",
+        "companyId": "9876543210"
+      }
+    },
+    {
+      "@type": "ExternalReference",
+      "entityType": "Employee",
+      "entityId": "EMP-2024-0042",
+      "systemName": "Workday",
+      "systemType": "HR",
+      "externalId": "workday_worker_21-456",
+      "externalUrl": "https://wd2.myworkday.com/company/d/inst/21-456",
+      "syncStatus": "synced",
+      "syncedAt": "2024-11-12T11:00:00Z",
+      "syncDirection": "pull_only",
+      "metadata": {
+        "tenantName": "company",
+        "workerId": "21-456"
+      }
+    },
+    {
+      "@type": "ExternalReference",
+      "entityType": "Patient",
+      "entityId": "PAT-2024-1234",
+      "systemName": "FHIR_Server",
+      "systemType": "Healthcare",
+      "externalId": "Patient/example-patient-123",
+      "externalUrl": "https://fhir.example.org/Patient/example-patient-123",
+      "syncStatus": "synced",
+      "syncedAt": "2024-11-12T11:30:00Z",
+      "syncDirection": "bidirectional",
+      "metadata": {
+        "fhirVersion": "R4",
+        "serverUrl": "https://fhir.example.org",
+        "resourceType": "Patient"
+      }
+    }
+  ]
+}

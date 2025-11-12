@@ -129,7 +129,7 @@
       },
       "totalAmount": {
         "@type": "MonetaryAmount",
-        "value": 1500.00,
+        "value": 1500.0,
         "currency": "USD"
       }
     }

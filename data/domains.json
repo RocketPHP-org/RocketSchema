@@ -1,74 +1,151 @@
 [
   {
-    "name": "core-entities",
-    "label": "Core Business Entities",
-    "description": "Fundamental business entities - people and organizations",
-    "tags": ["core", "entities", "people", "organizations"],
-    "icon": "users",
+    "name": "support-types",
+    "label": "Support Types",
+    "description": "Supporting data types and utilities - addresses, measurements, values",
+    "tags": [
+      "support",
+      "utilities",
+      "types",
+      "helpers"
+    ],
+    "icon": "wrench",
     "order": 1
   },
   {
     "name": "reference-data",
     "label": "Reference Data",
     "description": "Standardized reference data - countries, languages, currencies, genders, etc.",
-    "tags": ["reference", "standards", "codes", "enums"],
+    "tags": [
+      "reference",
+      "standards",
+      "codes",
+      "enums"
+    ],
     "icon": "database",
     "order": 2
   },
   {
-    "name": "support-types",
-    "label": "Support Types",
-    "description": "Supporting data types and utilities - addresses, measurements, values",
-    "tags": ["support", "utilities", "types", "helpers"],
-    "icon": "wrench",
+    "name": "core-entities",
+    "label": "Core Business Entities",
+    "description": "Fundamental business entities - people and organizations",
+    "tags": [
+      "core",
+      "entities",
+      "people",
+      "organizations"
+    ],
+    "icon": "users",
     "order": 3
+  },
+  {
+    "name": "transverse",
+    "label": "Transverse Entities",
+    "description": "Universal entities that apply across all domains - audit trails, external references, consents, and cross-cutting concerns",
+    "tags": [
+      "transverse",
+      "universal",
+      "audit",
+      "compliance",
+      "integrations"
+    ],
+    "icon": "git-branch",
+    "order": 4
+  },
+  {
+    "name": "crm",
+    "label": "CRM & Customer Management",
+    "description": "Customer Relationship Management - customer data, segmentation, loyalty programs, marketing consents, and relationship tracking",
+    "tags": [
+      "crm",
+      "customers",
+      "loyalty",
+      "marketing",
+      "segmentation",
+      "gdpr"
+    ],
+    "icon": "user-heart",
+    "order": 5
   },
   {
     "name": "e-commerce",
     "label": "E-Commerce",
     "description": "Online retail, product catalogs, shopping carts, orders, and customer management",
-    "tags": ["e-commerce", "retail", "shopping", "orders", "products"],
+    "tags": [
+      "e-commerce",
+      "retail",
+      "shopping",
+      "orders",
+      "products"
+    ],
     "icon": "shopping-cart",
-    "order": 4
-  },
-  {
-    "name": "health",
-    "label": "Health & Medical",
-    "description": "Healthcare entities - patients, practitioners, medical records, and clinical data",
-    "tags": ["health", "medical", "healthcare", "clinical", "patients"],
-    "icon": "heart-pulse",
-    "order": 5
-  },
-  {
-    "name": "human-resources",
-    "label": "Human Resources",
-    "description": "Employee management, recruitment, attendance, performance, training, and payroll",
-    "tags": ["hr", "employees", "payroll", "recruitment", "performance"],
-    "icon": "user-check",
     "order": 6
-  },
-  {
-    "name": "fleet",
-    "label": "Fleet Management",
-    "description": "Vehicle tracking, maintenance, fuel management, and service scheduling",
-    "tags": ["fleet", "vehicles", "maintenance", "logistics"],
-    "icon": "truck",
-    "order": 7
   },
   {
     "name": "financial",
     "label": "Financial",
     "description": "Accounting, invoicing, payments, and financial transactions",
-    "tags": ["financial", "accounting", "invoices", "payments"],
+    "tags": [
+      "financial",
+      "accounting",
+      "invoices",
+      "payments"
+    ],
     "icon": "dollar-sign",
+    "order": 7
+  },
+  {
+    "name": "human-resources",
+    "label": "Human Resources",
+    "description": "Employee management, recruitment, attendance, performance, training, and payroll",
+    "tags": [
+      "hr",
+      "employees",
+      "payroll",
+      "recruitment",
+      "performance"
+    ],
+    "icon": "user-check",
     "order": 8
+  },
+  {
+    "name": "health",
+    "label": "Health & Medical",
+    "description": "Healthcare entities - patients, practitioners, medical records, and clinical data",
+    "tags": [
+      "health",
+      "medical",
+      "healthcare",
+      "clinical",
+      "patients"
+    ],
+    "icon": "heart-pulse",
+    "order": 9
+  },
+  {
+    "name": "fleet",
+    "label": "Fleet Management",
+    "description": "Vehicle tracking, maintenance, fuel management, and service scheduling",
+    "tags": [
+      "fleet",
+      "vehicles",
+      "maintenance",
+      "logistics"
+    ],
+    "icon": "truck",
+    "order": 10
   },
   {
     "name": "knowledge",
     "label": "Knowledge Management",
     "description": "Document management, knowledge bases, categories, and search functionality",
-    "tags": ["knowledge", "documents", "cms", "content"],
+    "tags": [
+      "knowledge",
+      "documents",
+      "cms",
+      "content"
+    ],
     "icon": "book-open",
-    "order": 9
+    "order": 11
   }
 ]

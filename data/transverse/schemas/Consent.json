@@ -1,0 +1,231 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "Consent",
+  "description": "Universal consent tracking entity for all types of consent (marketing, GDPR, cookies, medical, data processing, etc.) with full audit trail. Base entity that can be extended for specific consent types.",
+  "properties": [
+    {
+      "name": "entityType",
+      "type": "string",
+      "mode": "stored",
+      "description": "Type of entity giving consent (Customer, Patient, Employee, User, etc.)",
+      "required": true,
+      "example": "Customer"
+    },
+    {
+      "name": "entityId",
+      "type": "string",
+      "mode": "stored",
+      "description": "Unique identifier of the entity giving consent",
+      "required": true,
+      "example": "CUST-2024-00123"
+    },
+    {
+      "name": "consentType",
+      "type": "string",
+      "mode": "enum",
+      "enum": [
+        "marketing",
+        "privacy_policy",
+        "terms_of_service",
+        "data_processing",
+        "cookies",
+        "analytics",
+        "medical_treatment",
+        "data_sharing",
+        "research",
+        "third_party_sharing"
+      ],
+      "description": "Category of consent being tracked",
+      "required": true,
+      "example": "marketing"
+    },
+    {
+      "name": "granted",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether consent is currently granted (true) or withdrawn (false)",
+      "required": true,
+      "example": true
+    },
+    {
+      "name": "grantedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Timestamp when consent was granted",
+      "example": "2024-01-15T10:30:00Z"
+    },
+    {
+      "name": "grantedIp",
+      "type": "string",
+      "mode": "stored",
+      "description": "IP address from which consent was granted (GDPR Article 7 proof requirement)",
+      "example": "192.168.1.100"
+    },
+    {
+      "name": "grantedBy",
+      "type": "User",
+      "mode": "stored",
+      "description": "User who granted consent (if obtained by staff on behalf of entity)",
+      "example": {
+        "@type": "User",
+        "userId": "support_042"
+      }
+    },
+    {
+      "name": "consentSource",
+      "type": "string",
+      "mode": "enum",
+      "enum": [
+        "web_form",
+        "mobile_app",
+        "api",
+        "customer_service",
+        "in_person",
+        "email",
+        "phone",
+        "import",
+        "manual"
+      ],
+      "description": "Source or method through which consent was obtained",
+      "example": "web_form"
+    },
+    {
+      "name": "withdrawnAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Timestamp when consent was withdrawn",
+      "example": "2024-06-15T14:20:00Z"
+    },
+    {
+      "name": "withdrawnIp",
+      "type": "string",
+      "mode": "stored",
+      "description": "IP address from which consent was withdrawn",
+      "example": "192.168.1.105"
+    },
+    {
+      "name": "withdrawnBy",
+      "type": "User",
+      "mode": "stored",
+      "description": "User who withdrew consent (if withdrawn by staff)"
+    },
+    {
+      "name": "withdrawalReason",
+      "type": "string",
+      "mode": "stored",
+      "description": "Reason provided for consent withdrawal",
+      "example": "No longer interested"
+    },
+    {
+      "name": "consentVersion",
+      "type": "string",
+      "mode": "stored",
+      "description": "Version of the consent form, policy, or terms under which consent was given",
+      "example": "2.1"
+    },
+    {
+      "name": "language",
+      "type": "Language",
+      "mode": "stored",
+      "description": "Language in which consent was presented and obtained"
+    },
+    {
+      "name": "expiresAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Optional expiration date for time-limited consents",
+      "example": "2025-01-15T00:00:00Z"
+    },
+    {
+      "name": "metadata",
+      "type": "object",
+      "mode": "stored",
+      "description": "Additional consent-specific metadata (form ID, document URL, etc.)",
+      "example": {
+        "formId": "consent_form_v2.1",
+        "documentUrl": "https://example.com/privacy-policy-v2.1.pdf"
+      }
+    }
+  ],
+  "examples": [
+    {
+      "@type": "Consent",
+      "entityType": "Customer",
+      "entityId": "CUST-2024-00123",
+      "consentType": "privacy_policy",
+      "granted": true,
+      "grantedAt": "2024-01-15T10:30:00Z",
+      "grantedIp": "192.168.1.100",
+      "consentSource": "web_form",
+      "consentVersion": "2.1",
+      "language": {
+        "@type": "Language",
+        "code": "en",
+        "name": "English"
+      },
+      "metadata": {
+        "formId": "privacy_policy_v2.1",
+        "documentUrl": "https://example.com/privacy-policy-v2.1.pdf"
+      }
+    },
+    {
+      "@type": "Consent",
+      "entityType": "Customer",
+      "entityId": "CUST-2024-00123",
+      "consentType": "cookies",
+      "granted": false,
+      "withdrawnAt": "2024-06-15T14:20:00Z",
+      "withdrawnIp": "192.168.1.105",
+      "withdrawalReason": "Privacy concerns",
+      "consentVersion": "1.5"
+    },
+    {
+      "@type": "Consent",
+      "entityType": "Patient",
+      "entityId": "PAT-2024-1234",
+      "consentType": "medical_treatment",
+      "granted": true,
+      "grantedAt": "2024-05-10T09:00:00Z",
+      "grantedIp": "10.0.0.25",
+      "grantedBy": {
+        "@type": "User",
+        "userId": "nurse_012",
+        "name": "Nurse Smith"
+      },
+      "consentSource": "in_person",
+      "consentVersion": "3.0",
+      "language": {
+        "@type": "Language",
+        "code": "en",
+        "name": "English"
+      },
+      "metadata": {
+        "procedureType": "Surgery",
+        "consentFormSigned": true,
+        "witnessName": "Dr. Johnson"
+      }
+    },
+    {
+      "@type": "Consent",
+      "entityType": "Employee",
+      "entityId": "EMP-2024-0042",
+      "consentType": "data_sharing",
+      "granted": true,
+      "grantedAt": "2024-02-01T08:00:00Z",
+      "grantedIp": "10.10.10.50",
+      "consentSource": "email",
+      "consentVersion": "1.0",
+      "language": {
+        "@type": "Language",
+        "code": "en",
+        "name": "English"
+      },
+      "expiresAt": "2025-02-01T00:00:00Z",
+      "metadata": {
+        "dataSharingPartner": "Background Check Provider",
+        "purpose": "Employment verification"
+      }
+    }
+  ]
+}

@@ -333,64 +333,14 @@
       "mode": "computed"
     },
     {
-      "name": "createdBy",
-      "type": "User",
-      "description": "User who created this customer record",
-      "mode": "stored"
-    },
-    {
-      "name": "createdAt",
-      "type": "DateTime",
-      "description": "Timestamp when customer record was created",
-      "required": true,
-      "mode": "stored"
-    },
-    {
-      "name": "modifiedBy",
-      "type": "User",
-      "description": "User who last modified this customer record",
-      "mode": "stored"
-    },
-    {
-      "name": "modifiedAt",
-      "type": "DateTime",
-      "description": "Timestamp of last modification",
-      "mode": "stored"
-    },
-    {
-      "name": "deleted",
-      "type": "boolean",
-      "description": "Soft delete flag for data retention compliance",
-      "example": false,
-      "mode": "computed"
-    },
-    {
-      "name": "deletedBy",
-      "type": "User",
-      "description": "User who soft-deleted this customer record",
-      "mode": "stored"
-    },
-    {
-      "name": "deletedAt",
-      "type": "DateTime",
-      "description": "Timestamp when customer record was soft-deleted",
-      "mode": "stored"
-    },
-    {
-      "name": "deletionReason",
-      "type": "string",
-      "description": "Business reason for customer deletion",
-      "mode": "stored"
-    },
-    {
       "name": "changeHistory",
-      "type": "CustomerChangeHistory[]",
+      "type": "ChangeHistory[]",
       "description": "Comprehensive change log tracking all field-level modifications with before/after values for audit trail and regulatory compliance",
       "mode": "stored"
     },
     {
       "name": "externalReferences",
-      "type": "CustomerExternalReference[]",
+      "type": "ExternalReference[]",
       "description": "References to customer records in external systems (Salesforce, SAP, etc.) for integration purposes",
       "example": [
         {
@@ -509,19 +459,6 @@
         "eco-conscious",
         "frequent-buyer"
       ],
-      "createdBy": {
-        "@type": "User",
-        "userId": "system",
-        "name": "System Registration"
-      },
-      "createdAt": "2024-01-15T10:00:00Z",
-      "modifiedBy": {
-        "@type": "User",
-        "userId": "support_042",
-        "name": "Customer Support Agent"
-      },
-      "modifiedAt": "2024-11-10T14:30:00Z",
-      "deleted": false,
       "dataQuality": {
         "qualityScore": 95,
         "lastVerifiedAt": "2024-11-01T00:00:00Z",
@@ -654,19 +591,6 @@
         "strategic-account",
         "volume-buyer"
       ],
-      "createdBy": {
-        "@type": "User",
-        "userId": "sales_028",
-        "name": "Sales Executive"
-      },
-      "createdAt": "2023-06-10T14:00:00Z",
-      "modifiedBy": {
-        "@type": "User",
-        "userId": "account_mgr_015",
-        "name": "Account Manager"
-      },
-      "modifiedAt": "2024-10-20T16:45:00Z",
-      "deleted": false,
       "externalReferences": [
         {
           "system": "Salesforce",

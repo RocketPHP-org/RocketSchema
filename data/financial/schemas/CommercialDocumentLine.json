@@ -103,7 +103,7 @@
       },
       "unitPrice": {
         "@type": "MonetaryAmount",
-        "value": 150.00,
+        "value": 150.0,
         "currency": {
           "@type": "Currency",
           "code": "USD",

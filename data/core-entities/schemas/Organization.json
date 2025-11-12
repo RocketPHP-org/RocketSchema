@@ -15,7 +15,10 @@
       "name": "alias",
       "type": "string[]",
       "description": "Alternate names or trading names for the organization",
-      "example": ["Acme", "Acme Corp"]
+      "example": [
+        "Acme",
+        "Acme Corp"
+      ]
     },
     {
       "name": "legalName",
@@ -126,7 +129,10 @@
     {
       "@type": "Organization",
       "name": "Acme Corp",
-      "alias": ["Acme", "Acme Corporation"],
+      "alias": [
+        "Acme",
+        "Acme Corporation"
+      ],
       "legalName": "Acme Corporation Inc.",
       "status": "active",
       "identifier": [

@@ -189,7 +189,9 @@
       "allergyStatus": "SEE_ALLERGY_LIST",
       "organDonor": true,
       "advanceDirective": true,
-      "disabilityAccommodations": ["Wheelchair access required"],
+      "disabilityAccommodations": [
+        "Wheelchair access required"
+      ],
       "telecoms": [
         {
           "@type": "ContactPoint",
@@ -266,7 +268,10 @@
         },
         "identityTraits": {
           "birthName": "MARTIN",
-          "birthGivenNames": ["Marie", "Louise"],
+          "birthGivenNames": [
+            "Marie",
+            "Louise"
+          ],
           "birthDate": "1985-03-20",
           "sex": "F",
           "birthPlace": "75112",
@@ -287,7 +292,10 @@
       "contact": [
         {
           "@type": "PatientContact",
-          "relationship": ["Personne à prévenir", "Conjoint"],
+          "relationship": [
+            "Personne à prévenir",
+            "Conjoint"
+          ],
           "name": {
             "givenName": "Pierre",
             "familyName": "MARTIN"
