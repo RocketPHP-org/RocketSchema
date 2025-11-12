@@ -4,17 +4,27 @@ import { useState } from 'react';
 import { SchemaDefinition } from '@/types/schema';
 import { CategoryMetadata } from '@/types/category';
 import { SolutionMetadata } from '@/lib/schemas';
-import SchemaCard from '@/components/SchemaCard';
 import { SchemaSearch } from '@/components/SchemaSearch';
 import { Badge } from '@/components/ui/badge';
+import Link from 'next/link';
+import { ArrowRight } from 'lucide-react';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 
 interface SchemaGridProps {
   categories: CategoryMetadata[];
   schemasByCategory: Record<string, SchemaDefinition[]>;
   solutions: SolutionMetadata[];
+  solutionName?: string; // Optional: if provided, schema links will be scoped to solution
 }
 
-export function SchemaGrid({ categories, schemasByCategory, solutions }: SchemaGridProps) {
+export function SchemaGrid({ categories, schemasByCategory, solutions, solutionName }: SchemaGridProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSolution, setSelectedSolution] = useState<string | null>(null);
 
@@ -64,55 +74,15 @@ export function SchemaGrid({ categories, schemasByCategory, solutions }: SchemaG
     return sum + (schemasByCategory[cat.name] || []).length;
   }, 0);
 
+  // Helper to generate schema link based on context
+  const getSchemaLink = (schemaName: string) => {
+    return solutionName
+      ? `/solutions/${solutionName}/schemas/${schemaName}`
+      : `/schemas/${schemaName}`;
+  };
+
   return (
-    <>
-      {/* Search Bar */}
-      <div className="mb-8">
-        <SchemaSearch value={searchQuery} onChange={setSearchQuery} />
-      </div>
-
-      {/* Dynamic Stats */}
-      <div className="flex justify-center gap-8 mb-8">
-        <div className="text-center">
-          <div className="text-3xl font-bold text-primary">
-            {totalDomains}
-          </div>
-          <div className="text-sm text-muted-foreground">Domains</div>
-        </div>
-        <div className="w-px bg-border"></div>
-        <div className="text-center">
-          <div className="text-3xl font-bold text-primary">
-            {totalSchemas}
-          </div>
-          <div className="text-sm text-muted-foreground">Schemas</div>
-        </div>
-      </div>
-
-      {/* Solution Filter Chips */}
-      {solutions.length > 0 && (
-        <div className="mb-8">
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-sm font-medium text-muted-foreground">Solutions:</span>
-            <Badge
-              variant={selectedSolution === null ? "default" : "outline"}
-              className="cursor-pointer hover:bg-primary/10"
-              onClick={() => setSelectedSolution(null)}
-            >
-              All Domains
-            </Badge>
-            {solutions.map(solution => (
-              <Badge
-                key={solution.name}
-                variant={selectedSolution === solution.name ? "default" : "outline"}
-                className="cursor-pointer hover:bg-primary/10"
-                onClick={() => handleSolutionClick(solution.name)}
-              >
-                {solution.label}
-              </Badge>
-            ))}
-          </div>
-        </div>
-      )}
+    <div className="w-full">
 
       {/* Business Domains */}
       {businessCategories.map((category, index) => {
@@ -129,10 +99,43 @@ export function SchemaGrid({ categories, schemasByCategory, solutions }: SchemaG
               {category.label}
             </h3>
             <p className="text-muted-foreground mb-6">{category.description}</p>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredSchemas.map((schema) => (
-                <SchemaCard key={schema.name} schema={schema} />
-              ))}
+            <div className="rounded-md border bg-white dark:bg-gray-800">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Schema Name</TableHead>
+                    <TableHead>Description</TableHead>
+                    <TableHead className="text-right">Properties</TableHead>
+                    <TableHead className="text-right"></TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredSchemas.map((schema) => (
+                    <TableRow key={schema.name} className="hover:bg-muted/50">
+                      <TableCell className="font-medium w-[250px]">
+                        <Link href={getSchemaLink(schema.name)} className="hover:text-primary hover:underline">
+                          {schema.name}
+                        </Link>
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {schema.description}
+                      </TableCell>
+                      <TableCell className="text-right w-[120px]">
+                        <Badge variant="secondary">
+                          {schema.properties.length}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right w-[80px]">
+                        <Link href={getSchemaLink(schema.name)}>
+                          <Badge variant="outline" className="cursor-pointer hover:bg-primary/10">
+                            <ArrowRight className="h-3 w-3" />
+                          </Badge>
+                        </Link>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             </div>
           </div>
         );
@@ -156,10 +159,43 @@ export function SchemaGrid({ categories, schemasByCategory, solutions }: SchemaG
                   {category.label}
                 </h3>
                 <p className="text-muted-foreground mb-6">{category.description}</p>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {filteredSchemas.map((schema) => (
-                    <SchemaCard key={schema.name} schema={schema} />
-                  ))}
+                <div className="rounded-md border bg-white dark:bg-gray-800">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Schema Name</TableHead>
+                        <TableHead>Description</TableHead>
+                        <TableHead className="text-right">Properties</TableHead>
+                        <TableHead className="text-right"></TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredSchemas.map((schema) => (
+                        <TableRow key={schema.name} className="hover:bg-muted/50">
+                          <TableCell className="font-medium w-[250px]">
+                            <Link href={getSchemaLink(schema.name)} className="hover:text-primary hover:underline">
+                              {schema.name}
+                            </Link>
+                          </TableCell>
+                          <TableCell className="text-muted-foreground">
+                            {schema.description}
+                          </TableCell>
+                          <TableCell className="text-right w-[120px]">
+                            <Badge variant="secondary">
+                              {schema.properties.length}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-right w-[80px]">
+                            <Link href={getSchemaLink(schema.name)}>
+                              <Badge variant="outline" className="cursor-pointer hover:bg-primary/10">
+                                <ArrowRight className="h-3 w-3" />
+                              </Badge>
+                            </Link>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
                 </div>
               </div>
             );
@@ -187,6 +223,6 @@ export function SchemaGrid({ categories, schemasByCategory, solutions }: SchemaG
           </p>
         </div>
       )}
-    </>
+    </div>
   );
 }

@@ -1,24 +1,17 @@
 import Link from 'next/link';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { Button } from '@/components/ui/button';
-import { getAllSchemas, getAllCategories, getSchemasByCategory, getAllSolutions } from '@/lib/schemas';
-import { Github } from 'lucide-react';
-import { SchemaGrid } from '@/components/SchemaGrid';
+import { getAllSolutions } from '@/lib/schemas';
+import { Github, ArrowRight } from 'lucide-react';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
 // Disable static generation to enable hot reload of JSON files
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export default function Home() {
-  const schemas = getAllSchemas();
-  const categories = getAllCategories();
   const solutions = getAllSolutions();
-
-  // Prepare schemas by category for the client component
-  const schemasByCategory: Record<string, any[]> = {};
-  categories.forEach(category => {
-    schemasByCategory[category.name] = getSchemasByCategory(category.name);
-  });
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -63,12 +56,67 @@ export default function Home() {
             </p>
           </div>
 
+          {/* Stats */}
+          <div className="flex justify-center gap-8 pt-2">
+            <div className="text-center">
+              <div className="text-3xl font-bold text-primary">
+                {solutions.length}
+              </div>
+              <div className="text-sm text-muted-foreground">Solutions</div>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* Schemas Grid with Search */}
+      {/* Solutions Grid */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
-        <SchemaGrid categories={categories} schemasByCategory={schemasByCategory} solutions={solutions} />
+        <h3 className="text-2xl font-bold mb-8 text-center">Choose Your Solution</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {solutions.map((solution) => (
+            <Link key={solution.name} href={`/solutions/${solution.name}`}>
+              <Card className="h-full hover:shadow-lg transition-all hover:scale-105 cursor-pointer bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+                <CardHeader>
+                  <CardTitle className="text-xl flex items-center gap-2">
+                    <span>{solution.label}</span>
+                  </CardTitle>
+                  <CardDescription className="line-clamp-2">
+                    {solution.description}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div>
+                      <p className="text-xs font-semibold text-muted-foreground uppercase mb-2">
+                        Includes
+                      </p>
+                      <div className="flex flex-wrap gap-1">
+                        {solution.domains.slice(0, 4).map(domain => (
+                          <Badge key={domain} variant="secondary" className="text-xs">
+                            {domain}
+                          </Badge>
+                        ))}
+                        {solution.domains.length > 4 && (
+                          <Badge variant="secondary" className="text-xs">
+                            +{solution.domains.length - 4} more
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+                <CardFooter className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">
+                    {solution.domains.length} domains
+                  </span>
+                  <div className="flex items-center gap-1 text-sm font-medium text-primary">
+                    Explore
+                    <ArrowRight className="h-4 w-4" />
+                  </div>
+                </CardFooter>
+              </Card>
+            </Link>
+          ))}
+        </div>
       </section>
 
       {/* Footer */}

@@ -1,8 +1,11 @@
 import { notFound } from 'next/navigation';
-import { getSchema, getAllSchemaNames } from '@/lib/schemas';
+import Link from 'next/link';
+import { getSchema, getAllSchemaNames, getAllCategories, getSchemasByCategory } from '@/lib/schemas';
 import PropertyTable from '@/components/PropertyTable';
 import { ThemeToggle } from '@/components/ThemeToggle';
-import { BackButton } from '@/components/BackButton';
+import { SchemaSidebar } from '@/components/SchemaSidebar';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft } from 'lucide-react';
 
 // Disable static generation to enable hot reload of JSON files
 export const dynamic = 'force-dynamic';
@@ -25,25 +28,49 @@ export default function SchemaDetailPage({ params }: PageProps) {
     notFound();
   }
 
+  // Get all categories and schemas for sidebar
+  const allCategories = getAllCategories();
+  const schemasByCategory: Record<string, any[]> = {};
+  allCategories.forEach(category => {
+    schemasByCategory[category.name] = getSchemasByCategory(category.name);
+  });
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header */}
-      <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50">
+        <div className="px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
-            <BackButton />
+            <div className="flex items-center gap-4">
+              <Link href="/">
+                <Button variant="ghost" size="sm">
+                  <ArrowLeft className="mr-2 h-4 w-4" />
+                  Back
+                </Button>
+              </Link>
+              <div>
+                <h1 className="text-xl font-bold">
+                  {schema.name}
+                </h1>
+              </div>
+            </div>
             <ThemeToggle />
           </div>
         </div>
       </header>
 
-      {/* Schema Details */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      {/* Main Layout with Sidebar */}
+      <div className="flex">
+        {/* Left Sidebar */}
+        <SchemaSidebar
+          categories={allCategories}
+          schemasByCategory={schemasByCategory}
+        />
+
+        {/* Schema Details */}
+        <main className="flex-1 px-4 sm:px-6 lg:px-8 py-12">
         {/* Title Section */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-8 mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-            {schema.name}
-          </h1>
           <p className="text-lg text-gray-600 dark:text-gray-300 mb-6">{schema.description}</p>
           <div className="flex gap-4 flex-wrap">
             {schema.extends && (
@@ -94,6 +121,7 @@ export default function SchemaDetailPage({ params }: PageProps) {
           </div>
         )}
       </main>
+      </div>
     </div>
   );
 }

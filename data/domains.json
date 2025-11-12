@@ -54,7 +54,7 @@
   },
   {
     "name": "crm",
-    "label": "CRM & Customer Management",
+    "label": "Customer Management",
     "description": "Customer Relationship Management - customer data, segmentation, loyalty programs, marketing consents, and relationship tracking",
     "tags": [
       "crm",
