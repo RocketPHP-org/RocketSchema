@@ -2,11 +2,12 @@
   "@type": "Schema",
   "@context": "https://rocketschema.org/context",
   "name": "CommercialDocument",
-  "description": "Base schema for all commercial documents (invoices, quotes, delivery notes, orders, credit notes, etc.) - universal across all countries and business types",
+  "description": "Base schema for all commercial documents (invoices, quotes, delivery notes, orders, credit notes, etc.) - universal across all countries and business types. This schema uses intentional denormalization for addresses to maintain point-in-time historical accuracy.",
   "properties": [
     {
       "name": "documentNumber",
       "type": "string",
+      "mode": "stored",
       "description": "Unique document number/reference",
       "required": true,
       "example": "DOC-2024-001"
@@ -14,18 +15,56 @@
     {
       "name": "documentType",
       "type": "DocumentType",
+      "mode": "stored",
       "description": "Type of document (reference to DocumentType entity)",
       "required": true
     },
     {
       "name": "status",
       "type": "string",
-      "description": "Current status (draft, sent, accepted, rejected, paid, cancelled, etc.)",
+      "mode": "enum",
+      "description": "Current status of the document in its lifecycle",
+      "required": true,
+      "allowedValues": [
+        "draft",
+        "pending_approval",
+        "approved",
+        "sent",
+        "acknowledged",
+        "accepted",
+        "rejected",
+        "partially_paid",
+        "paid",
+        "overdue",
+        "cancelled",
+        "void"
+      ],
       "example": "sent"
+    },
+    {
+      "name": "version",
+      "type": "number",
+      "mode": "stored",
+      "description": "Version number of this document (1 for original, incremented for revisions)",
+      "required": true,
+      "example": 1
+    },
+    {
+      "name": "previousVersion",
+      "type": "CommercialDocument",
+      "mode": "stored",
+      "description": "Reference to the previous version if this is a revision"
+    },
+    {
+      "name": "revisionReason",
+      "type": "string",
+      "mode": "stored",
+      "description": "Reason for creating this revision (if applicable)"
     },
     {
       "name": "issueDate",
       "type": "Date",
+      "mode": "stored",
       "description": "Date when the document was issued",
       "required": true,
       "example": "2024-01-15"
@@ -33,105 +72,461 @@
     {
       "name": "validUntil",
       "type": "Date",
-      "description": "Validity date (for quotes, offers)",
+      "mode": "stored",
+      "description": "Validity date (typically used for quotes and offers)",
       "example": "2024-02-15"
     },
     {
       "name": "dueDate",
       "type": "Date",
-      "description": "Due date (for invoices, payments)",
+      "mode": "stored",
+      "description": "Payment due date (for invoices) - if not set, computed from issueDate and paymentTerms",
       "example": "2024-02-15"
+    },
+    {
+      "name": "deliveryDate",
+      "type": "Date",
+      "mode": "stored",
+      "description": "Actual or expected delivery date (for orders and delivery notes)"
     },
     {
       "name": "issuer",
       "type": "Organization",
+      "mode": "stored",
       "description": "Organization issuing the document (seller/supplier)",
       "required": true
     },
     {
+      "name": "issuerName",
+      "type": "string",
+      "mode": "stored",
+      "description": "Cached name of issuer organization for quick display and historical accuracy",
+      "example": "Acme Corp"
+    },
+    {
       "name": "recipient",
       "type": "Organization | Person",
+      "mode": "stored",
       "description": "Recipient of the document (buyer/customer)",
       "required": true
     },
     {
+      "name": "recipientName",
+      "type": "string",
+      "mode": "stored",
+      "description": "Cached name of recipient (organization or person) for quick display and historical accuracy",
+      "example": "Client Company"
+    },
+    {
       "name": "billingAddress",
       "type": "PostalAddress",
-      "description": "Billing address"
+      "mode": "stored",
+      "description": "Billing address at the time of document issuance (snapshot from recipient entity for point-in-time historical accuracy)",
+      "required": true
     },
     {
       "name": "shippingAddress",
       "type": "PostalAddress",
-      "description": "Shipping/delivery address"
+      "mode": "stored",
+      "description": "Shipping/delivery address at the time of document issuance (snapshot for point-in-time historical accuracy)"
     },
     {
       "name": "lineItems",
       "type": "CommercialDocumentLine[]",
-      "description": "Line items/products in the document"
+      "mode": "stored",
+      "description": "Line items/products in the document (composition relationship - line items are part of the document lifecycle)"
+    },
+    {
+      "name": "lineItemCount",
+      "type": "number",
+      "mode": "computed",
+      "description": "Number of line items in this document (computed from lineItems.length)"
     },
     {
       "name": "currency",
       "type": "Currency",
-      "description": "Currency used in the document",
+      "mode": "stored",
+      "description": "Currency used throughout this document - all monetary amounts must use this currency",
       "required": true
     },
     {
-      "name": "paymentTerms",
-      "type": "PaymentTerm",
-      "description": "Payment terms and conditions (reference to PaymentTerm entity)"
+      "name": "language",
+      "type": "Language",
+      "mode": "stored",
+      "description": "Language of the document content (for internationalization)",
+      "example": "en"
+    },
+    {
+      "name": "locale",
+      "type": "string",
+      "mode": "stored",
+      "description": "Locale for number and date formatting (e.g., 'en-US', 'fr-FR', 'de-DE')",
+      "example": "en-US"
+    },
+    {
+      "name": "subtotalAmount",
+      "type": "MonetaryAmount",
+      "mode": "computed",
+      "description": "Sum of all line items before taxes and discounts (computed: sum of lineItems[].quantity * lineItems[].unitPrice)"
+    },
+    {
+      "name": "discountPercentage",
+      "type": "number",
+      "mode": "stored",
+      "description": "Discount percentage applied to the entire document (alternative to discountAmount)",
+      "example": 5.0
     },
     {
       "name": "discountAmount",
       "type": "MonetaryAmount",
-      "description": "Total discount applied to this specific document"
+      "mode": "stored",
+      "description": "Fixed discount amount applied to the entire document (alternative to discountPercentage)"
+    },
+    {
+      "name": "discountReason",
+      "type": "string",
+      "mode": "stored",
+      "description": "Reason for discount (early payment, bulk order, promotion, customer loyalty, etc.)",
+      "example": "Early payment discount"
+    },
+    {
+      "name": "taxAmount",
+      "type": "MonetaryAmount",
+      "mode": "computed",
+      "description": "Total tax amount across all line items (computed: sum of taxes from lineItems)"
+    },
+    {
+      "name": "taxDetails",
+      "type": "TaxEntry[]",
+      "mode": "computed",
+      "description": "Breakdown of taxes by rate and jurisdiction (computed from line items, grouped by tax rate)"
+    },
+    {
+      "name": "isTaxExempt",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this document is exempt from taxes",
+      "example": false
+    },
+    {
+      "name": "taxExemptionReason",
+      "type": "string",
+      "mode": "stored",
+      "description": "Reason for tax exemption (if applicable)"
+    },
+    {
+      "name": "totalAmount",
+      "type": "MonetaryAmount",
+      "mode": "computed",
+      "description": "Final total amount (computed: subtotalAmount + taxAmount - discountAmount). For finalized documents, this value is cached.",
+      "required": true
+    },
+    {
+      "name": "amountPaid",
+      "type": "MonetaryAmount",
+      "mode": "computed",
+      "description": "Total amount paid so far (computed from related payment records)"
+    },
+    {
+      "name": "balanceDue",
+      "type": "MonetaryAmount",
+      "mode": "computed",
+      "description": "Remaining amount to be paid (computed: totalAmount - amountPaid)"
+    },
+    {
+      "name": "isOverdue",
+      "type": "boolean",
+      "mode": "computed",
+      "description": "Whether payment is past due date (computed: current date > dueDate and balanceDue > 0)"
+    },
+    {
+      "name": "totalsLocked",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether computed totals have been calculated and locked (true for finalized documents beyond draft status)",
+      "example": false
+    },
+    {
+      "name": "paymentTerms",
+      "type": "PaymentTerm",
+      "mode": "stored",
+      "description": "Payment terms and conditions (reference to PaymentTerm entity)"
+    },
+    {
+      "name": "deliveryMethod",
+      "type": "string",
+      "mode": "enum",
+      "description": "Shipping/delivery method",
+      "allowedValues": [
+        "standard_shipping",
+        "express_shipping",
+        "overnight",
+        "pickup",
+        "digital_delivery",
+        "hand_delivery",
+        "freight",
+        "other"
+      ]
+    },
+    {
+      "name": "trackingNumber",
+      "type": "string",
+      "mode": "stored",
+      "description": "Shipping tracking number (if applicable)"
+    },
+    {
+      "name": "carrier",
+      "type": "Organization",
+      "mode": "stored",
+      "description": "Shipping carrier organization (reference to carrier/logistics company)"
     },
     {
       "name": "notes",
       "type": "string",
+      "mode": "stored",
       "description": "Additional notes or comments"
+    },
+    {
+      "name": "internalNotes",
+      "type": "string",
+      "mode": "stored",
+      "description": "Internal notes not visible to recipient"
+    },
+    {
+      "name": "termsAndConditions",
+      "type": "string",
+      "mode": "stored",
+      "description": "Terms and conditions text applicable to this document"
     },
     {
       "name": "relatedDocuments",
       "type": "CommercialDocument[]",
-      "description": "Related documents (quote → order → invoice → credit note chain)"
+      "mode": "stored",
+      "description": "Related documents in the transaction chain (quote -> order -> invoice -> credit note). Note: For complex relationship tracking, consider using a separate CommercialDocumentRelation junction entity."
     },
     {
       "name": "attachments",
-      "type": "string[]",
-      "description": "URLs to attached files (PDF, images, etc.)"
+      "type": "Document[]",
+      "mode": "stored",
+      "description": "Attached files (PDF, images, supporting documents, etc.) - references to Document entity"
+    },
+    {
+      "name": "legalEntity",
+      "type": "Organization",
+      "mode": "stored",
+      "description": "Legal entity responsible for this document (may differ from issuer for multi-entity organizations)"
+    },
+    {
+      "name": "fiscalYear",
+      "type": "number",
+      "mode": "stored",
+      "description": "Fiscal year this document belongs to",
+      "example": 2024
+    },
+    {
+      "name": "fiscalPeriod",
+      "type": "string",
+      "mode": "stored",
+      "description": "Fiscal period within the year (Q1, Q2, Q3, Q4, or month)",
+      "example": "Q1"
+    },
+    {
+      "name": "approvedBy",
+      "type": "Person",
+      "mode": "stored",
+      "description": "Person who approved this document (if approval is required)"
+    },
+    {
+      "name": "approvedDate",
+      "type": "Date",
+      "mode": "stored",
+      "description": "Date when this document was approved"
     },
     {
       "name": "metadata",
       "type": "object",
-      "description": "Country-specific or custom fields"
+      "mode": "stored",
+      "description": "Country-specific, industry-specific, or custom fields for extensibility"
     }
   ],
   "examples": [
     {
       "@type": "CommercialDocument",
-      "documentNumber": "DOC-2024-001",
-      "documentType": "invoice",
+      "documentNumber": "INV-2024-001",
+      "documentType": {
+        "@type": "DocumentType",
+        "code": "invoice",
+        "name": "Invoice"
+      },
       "status": "sent",
+      "version": 1,
       "issueDate": "2024-01-15",
       "dueDate": "2024-02-15",
       "issuer": {
         "@type": "Organization",
         "name": "Acme Corp"
       },
+      "issuerName": "Acme Corp",
       "recipient": {
         "@type": "Organization",
         "name": "Client Company"
       },
+      "recipientName": "Client Company",
+      "billingAddress": {
+        "@type": "PostalAddress",
+        "streetAddress": "456 Client Street",
+        "addressLocality": "New York",
+        "addressRegion": "NY",
+        "postalCode": "10001",
+        "addressCountry": "US"
+      },
+      "lineItems": [
+        {
+          "@type": "CommercialDocumentLine",
+          "lineNumber": 1,
+          "description": "Professional Services - Consulting",
+          "quantity": 10,
+          "unitPrice": {
+            "@type": "MonetaryAmount",
+            "value": 150.0,
+            "currency": {
+              "@type": "Currency",
+              "code": "USD",
+              "symbol": "$"
+            }
+          },
+          "taxRate": 10
+        }
+      ],
+      "lineItemCount": 1,
       "currency": {
         "@type": "Currency",
         "code": "USD",
         "symbol": "$"
       },
-      "totalAmount": {
+      "language": "en",
+      "locale": "en-US",
+      "subtotalAmount": {
         "@type": "MonetaryAmount",
         "value": 1500.0,
         "currency": "USD"
-      }
+      },
+      "taxAmount": {
+        "@type": "MonetaryAmount",
+        "value": 150.0,
+        "currency": "USD"
+      },
+      "totalAmount": {
+        "@type": "MonetaryAmount",
+        "value": 1650.0,
+        "currency": "USD"
+      },
+      "balanceDue": {
+        "@type": "MonetaryAmount",
+        "value": 1650.0,
+        "currency": "USD"
+      },
+      "amountPaid": {
+        "@type": "MonetaryAmount",
+        "value": 0.0,
+        "currency": "USD"
+      },
+      "isOverdue": false,
+      "totalsLocked": true,
+      "fiscalYear": 2024,
+      "fiscalPeriod": "Q1"
+    },
+    {
+      "@type": "CommercialDocument",
+      "documentNumber": "QUOTE-2024-042",
+      "documentType": {
+        "@type": "DocumentType",
+        "code": "quote",
+        "name": "Quotation"
+      },
+      "status": "sent",
+      "version": 1,
+      "issueDate": "2024-03-01",
+      "validUntil": "2024-03-31",
+      "issuer": {
+        "@type": "Organization",
+        "name": "Tech Solutions Inc"
+      },
+      "issuerName": "Tech Solutions Inc",
+      "recipient": {
+        "@type": "Person",
+        "givenName": "John",
+        "familyName": "Smith"
+      },
+      "recipientName": "John Smith",
+      "billingAddress": {
+        "@type": "PostalAddress",
+        "streetAddress": "789 Customer Ave",
+        "addressLocality": "Boston",
+        "addressRegion": "MA",
+        "postalCode": "02115",
+        "addressCountry": "US"
+      },
+      "shippingAddress": {
+        "@type": "PostalAddress",
+        "streetAddress": "789 Customer Ave",
+        "addressLocality": "Boston",
+        "addressRegion": "MA",
+        "postalCode": "02115",
+        "addressCountry": "US"
+      },
+      "lineItems": [
+        {
+          "@type": "CommercialDocumentLine",
+          "lineNumber": 1,
+          "description": "Website Development",
+          "quantity": 1,
+          "unitPrice": {
+            "@type": "MonetaryAmount",
+            "value": 5000.0,
+            "currency": {
+              "@type": "Currency",
+              "code": "USD",
+              "symbol": "$"
+            }
+          },
+          "taxRate": 10
+        }
+      ],
+      "lineItemCount": 1,
+      "currency": {
+        "@type": "Currency",
+        "code": "USD",
+        "symbol": "$"
+      },
+      "language": "en",
+      "locale": "en-US",
+      "subtotalAmount": {
+        "@type": "MonetaryAmount",
+        "value": 5000.0,
+        "currency": "USD"
+      },
+      "discountPercentage": 10.0,
+      "discountAmount": {
+        "@type": "MonetaryAmount",
+        "value": 500.0,
+        "currency": "USD"
+      },
+      "discountReason": "First-time customer discount",
+      "taxAmount": {
+        "@type": "MonetaryAmount",
+        "value": 450.0,
+        "currency": "USD"
+      },
+      "totalAmount": {
+        "@type": "MonetaryAmount",
+        "value": 4950.0,
+        "currency": "USD"
+      },
+      "totalsLocked": true,
+      "notes": "This quote is valid for 30 days. Payment terms: 50% upfront, 50% upon completion.",
+      "fiscalYear": 2024,
+      "fiscalPeriod": "Q1"
     }
   ]
 }

@@ -1,0 +1,990 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "Tax",
+  "description": "Comprehensive tax definition and configuration catalog supporting multiple jurisdictions, calculation methods, and complex tax scenarios. Defines tax types, rates, calculation methods, jurisdictions, exemptions, and special handling rules. Reference data used by TaxEntry for actual tax calculations on documents.",
+  "properties": [
+    {
+      "name": "code",
+      "type": "string",
+      "mode": "stored",
+      "description": "Unique tax code identifier (e.g., VAT-STD-20, NY-SALES-8.875)",
+      "required": true,
+      "example": "VAT-STD-20"
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "mode": "stored",
+      "description": "Display name of the tax",
+      "required": true,
+      "example": "VAT Standard Rate"
+    },
+    {
+      "name": "description",
+      "type": "string",
+      "mode": "stored",
+      "description": "Detailed description of the tax, when it applies, and any special conditions",
+      "example": "Standard VAT rate applicable to most goods and services in France"
+    },
+    {
+      "name": "taxType",
+      "type": "string",
+      "mode": "enum",
+      "enum": [
+        "vat",
+        "sales_tax",
+        "gst",
+        "pst",
+        "hst",
+        "use_tax",
+        "withholding",
+        "excise",
+        "customs",
+        "service_tax",
+        "luxury_tax",
+        "import_duty",
+        "export_duty",
+        "carbon_tax",
+        "environmental_tax",
+        "digital_services_tax",
+        "other"
+      ],
+      "description": "Category of tax - determines the nature and regulatory framework of the tax",
+      "required": true,
+      "example": "vat"
+    },
+    {
+      "name": "taxScope",
+      "type": "string",
+      "mode": "enum",
+      "enum": [
+        "goods",
+        "services",
+        "digital_goods",
+        "digital_services",
+        "shipping",
+        "handling",
+        "insurance",
+        "all"
+      ],
+      "description": "Scope of what the tax applies to - restricts tax to specific types of products or services",
+      "example": "goods"
+    },
+    {
+      "name": "rate",
+      "type": "number",
+      "mode": "stored",
+      "description": "Tax rate as percentage (e.g., 20 for 20%) or absolute amount based on calculationMethod",
+      "required": true,
+      "example": 20
+    },
+    {
+      "name": "calculationMethod",
+      "type": "string",
+      "mode": "enum",
+      "enum": [
+        "percentage",
+        "fixed_amount",
+        "tiered",
+        "progressive",
+        "compound",
+        "percentage_tax_included"
+      ],
+      "description": "Method used to calculate the tax. percentage: standard percentage calculation. fixed_amount: flat fee regardless of amount. tiered: different rates for different amount ranges. progressive: rate increases with amount. compound: calculated on top of other taxes (tax on tax). percentage_tax_included: tax is extracted from price that already includes tax (division method)",
+      "required": true,
+      "example": "percentage"
+    },
+    {
+      "name": "isCompound",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this tax is calculated on top of other taxes (compound tax, e.g., Quebec PST on GST)",
+      "example": false
+    },
+    {
+      "name": "compoundSequence",
+      "type": "number",
+      "mode": "stored",
+      "description": "Order in which to apply this tax when multiple taxes exist. Lower numbers applied first. Used for compound tax calculations",
+      "example": 1
+    },
+    {
+      "name": "baseForCompound",
+      "type": "string[]",
+      "mode": "stored",
+      "description": "List of tax codes that should be included in the base amount for compound calculation",
+      "example": ["CA-GST-5"]
+    },
+    {
+      "name": "includeBaseAmount",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "If true, this tax affects the base of subsequent taxes with higher sequence (Odoo pattern)",
+      "example": false
+    },
+    {
+      "name": "isBaseAffected",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "If true, taxes with lower sequence can affect this tax's base amount",
+      "example": true
+    },
+    {
+      "name": "priceIncludesTax",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether the price already includes this tax (tax-inclusive pricing). When true, tax is extracted from price rather than added to it",
+      "example": false
+    },
+    {
+      "name": "jurisdiction",
+      "type": "string",
+      "mode": "stored",
+      "description": "Geographic jurisdiction code (ISO country code, state/province code, or municipality code)",
+      "required": true,
+      "example": "FR"
+    },
+    {
+      "name": "jurisdictionLevel",
+      "type": "string",
+      "mode": "enum",
+      "enum": [
+        "country",
+        "state",
+        "province",
+        "county",
+        "city",
+        "district",
+        "postal_code",
+        "federal",
+        "municipal"
+      ],
+      "description": "Level of jurisdiction hierarchy",
+      "example": "country"
+    },
+    {
+      "name": "jurisdictionName",
+      "type": "string",
+      "mode": "stored",
+      "description": "Human-readable name of the jurisdiction",
+      "example": "New York State"
+    },
+    {
+      "name": "postalCodeFrom",
+      "type": "string",
+      "mode": "stored",
+      "description": "Starting postal/ZIP code for location-based tax (inclusive). Used for granular jurisdiction matching",
+      "example": "75000"
+    },
+    {
+      "name": "postalCodeTo",
+      "type": "string",
+      "mode": "stored",
+      "description": "Ending postal/ZIP code for location-based tax (inclusive). If same as postalCodeFrom, applies to single postal code",
+      "example": "75020"
+    },
+    {
+      "name": "addressType",
+      "type": "string",
+      "mode": "enum",
+      "enum": [
+        "billing",
+        "shipping",
+        "origin"
+      ],
+      "description": "Which address to use for determining tax jurisdiction. billing: customer billing address. shipping: delivery destination. origin: seller/warehouse location",
+      "example": "shipping"
+    },
+    {
+      "name": "isActive",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this tax is currently active and should be applied to new transactions",
+      "example": true
+    },
+    {
+      "name": "effectiveFrom",
+      "type": "Date",
+      "mode": "stored",
+      "description": "Date from which this tax rate is effective (inclusive)",
+      "example": "2024-01-01"
+    },
+    {
+      "name": "effectiveUntil",
+      "type": "Date",
+      "mode": "stored",
+      "description": "Date until which this tax rate is valid (inclusive). Null if indefinite",
+      "example": "2024-12-31"
+    },
+    {
+      "name": "applicableToProducts",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this tax applies to physical products/goods",
+      "example": true
+    },
+    {
+      "name": "applicableToServices",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this tax applies to services",
+      "example": true
+    },
+    {
+      "name": "applicableToShipping",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this tax applies to shipping/freight charges",
+      "example": true
+    },
+    {
+      "name": "applicableToHandling",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this tax applies to handling fees",
+      "example": false
+    },
+    {
+      "name": "applicableToDiscounts",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this tax should be calculated after discounts are applied",
+      "example": true
+    },
+    {
+      "name": "taxClass",
+      "type": "string",
+      "mode": "stored",
+      "description": "Tax class identifier for grouping similar tax rates (e.g., 'standard', 'reduced', 'zero', 'exempt'). Used in Magento/WooCommerce patterns",
+      "example": "standard"
+    },
+    {
+      "name": "taxGroup",
+      "type": "string",
+      "mode": "stored",
+      "description": "Tax group identifier for combining multiple taxes that appear together (e.g., 'EU VAT', 'US Sales Tax')",
+      "example": "EU VAT"
+    },
+    {
+      "name": "priority",
+      "type": "number",
+      "mode": "stored",
+      "description": "Priority for tax calculation and application order. Lower numbers have higher priority. Used for determining which tax applies when multiple rates match",
+      "example": 1
+    },
+    {
+      "name": "displayOrder",
+      "type": "number",
+      "mode": "stored",
+      "description": "Order in which to display this tax on documents (invoices, receipts)",
+      "example": 1
+    },
+    {
+      "name": "minimumAmount",
+      "type": "MonetaryAmount",
+      "mode": "stored",
+      "description": "Minimum transaction amount for tax to apply. Tax only applies if transaction total meets or exceeds this threshold"
+    },
+    {
+      "name": "maximumAmount",
+      "type": "MonetaryAmount",
+      "mode": "stored",
+      "description": "Maximum tax amount cap. Tax calculation is capped at this value regardless of transaction amount"
+    },
+    {
+      "name": "minimumTaxableAmount",
+      "type": "MonetaryAmount",
+      "mode": "stored",
+      "description": "Minimum amount that must be taxable for this tax to apply (different from minimumAmount which is transaction total)"
+    },
+    {
+      "name": "exemptionThreshold",
+      "type": "MonetaryAmount",
+      "mode": "stored",
+      "description": "Amount below which transactions are exempt from this tax (small seller exemption, de minimis threshold)"
+    },
+    {
+      "name": "isReverseCharge",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this tax uses reverse charge mechanism (EU VAT pattern). When true, buyer is responsible for tax payment instead of seller",
+      "example": false
+    },
+    {
+      "name": "reverseChargeConditions",
+      "type": "string",
+      "mode": "stored",
+      "description": "Conditions under which reverse charge applies (e.g., 'B2B intra-community supply', 'Construction services')",
+      "example": "B2B intra-community supply within EU"
+    },
+    {
+      "name": "isIntraCommunity",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this is an intra-community (EU cross-border) tax rate. Applies to supplies between EU member states",
+      "example": false
+    },
+    {
+      "name": "zeroRatedReason",
+      "type": "string",
+      "mode": "enum",
+      "enum": [
+        "export",
+        "intra_community_supply",
+        "international_services",
+        "exempt_goods",
+        "charitable",
+        "government",
+        "education",
+        "healthcare",
+        "financial_services",
+        "insurance",
+        "other"
+      ],
+      "description": "Reason for zero rate or exemption. Important for compliance and audit trails"
+    },
+    {
+      "name": "exemptionCertificateRequired",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether a tax exemption certificate must be provided to apply this tax rate (US pattern for resale certificates)",
+      "example": false
+    },
+    {
+      "name": "vatRegistrationRequired",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether customer must have a valid VAT registration number for this rate to apply",
+      "example": false
+    },
+    {
+      "name": "roundingMethod",
+      "type": "string",
+      "mode": "enum",
+      "enum": [
+        "round_half_up",
+        "round_half_down",
+        "round_up",
+        "round_down",
+        "round_to_nearest_5_cents",
+        "round_per_line",
+        "round_total"
+      ],
+      "description": "Method for rounding tax amounts. round_per_line: round each line item tax. round_total: round total tax only",
+      "example": "round_half_up"
+    },
+    {
+      "name": "roundingPrecision",
+      "type": "number",
+      "mode": "stored",
+      "description": "Number of decimal places for rounding (e.g., 2 for currency precision, 4 for high-precision)",
+      "example": 2
+    },
+    {
+      "name": "roundAtSubtotal",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether to round tax at subtotal level rather than per line item (WooCommerce pattern)",
+      "example": false
+    },
+    {
+      "name": "taxExigibility",
+      "type": "string",
+      "mode": "enum",
+      "enum": [
+        "on_invoice",
+        "on_payment",
+        "on_delivery"
+      ],
+      "description": "When the tax becomes due. on_invoice: due when invoice is issued. on_payment: due when payment is received (cash basis). on_delivery: due when goods are delivered",
+      "example": "on_invoice"
+    },
+    {
+      "name": "cashBasisAccount",
+      "type": "string",
+      "mode": "stored",
+      "description": "Account code for cash basis transition account (Odoo pattern). Used to track tax amounts pending payment"
+    },
+    {
+      "name": "taxableItemCategories",
+      "type": "string[]",
+      "mode": "stored",
+      "description": "List of product/item categories this tax applies to. Empty array means applies to all categories",
+      "example": ["food", "beverages"]
+    },
+    {
+      "name": "exemptItemCategories",
+      "type": "string[]",
+      "mode": "stored",
+      "description": "List of product/item categories exempt from this tax",
+      "example": ["prescription_medicine", "baby_products"]
+    },
+    {
+      "name": "applicableCustomerTypes",
+      "type": "string[]",
+      "mode": "enum",
+      "enum": [
+        "individual",
+        "business",
+        "government",
+        "non_profit",
+        "reseller",
+        "all"
+      ],
+      "description": "Types of customers this tax applies to (Odoo customer tax class pattern)",
+      "example": ["individual", "business"]
+    },
+    {
+      "name": "isWithholding",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this is a withholding tax (tax withheld at source, common in many jurisdictions for payments to contractors/services)",
+      "example": false
+    },
+    {
+      "name": "withholdingType",
+      "type": "string",
+      "mode": "enum",
+      "enum": [
+        "income",
+        "services",
+        "royalties",
+        "dividends",
+        "interest",
+        "rent",
+        "professional_fees"
+      ],
+      "description": "Type of withholding tax if isWithholding is true"
+    },
+    {
+      "name": "withholdingThreshold",
+      "type": "MonetaryAmount",
+      "mode": "stored",
+      "description": "Annual threshold above which withholding tax applies (ERPNext pattern)"
+    },
+    {
+      "name": "childTaxes",
+      "type": "string[]",
+      "mode": "stored",
+      "description": "Array of tax codes that are part of this tax group. Used for composite taxes that combine multiple individual taxes (Odoo group tax pattern)",
+      "example": ["CA-GST-5", "CA-PST-7"]
+    },
+    {
+      "name": "replacedByTaxCode",
+      "type": "string",
+      "mode": "stored",
+      "description": "Code of tax that replaces this one (for historical/archived taxes). Used for fiscal position mapping"
+    },
+    {
+      "name": "originalTaxCodes",
+      "type": "string[]",
+      "mode": "stored",
+      "description": "List of domestic tax codes this tax can replace based on fiscal position (Odoo alternative tax pattern)"
+    },
+    {
+      "name": "invoiceLabel",
+      "type": "string",
+      "mode": "stored",
+      "description": "Label to display on invoices (may differ from name for customer-facing documents)",
+      "example": "Value Added Tax (20%)"
+    },
+    {
+      "name": "receiptLabel",
+      "type": "string",
+      "mode": "stored",
+      "description": "Label to display on receipts, especially point-of-sale receipts (shorter form)",
+      "example": "VAT"
+    },
+    {
+      "name": "legalReference",
+      "type": "string",
+      "mode": "stored",
+      "description": "Legal or regulatory reference for this tax (e.g., 'Article 278 CGI', 'IRC Section 1234')",
+      "example": "EU VAT Directive Article 98"
+    },
+    {
+      "name": "legalNotes",
+      "type": "string",
+      "mode": "stored",
+      "description": "Legal mentions or notes that must be printed on invoices when this tax is applied",
+      "example": "Reverse charge applies - Customer must self-account for VAT"
+    },
+    {
+      "name": "taxAuthorityName",
+      "type": "string",
+      "mode": "stored",
+      "description": "Name of the tax authority that collects this tax",
+      "example": "Direction Générale des Finances Publiques"
+    },
+    {
+      "name": "taxAuthorityCode",
+      "type": "string",
+      "mode": "stored",
+      "description": "Official code or identifier from tax authority",
+      "example": "DGFiP"
+    },
+    {
+      "name": "reportingCategory",
+      "type": "string",
+      "mode": "stored",
+      "description": "Category for tax reporting and filing (maps to tax return line items)",
+      "example": "Box 6 - Standard Rate Sales"
+    },
+    {
+      "name": "accountingCode",
+      "type": "string",
+      "mode": "stored",
+      "description": "General ledger account code for posting this tax",
+      "example": "445710"
+    },
+    {
+      "name": "collectedTaxAccount",
+      "type": "string",
+      "mode": "stored",
+      "description": "Account code for tax collected from customers (sales tax)",
+      "example": "2200"
+    },
+    {
+      "name": "paidTaxAccount",
+      "type": "string",
+      "mode": "stored",
+      "description": "Account code for tax paid to suppliers (purchase tax, input VAT)",
+      "example": "1410"
+    },
+    {
+      "name": "tags",
+      "type": "string[]",
+      "mode": "stored",
+      "description": "Tags for categorizing and filtering taxes (e.g., 'food', 'digital', 'reduced-rate')",
+      "example": ["essential-goods", "reduced-rate"]
+    },
+    {
+      "name": "metadata",
+      "type": "JSON",
+      "mode": "stored",
+      "description": "Additional jurisdiction-specific or implementation-specific metadata as JSON object"
+    },
+    {
+      "name": "isDeleted",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Soft delete flag. Historical tax rates should not be hard deleted but marked as deleted for audit trail",
+      "example": false
+    },
+    {
+      "name": "deletedAt",
+      "type": "Date",
+      "mode": "stored",
+      "description": "Timestamp when tax was soft deleted"
+    },
+    {
+      "name": "createdBy",
+      "type": "string",
+      "mode": "stored",
+      "description": "User ID who created this tax configuration"
+    },
+    {
+      "name": "modifiedBy",
+      "type": "string",
+      "mode": "stored",
+      "description": "User ID who last modified this tax configuration"
+    },
+    {
+      "name": "version",
+      "type": "number",
+      "mode": "stored",
+      "description": "Version number for tracking tax rate changes over time",
+      "example": 1
+    }
+  ],
+  "examples": [
+    {
+      "@type": "Tax",
+      "code": "VAT-STD-20",
+      "name": "VAT Standard Rate",
+      "description": "Standard VAT rate applicable to most goods and services in France",
+      "taxType": "vat",
+      "taxScope": "all",
+      "rate": 20,
+      "calculationMethod": "percentage",
+      "isCompound": false,
+      "priceIncludesTax": false,
+      "jurisdiction": "FR",
+      "jurisdictionLevel": "country",
+      "jurisdictionName": "France",
+      "addressType": "shipping",
+      "isActive": true,
+      "effectiveFrom": "2014-01-01",
+      "applicableToProducts": true,
+      "applicableToServices": true,
+      "applicableToShipping": true,
+      "taxClass": "standard",
+      "taxGroup": "EU VAT",
+      "priority": 1,
+      "displayOrder": 1,
+      "roundingMethod": "round_half_up",
+      "roundingPrecision": 2,
+      "taxExigibility": "on_invoice",
+      "invoiceLabel": "VAT (20%)",
+      "legalReference": "EU VAT Directive Article 98",
+      "reportingCategory": "Box 6",
+      "isDeleted": false
+    },
+    {
+      "@type": "Tax",
+      "code": "VAT-RED-5.5",
+      "name": "VAT Reduced Rate",
+      "description": "Reduced VAT rate for essential goods (food, books, medicine)",
+      "taxType": "vat",
+      "taxScope": "goods",
+      "rate": 5.5,
+      "calculationMethod": "percentage",
+      "isCompound": false,
+      "priceIncludesTax": false,
+      "jurisdiction": "FR",
+      "jurisdictionLevel": "country",
+      "jurisdictionName": "France",
+      "addressType": "shipping",
+      "isActive": true,
+      "effectiveFrom": "2014-01-01",
+      "applicableToProducts": true,
+      "applicableToServices": false,
+      "applicableToShipping": false,
+      "taxClass": "reduced",
+      "taxGroup": "EU VAT",
+      "priority": 1,
+      "displayOrder": 2,
+      "taxableItemCategories": ["food", "books", "medicine"],
+      "roundingMethod": "round_half_up",
+      "roundingPrecision": 2,
+      "taxExigibility": "on_invoice",
+      "invoiceLabel": "VAT Reduced (5.5%)",
+      "reportingCategory": "Box 7",
+      "isDeleted": false
+    },
+    {
+      "@type": "Tax",
+      "code": "VAT-INTRA-0",
+      "name": "VAT Intra-Community Supply",
+      "description": "Zero-rated VAT for B2B intra-community supply within EU",
+      "taxType": "vat",
+      "taxScope": "all",
+      "rate": 0,
+      "calculationMethod": "percentage",
+      "isCompound": false,
+      "priceIncludesTax": false,
+      "jurisdiction": "FR",
+      "jurisdictionLevel": "country",
+      "jurisdictionName": "France",
+      "addressType": "shipping",
+      "isActive": true,
+      "effectiveFrom": "2014-01-01",
+      "applicableToProducts": true,
+      "applicableToServices": true,
+      "taxClass": "zero",
+      "taxGroup": "EU VAT",
+      "isIntraCommunity": true,
+      "isReverseCharge": true,
+      "reverseChargeConditions": "B2B intra-community supply within EU with valid VAT number",
+      "zeroRatedReason": "intra_community_supply",
+      "vatRegistrationRequired": true,
+      "priority": 1,
+      "displayOrder": 1,
+      "applicableCustomerTypes": ["business"],
+      "roundingMethod": "round_half_up",
+      "roundingPrecision": 2,
+      "invoiceLabel": "VAT 0% - Reverse Charge",
+      "legalNotes": "Reverse charge applies - Customer must self-account for VAT under Article 196 EU VAT Directive",
+      "legalReference": "EU VAT Directive Article 138",
+      "reportingCategory": "Box 2 - Intra-Community Supply",
+      "isDeleted": false
+    },
+    {
+      "@type": "Tax",
+      "code": "NY-SALES-8.875",
+      "name": "New York Sales Tax",
+      "description": "Combined state and local sales tax for New York City",
+      "taxType": "sales_tax",
+      "taxScope": "goods",
+      "rate": 8.875,
+      "calculationMethod": "percentage",
+      "isCompound": false,
+      "priceIncludesTax": false,
+      "jurisdiction": "NY",
+      "jurisdictionLevel": "state",
+      "jurisdictionName": "New York State",
+      "addressType": "shipping",
+      "isActive": true,
+      "effectiveFrom": "2024-01-01",
+      "applicableToProducts": true,
+      "applicableToServices": false,
+      "applicableToShipping": true,
+      "taxClass": "standard",
+      "priority": 1,
+      "displayOrder": 1,
+      "exemptItemCategories": ["food_groceries", "prescription_medicine"],
+      "exemptionCertificateRequired": true,
+      "roundingMethod": "round_half_up",
+      "roundingPrecision": 2,
+      "taxExigibility": "on_invoice",
+      "invoiceLabel": "Sales Tax",
+      "taxAuthorityName": "New York State Department of Taxation and Finance",
+      "reportingCategory": "Taxable Sales",
+      "isDeleted": false
+    },
+    {
+      "@type": "Tax",
+      "code": "CA-GST-5",
+      "name": "Canadian GST",
+      "description": "Federal Goods and Services Tax in Canada",
+      "taxType": "gst",
+      "taxScope": "all",
+      "rate": 5,
+      "calculationMethod": "percentage",
+      "isCompound": false,
+      "compoundSequence": 1,
+      "priceIncludesTax": false,
+      "jurisdiction": "CA",
+      "jurisdictionLevel": "federal",
+      "jurisdictionName": "Canada",
+      "addressType": "shipping",
+      "isActive": true,
+      "effectiveFrom": "2024-01-01",
+      "applicableToProducts": true,
+      "applicableToServices": true,
+      "applicableToShipping": true,
+      "taxClass": "standard",
+      "priority": 1,
+      "displayOrder": 1,
+      "roundingMethod": "round_half_up",
+      "roundingPrecision": 2,
+      "taxExigibility": "on_invoice",
+      "invoiceLabel": "GST (5%)",
+      "taxAuthorityName": "Canada Revenue Agency",
+      "reportingCategory": "GST/HST",
+      "isDeleted": false
+    },
+    {
+      "@type": "Tax",
+      "code": "CA-QST-9.975",
+      "name": "Quebec Sales Tax",
+      "description": "Quebec Provincial Sales Tax (calculated on subtotal + GST)",
+      "taxType": "pst",
+      "taxScope": "all",
+      "rate": 9.975,
+      "calculationMethod": "compound",
+      "isCompound": true,
+      "compoundSequence": 2,
+      "baseForCompound": ["CA-GST-5"],
+      "priceIncludesTax": false,
+      "jurisdiction": "QC",
+      "jurisdictionLevel": "province",
+      "jurisdictionName": "Quebec",
+      "addressType": "shipping",
+      "isActive": true,
+      "effectiveFrom": "2024-01-01",
+      "applicableToProducts": true,
+      "applicableToServices": true,
+      "applicableToShipping": true,
+      "taxClass": "standard",
+      "priority": 2,
+      "displayOrder": 2,
+      "roundingMethod": "round_half_up",
+      "roundingPrecision": 2,
+      "taxExigibility": "on_invoice",
+      "invoiceLabel": "QST (9.975%)",
+      "taxAuthorityName": "Revenu Québec",
+      "reportingCategory": "QST",
+      "isDeleted": false
+    },
+    {
+      "@type": "Tax",
+      "code": "UK-VAT-20-INC",
+      "name": "UK VAT Standard Rate (Price Inclusive)",
+      "description": "Standard UK VAT rate with tax-inclusive pricing",
+      "taxType": "vat",
+      "taxScope": "all",
+      "rate": 20,
+      "calculationMethod": "percentage_tax_included",
+      "isCompound": false,
+      "priceIncludesTax": true,
+      "jurisdiction": "GB",
+      "jurisdictionLevel": "country",
+      "jurisdictionName": "United Kingdom",
+      "addressType": "shipping",
+      "isActive": true,
+      "effectiveFrom": "2011-01-04",
+      "applicableToProducts": true,
+      "applicableToServices": true,
+      "applicableToShipping": true,
+      "taxClass": "standard",
+      "priority": 1,
+      "displayOrder": 1,
+      "roundingMethod": "round_half_up",
+      "roundingPrecision": 2,
+      "taxExigibility": "on_invoice",
+      "invoiceLabel": "VAT @ 20%",
+      "taxAuthorityName": "HM Revenue & Customs",
+      "reportingCategory": "Box 1",
+      "isDeleted": false
+    },
+    {
+      "@type": "Tax",
+      "code": "IN-CGST-9",
+      "name": "Central GST",
+      "description": "Central Goods and Services Tax for intra-state supply in India",
+      "taxType": "gst",
+      "taxScope": "all",
+      "rate": 9,
+      "calculationMethod": "percentage",
+      "isCompound": false,
+      "compoundSequence": 1,
+      "priceIncludesTax": false,
+      "jurisdiction": "IN",
+      "jurisdictionLevel": "federal",
+      "jurisdictionName": "India",
+      "addressType": "shipping",
+      "isActive": true,
+      "effectiveFrom": "2017-07-01",
+      "applicableToProducts": true,
+      "applicableToServices": true,
+      "taxClass": "standard",
+      "priority": 1,
+      "displayOrder": 1,
+      "roundingMethod": "round_half_up",
+      "roundingPrecision": 2,
+      "taxExigibility": "on_invoice",
+      "invoiceLabel": "CGST (9%)",
+      "taxAuthorityName": "Central Board of Indirect Taxes and Customs",
+      "reportingCategory": "GSTR-3B Table 3.1",
+      "isDeleted": false
+    },
+    {
+      "@type": "Tax",
+      "code": "IN-SGST-9",
+      "name": "State GST",
+      "description": "State Goods and Services Tax for intra-state supply in India",
+      "taxType": "gst",
+      "taxScope": "all",
+      "rate": 9,
+      "calculationMethod": "percentage",
+      "isCompound": false,
+      "compoundSequence": 1,
+      "priceIncludesTax": false,
+      "jurisdiction": "IN-MH",
+      "jurisdictionLevel": "state",
+      "jurisdictionName": "Maharashtra",
+      "addressType": "shipping",
+      "isActive": true,
+      "effectiveFrom": "2017-07-01",
+      "applicableToProducts": true,
+      "applicableToServices": true,
+      "taxClass": "standard",
+      "priority": 1,
+      "displayOrder": 2,
+      "roundingMethod": "round_half_up",
+      "roundingPrecision": 2,
+      "taxExigibility": "on_invoice",
+      "invoiceLabel": "SGST (9%)",
+      "taxAuthorityName": "Maharashtra State Tax Department",
+      "reportingCategory": "GSTR-3B Table 3.1",
+      "isDeleted": false
+    },
+    {
+      "@type": "Tax",
+      "code": "BR-ICMS-18",
+      "name": "ICMS São Paulo",
+      "description": "State VAT on circulation of goods and services in São Paulo",
+      "taxType": "vat",
+      "taxScope": "goods",
+      "rate": 18,
+      "calculationMethod": "percentage",
+      "isCompound": false,
+      "priceIncludesTax": false,
+      "jurisdiction": "BR-SP",
+      "jurisdictionLevel": "state",
+      "jurisdictionName": "São Paulo",
+      "addressType": "origin",
+      "isActive": true,
+      "effectiveFrom": "2024-01-01",
+      "applicableToProducts": true,
+      "applicableToServices": false,
+      "applicableToShipping": true,
+      "taxClass": "standard",
+      "priority": 1,
+      "displayOrder": 1,
+      "roundingMethod": "round_half_up",
+      "roundingPrecision": 2,
+      "taxExigibility": "on_invoice",
+      "invoiceLabel": "ICMS-SP (18%)",
+      "taxAuthorityName": "Secretaria da Fazenda do Estado de São Paulo",
+      "isDeleted": false
+    },
+    {
+      "@type": "Tax",
+      "code": "AU-GST-10",
+      "name": "Australian GST",
+      "description": "Goods and Services Tax in Australia",
+      "taxType": "gst",
+      "taxScope": "all",
+      "rate": 10,
+      "calculationMethod": "percentage",
+      "isCompound": false,
+      "priceIncludesTax": true,
+      "jurisdiction": "AU",
+      "jurisdictionLevel": "federal",
+      "jurisdictionName": "Australia",
+      "addressType": "shipping",
+      "isActive": true,
+      "effectiveFrom": "2000-07-01",
+      "applicableToProducts": true,
+      "applicableToServices": true,
+      "applicableToShipping": true,
+      "taxClass": "standard",
+      "exemptItemCategories": ["fresh_food", "health", "education"],
+      "priority": 1,
+      "displayOrder": 1,
+      "roundingMethod": "round_half_up",
+      "roundingPrecision": 2,
+      "taxExigibility": "on_invoice",
+      "invoiceLabel": "GST",
+      "taxAuthorityName": "Australian Taxation Office",
+      "reportingCategory": "G1",
+      "isDeleted": false
+    },
+    {
+      "@type": "Tax",
+      "code": "US-WITH-24",
+      "name": "Federal Income Tax Withholding",
+      "description": "Federal income tax withholding on contractor payments",
+      "taxType": "withholding",
+      "rate": 24,
+      "calculationMethod": "percentage",
+      "isCompound": false,
+      "priceIncludesTax": false,
+      "jurisdiction": "US",
+      "jurisdictionLevel": "federal",
+      "jurisdictionName": "United States",
+      "addressType": "billing",
+      "isActive": true,
+      "effectiveFrom": "2024-01-01",
+      "applicableToServices": true,
+      "isWithholding": true,
+      "withholdingType": "professional_fees",
+      "withholdingThreshold": {
+        "amount": 600,
+        "currency": "USD"
+      },
+      "priority": 1,
+      "displayOrder": 1,
+      "roundingMethod": "round_half_up",
+      "roundingPrecision": 2,
+      "invoiceLabel": "Federal Tax Withholding (24%)",
+      "taxAuthorityName": "Internal Revenue Service",
+      "legalReference": "IRC Section 3402",
+      "reportingCategory": "1099-NEC Box 4",
+      "isDeleted": false
+    }
+  ]
+}

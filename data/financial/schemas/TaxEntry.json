@@ -1,0 +1,124 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "TaxEntry",
+  "description": "Tax calculation and breakdown for commercial documents. Represents a single tax component (VAT, sales tax, GST, etc.) with rate, amount, and jurisdiction information.",
+  "properties": [
+    {
+      "name": "taxName",
+      "type": "string",
+      "mode": "stored",
+      "description": "Name of the tax (e.g., 'VAT', 'Sales Tax', 'GST', 'State Tax')",
+      "required": true,
+      "example": "VAT"
+    },
+    {
+      "name": "taxType",
+      "type": "string",
+      "mode": "enum",
+      "enum": [
+        "vat",
+        "sales_tax",
+        "gst",
+        "pst",
+        "hst",
+        "withholding",
+        "excise",
+        "customs",
+        "other"
+      ],
+      "description": "Type of tax",
+      "required": true,
+      "example": "vat"
+    },
+    {
+      "name": "taxRate",
+      "type": "number",
+      "mode": "stored",
+      "description": "Tax rate as percentage (e.g., 20 for 20%)",
+      "required": true,
+      "example": 20
+    },
+    {
+      "name": "taxableAmount",
+      "type": "MonetaryAmount",
+      "mode": "stored",
+      "description": "Amount subject to this tax",
+      "required": true
+    },
+    {
+      "name": "taxAmount",
+      "type": "MonetaryAmount",
+      "mode": "computed",
+      "description": "Calculated tax amount (taxableAmount * taxRate / 100)"
+    },
+    {
+      "name": "jurisdiction",
+      "type": "string",
+      "mode": "stored",
+      "description": "Tax jurisdiction (country, state, province, city)",
+      "example": "FR"
+    },
+    {
+      "name": "taxCode",
+      "type": "string",
+      "mode": "stored",
+      "description": "Official tax code or identifier",
+      "example": "VAT-STD-20"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "TaxEntry",
+      "taxName": "VAT",
+      "taxType": "vat",
+      "taxRate": 20,
+      "taxableAmount": {
+        "@type": "MonetaryAmount",
+        "value": 1000.00,
+        "currency": {
+          "@type": "Currency",
+          "code": "EUR",
+          "symbol": "€"
+        }
+      },
+      "taxAmount": {
+        "@type": "MonetaryAmount",
+        "value": 200.00,
+        "currency": {
+          "@type": "Currency",
+          "code": "EUR",
+          "symbol": "€"
+        }
+      },
+      "jurisdiction": "FR",
+      "taxCode": "VAT-STD-20"
+    },
+    {
+      "@type": "TaxEntry",
+      "taxName": "Sales Tax",
+      "taxType": "sales_tax",
+      "taxRate": 8.875,
+      "taxableAmount": {
+        "@type": "MonetaryAmount",
+        "value": 500.00,
+        "currency": {
+          "@type": "Currency",
+          "code": "USD",
+          "symbol": "$"
+        }
+      },
+      "taxAmount": {
+        "@type": "MonetaryAmount",
+        "value": 44.38,
+        "currency": {
+          "@type": "Currency",
+          "code": "USD",
+          "symbol": "$"
+        }
+      },
+      "jurisdiction": "NY",
+      "taxCode": "NY-SALES-TAX"
+    }
+  ]
+}
