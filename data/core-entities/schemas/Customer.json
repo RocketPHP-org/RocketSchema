@@ -501,47 +501,6 @@
       "loyaltyMemberSince": "2024-01-15",
       "customerSegment": "High-Value",
       "referralCode": "REF-EMILY-2024",
-      "marketingConsent": {
-        "email": {
-          "granted": true,
-          "grantedAt": "2024-01-15T10:30:00Z",
-          "ipAddress": "192.168.1.100",
-          "source": "registration_form"
-        },
-        "sms": {
-          "granted": false
-        },
-        "phone": {
-          "granted": false
-        },
-        "mail": {
-          "granted": true,
-          "grantedAt": "2024-01-15T10:30:00Z",
-          "ipAddress": "192.168.1.100",
-          "source": "registration_form"
-        }
-      },
-      "newsletter": {
-        "subscribed": true,
-        "subscribedAt": "2024-01-15T10:30:00Z",
-        "subscribedIp": "192.168.1.100",
-        "unsubscribeToken": "a1b2c3d4e5f6g7h8"
-      },
-      "gdprConsent": {
-        "privacyPolicyVersion": "2.1",
-        "privacyPolicyAcceptedAt": "2024-01-15T10:30:00Z",
-        "privacyPolicyAcceptedIp": "192.168.1.100",
-        "termsOfServiceVersion": "1.5",
-        "termsOfServiceAcceptedAt": "2024-01-15T10:30:00Z",
-        "termsOfServiceAcceptedIp": "192.168.1.100",
-        "dataProcessingConsent": true,
-        "dataProcessingConsentAt": "2024-01-15T10:30:00Z"
-      },
-      "communicationPreferences": {
-        "channel": "email",
-        "frequency": "weekly",
-        "timezone": "America/Los_Angeles"
-      },
       "pricingTier": "Standard",
       "discountPercentage": 0,
       "notes": "Loyal customer. Prefers eco-friendly packaging.",
@@ -550,21 +509,19 @@
         "eco-conscious",
         "frequent-buyer"
       ],
-      "auditTrail": {
-        "createdBy": {
-          "@type": "User",
-          "userId": "system",
-          "name": "System Registration"
-        },
-        "createdAt": "2024-01-15T10:00:00Z",
-        "modifiedBy": {
-          "@type": "User",
-          "userId": "support_042",
-          "name": "Customer Support Agent"
-        },
-        "modifiedAt": "2024-11-10T14:30:00Z",
-        "deleted": false
+      "createdBy": {
+        "@type": "User",
+        "userId": "system",
+        "name": "System Registration"
       },
+      "createdAt": "2024-01-15T10:00:00Z",
+      "modifiedBy": {
+        "@type": "User",
+        "userId": "support_042",
+        "name": "Customer Support Agent"
+      },
+      "modifiedAt": "2024-11-10T14:30:00Z",
+      "deleted": false,
       "dataQuality": {
         "qualityScore": 95,
         "lastVerifiedAt": "2024-11-01T00:00:00Z",
@@ -637,77 +594,12 @@
           "symbol": "$"
         }
       },
-      "billingAddress": {
-        "@type": "PostalAddress",
-        "use": "billing",
-        "label": "Accounts Payable",
-        "streetAddress": "2500 Technology Boulevard",
-        "addressLocality": "Seattle",
-        "addressRegion": "WA",
-        "postalCode": "98101",
-        "addressCountry": "US"
-      },
-      "shippingAddresses": [
-        {
-          "@type": "PostalAddress",
-          "use": "shipping",
-          "label": "Main Warehouse",
-          "streetAddress": "2500 Technology Boulevard",
-          "addressLocality": "Seattle",
-          "addressRegion": "WA",
-          "postalCode": "98101",
-          "addressCountry": "US"
-        },
-        {
-          "@type": "PostalAddress",
-          "use": "shipping",
-          "label": "Portland Branch",
-          "streetAddress": "1800 Industrial Way",
-          "addressLocality": "Portland",
-          "addressRegion": "OR",
-          "postalCode": "97209",
-          "addressCountry": "US"
-        }
-      ],
-      "telecoms": [
-        {
-          "@type": "ContactPoint",
-          "system": "email",
-          "value": "procurement@nwtech.com",
-          "use": "work",
-          "rank": 1,
-          "label": "Procurement Department"
-        },
-        {
-          "@type": "ContactPoint",
-          "system": "phone",
-          "value": "+1-206-555-0100",
-          "use": "work",
-          "rank": 1,
-          "label": "Main Office"
-        }
-      ],
-      "preferredLanguage": {
-        "@type": "Language",
-        "code": "en",
-        "name": "English"
-      },
       "preferredCurrency": {
         "@type": "Currency",
         "code": "USD",
         "symbol": "$"
       },
       "timezone": "America/Los_Angeles",
-      "authentication": {
-        "emailConfirmed": true,
-        "emailConfirmedAt": "2023-06-10T15:20:00Z",
-        "phoneConfirmed": true,
-        "twoFactorEnabled": false,
-        "accountLocked": false,
-        "failedLoginAttempts": 0,
-        "lastSuccessfulLoginAt": "2024-10-20T09:15:00Z",
-        "loginCount": 387
-      },
       "creditLimit": {
         "@type": "MonetaryAmount",
         "value": 100000.0,
@@ -738,50 +630,6 @@
       "loyaltyMemberSince": "2023-06-10",
       "customerSegment": "Enterprise",
       "referralCode": "REF-NWTECH-2023",
-      "marketingConsent": {
-        "email": {
-          "granted": true,
-          "grantedAt": "2023-06-10T15:00:00Z",
-          "ipAddress": "203.0.113.50",
-          "source": "b2b_contract_signup"
-        },
-        "sms": {
-          "granted": false
-        },
-        "phone": {
-          "granted": true,
-          "grantedAt": "2023-06-10T15:00:00Z",
-          "ipAddress": "203.0.113.50",
-          "source": "b2b_contract_signup"
-        },
-        "mail": {
-          "granted": true,
-          "grantedAt": "2023-06-10T15:00:00Z",
-          "ipAddress": "203.0.113.50",
-          "source": "b2b_contract_signup"
-        }
-      },
-      "newsletter": {
-        "subscribed": true,
-        "subscribedAt": "2023-06-10T15:00:00Z",
-        "subscribedIp": "203.0.113.50",
-        "unsubscribeToken": "b2b9876xyz"
-      },
-      "gdprConsent": {
-        "privacyPolicyVersion": "2.0",
-        "privacyPolicyAcceptedAt": "2023-06-10T15:00:00Z",
-        "privacyPolicyAcceptedIp": "203.0.113.50",
-        "termsOfServiceVersion": "1.3",
-        "termsOfServiceAcceptedAt": "2023-06-10T15:00:00Z",
-        "termsOfServiceAcceptedIp": "203.0.113.50",
-        "dataProcessingConsent": true,
-        "dataProcessingConsentAt": "2023-06-10T15:00:00Z"
-      },
-      "communicationPreferences": {
-        "channel": "email",
-        "frequency": "monthly",
-        "timezone": "America/Los_Angeles"
-      },
       "salesRepresentative": {
         "@type": "Employee",
         "givenName": "Michael",
@@ -806,28 +654,19 @@
         "strategic-account",
         "volume-buyer"
       ],
-      "industryClassification": {
-        "naicsCode": "541511",
-        "naicsDescription": "Custom Computer Programming Services",
-        "sicCode": "7371",
-        "sicDescription": "Computer Programming Services",
-        "customIndustry": "Technology - Software Development"
+      "createdBy": {
+        "@type": "User",
+        "userId": "sales_028",
+        "name": "Sales Executive"
       },
-      "auditTrail": {
-        "createdBy": {
-          "@type": "User",
-          "userId": "sales_028",
-          "name": "Sales Executive"
-        },
-        "createdAt": "2023-06-10T14:00:00Z",
-        "modifiedBy": {
-          "@type": "User",
-          "userId": "account_mgr_015",
-          "name": "Account Manager"
-        },
-        "modifiedAt": "2024-10-20T16:45:00Z",
-        "deleted": false
+      "createdAt": "2023-06-10T14:00:00Z",
+      "modifiedBy": {
+        "@type": "User",
+        "userId": "account_mgr_015",
+        "name": "Account Manager"
       },
+      "modifiedAt": "2024-10-20T16:45:00Z",
+      "deleted": false,
       "externalReferences": [
         {
           "system": "Salesforce",
@@ -895,49 +734,6 @@
           "symbol": "€"
         }
       },
-      "billingAddress": {
-        "@type": "PostalAddress",
-        "use": "billing",
-        "label": "Domicile",
-        "streetAddress": "25 Rue de la République",
-        "addressLocality": "Lyon",
-        "addressRegion": "Auvergne-Rhône-Alpes",
-        "postalCode": "69002",
-        "addressCountry": "FR"
-      },
-      "shippingAddresses": [
-        {
-          "@type": "PostalAddress",
-          "use": "shipping",
-          "label": "Domicile",
-          "streetAddress": "25 Rue de la République",
-          "addressLocality": "Lyon",
-          "addressRegion": "Auvergne-Rhône-Alpes",
-          "postalCode": "69002",
-          "addressCountry": "FR"
-        }
-      ],
-      "telecoms": [
-        {
-          "@type": "ContactPoint",
-          "system": "email",
-          "value": "sophie.dubois@email.fr",
-          "use": "home",
-          "rank": 1
-        },
-        {
-          "@type": "ContactPoint",
-          "system": "phone",
-          "value": "+33 6 12 34 56 78",
-          "use": "mobile",
-          "rank": 1
-        }
-      ],
-      "preferredLanguage": {
-        "@type": "Language",
-        "code": "fr",
-        "name": "Français"
-      },
       "preferredCurrency": {
         "@type": "Currency",
         "code": "EUR",
@@ -949,17 +745,6 @@
       "loyaltyMemberSince": "2024-03-10",
       "customerSegment": "Regular",
       "referralCode": "REF-SOPHIE-2024",
-      "marketingConsent": {
-        "email": true,
-        "sms": true,
-        "phone": false,
-        "mail": false
-      },
-      "communicationPreferences": {
-        "channel": "email",
-        "frequency": "bi-weekly",
-        "timezone": "Europe/Paris"
-      },
       "pricingTier": "Standard",
       "discountPercentage": 0,
       "notes": "Cliente fidèle. Apprécie les produits bio et locaux.",
@@ -1046,59 +831,6 @@
           "symbol": "€"
         }
       },
-      "billingAddress": {
-        "@type": "PostalAddress",
-        "use": "billing",
-        "label": "Comptabilité",
-        "streetAddress": "15 Avenue des Champs-Élysées",
-        "addressLocality": "Paris",
-        "postalCode": "75008",
-        "addressCountry": "FR"
-      },
-      "shippingAddresses": [
-        {
-          "@type": "PostalAddress",
-          "use": "shipping",
-          "label": "Siège Social",
-          "streetAddress": "15 Avenue des Champs-Élysées",
-          "addressLocality": "Paris",
-          "postalCode": "75008",
-          "addressCountry": "FR"
-        },
-        {
-          "@type": "PostalAddress",
-          "use": "shipping",
-          "label": "Entrepôt Lyon",
-          "streetAddress": "50 Rue de l'Industrie",
-          "addressLocality": "Lyon",
-          "addressRegion": "Auvergne-Rhône-Alpes",
-          "postalCode": "69100",
-          "addressCountry": "FR"
-        }
-      ],
-      "telecoms": [
-        {
-          "@type": "ContactPoint",
-          "system": "email",
-          "value": "achats@innovatech.fr",
-          "use": "work",
-          "rank": 1,
-          "label": "Service Achats"
-        },
-        {
-          "@type": "ContactPoint",
-          "system": "phone",
-          "value": "+33 1 42 00 00 00",
-          "use": "work",
-          "rank": 1,
-          "label": "Standard"
-        }
-      ],
-      "preferredLanguage": {
-        "@type": "Language",
-        "code": "fr",
-        "name": "Français"
-      },
       "preferredCurrency": {
         "@type": "Currency",
         "code": "EUR",
@@ -1134,17 +866,6 @@
       "loyaltyMemberSince": "2023-02-15",
       "customerSegment": "Compte Stratégique",
       "referralCode": "REF-INNOVATECH-2023",
-      "marketingConsent": {
-        "email": true,
-        "sms": false,
-        "phone": true,
-        "mail": true
-      },
-      "communicationPreferences": {
-        "channel": "email",
-        "frequency": "monthly",
-        "timezone": "Europe/Paris"
-      },
       "salesRepresentative": {
         "@type": "Employee",
         "givenName": "Pierre",
