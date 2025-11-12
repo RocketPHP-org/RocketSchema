@@ -13,6 +13,7 @@ import { getAllSchemaNames } from '@/lib/schemas';
 
 interface PropertyTableProps {
   properties: SchemaProperty[];
+  solutionName?: string; // Optional: if provided, type links will be scoped to solution
 }
 
 // Helper function to check if a type is a schema reference
@@ -22,8 +23,15 @@ function isSchemaType(type: string): boolean {
 }
 
 // Helper function to render type with links
-function renderType(type: string | string[]) {
+function renderType(type: string | string[], solutionName?: string) {
   const allSchemas = getAllSchemaNames();
+
+  // Helper to generate schema link
+  const getSchemaLink = (schemaName: string) => {
+    return solutionName
+      ? `/solutions/${solutionName}/schemas/${schemaName}`
+      : `/schemas/${schemaName}`;
+  };
 
   if (Array.isArray(type)) {
     return type.map((t, index) => {
@@ -36,7 +44,7 @@ function renderType(type: string | string[]) {
           {index > 0 && ' | '}
           {isSchema ? (
             <Link
-              href={`/schemas/${cleanType}`}
+              href={getSchemaLink(cleanType)}
               className="hover:underline text-primary font-semibold"
             >
               {t}
@@ -56,7 +64,7 @@ function renderType(type: string | string[]) {
   if (isSchema) {
     return (
       <Link
-        href={`/schemas/${cleanType}`}
+        href={getSchemaLink(cleanType)}
         className="hover:underline text-primary font-semibold"
       >
         {type}
@@ -67,7 +75,7 @@ function renderType(type: string | string[]) {
   return <span>{type}</span>;
 }
 
-export default function PropertyTable({ properties }: PropertyTableProps) {
+export default function PropertyTable({ properties, solutionName }: PropertyTableProps) {
   // Check if any property has a source (inheritance)
   const hasInheritance = properties.some(prop => prop.source);
 
@@ -90,7 +98,7 @@ export default function PropertyTable({ properties }: PropertyTableProps) {
               {property.name}
             </TableCell>
             <TableCell className="font-mono text-sm">
-              {renderType(property.type)}
+              {renderType(property.type, solutionName)}
             </TableCell>
             <TableCell>
               {property.mode && (
