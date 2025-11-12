@@ -1,7 +1,0 @@
-{
-  "@type": "Schema",
-  "@context": "https://rocketschema.org/context",
-  "name": "Tag",
-  "description": "Tag for categorizing and searching content",
-  "properties": []
-}

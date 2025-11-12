@@ -98,17 +98,23 @@ export function SchemaSidebar({ categories, schemasByCategory, solutionName, act
                       <ul className="mt-1 space-y-1 ml-2">
                         {categorySchemas.map(schema => {
                           const isActive = activeSchema === schema.name;
+                          const hasNoProperties = schema.properties.length === 0;
                           return (
                             <li key={schema.name}>
                               <Link
                                 href={getSchemaLink(schema.name)}
-                                className={`block px-3 py-1.5 text-sm rounded-md transition-colors ${
+                                className={`flex items-center justify-between gap-2 px-3 py-1.5 text-sm rounded-md transition-colors ${
                                   isActive
                                     ? 'bg-primary text-primary-foreground font-medium'
                                     : 'hover:bg-muted text-muted-foreground hover:text-foreground'
                                 }`}
                               >
-                                {schema.name}
+                                <span className="truncate">{schema.name}</span>
+                                {hasNoProperties && (
+                                  <Badge variant="outline" className="text-xs px-1.5 py-0 shrink-0">
+                                    WIP
+                                  </Badge>
+                                )}
                               </Link>
                             </li>
                           );
@@ -155,17 +161,23 @@ export function SchemaSidebar({ categories, schemasByCategory, solutionName, act
                       <ul className="mt-1 space-y-1 ml-2">
                         {categorySchemas.map(schema => {
                           const isActive = activeSchema === schema.name;
+                          const hasNoProperties = schema.properties.length === 0;
                           return (
                             <li key={schema.name}>
                               <Link
                                 href={getSchemaLink(schema.name)}
-                                className={`block px-3 py-1.5 text-sm rounded-md transition-colors ${
+                                className={`flex items-center justify-between gap-2 px-3 py-1.5 text-sm rounded-md transition-colors ${
                                   isActive
                                     ? 'bg-primary text-primary-foreground font-medium'
                                     : 'hover:bg-muted text-muted-foreground hover:text-foreground'
                                 }`}
                               >
-                                {schema.name}
+                                <span className="truncate">{schema.name}</span>
+                                {hasNoProperties && (
+                                  <Badge variant="outline" className="text-xs px-1.5 py-0 shrink-0">
+                                    WIP
+                                  </Badge>
+                                )}
                               </Link>
                             </li>
                           );

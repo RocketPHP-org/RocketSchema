@@ -2,6 +2,130 @@
   "@type": "Schema",
   "@context": "https://rocketschema.org/context",
   "name": "CustomerTag",
-  "description": "Tag for customer categorization and filtering with many-to-many relationship support",
-  "properties": []
+  "extends": "Tag",
+  "description": "Tag for customer categorization and filtering. Extends Tag with customer reference and assignment metadata for segmentation, targeting, and analytics.",
+  "properties": [
+    {
+      "name": "customer",
+      "type": "Customer",
+      "mode": "stored",
+      "description": "Reference to the customer being tagged",
+      "required": true
+    },
+    {
+      "name": "assignedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Timestamp when the tag was assigned to this customer",
+      "required": true,
+      "example": "2024-11-12T10:00:00Z"
+    },
+    {
+      "name": "assignedBy",
+      "type": "User",
+      "mode": "stored",
+      "description": "User who assigned the tag to this customer"
+    },
+    {
+      "name": "isSystemGenerated",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether the tag was automatically assigned by the system (e.g., from analytics, ML models) or manually",
+      "example": false
+    },
+    {
+      "name": "confidence",
+      "type": "number",
+      "mode": "stored",
+      "description": "Confidence score for system-generated tag assignments (0-1 range, only for ML-generated tags)",
+      "example": 0.95
+    },
+    {
+      "name": "notes",
+      "type": "string",
+      "mode": "stored",
+      "description": "Optional notes about why this tag was assigned to this customer",
+      "example": "Tagged as VIP after reaching $10k lifetime value"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "CustomerTag",
+      "customer": {
+        "@type": "Customer",
+        "customerNumber": "CUST-2024-00123"
+      },
+      "name": "VIP",
+      "slug": "vip",
+      "category": "segment",
+      "description": "Very Important Person - top tier customer",
+      "color": "#8B5CF6",
+      "icon": "star",
+      "isActive": true,
+      "sortOrder": 1,
+      "assignedAt": "2024-11-12T10:00:00Z",
+      "assignedBy": {
+        "@type": "User",
+        "userId": "admin_001",
+        "name": "Admin User"
+      },
+      "isSystemGenerated": false,
+      "notes": "Promoted to VIP after reaching $10k lifetime value"
+    },
+    {
+      "@type": "CustomerTag",
+      "customer": {
+        "@type": "Customer",
+        "customerNumber": "CUST-2024-00123"
+      },
+      "name": "At-Risk",
+      "slug": "at-risk",
+      "category": "lifecycle",
+      "description": "Customer at risk of churning",
+      "color": "#EF4444",
+      "icon": "alert-triangle",
+      "isActive": true,
+      "sortOrder": 5,
+      "assignedAt": "2024-11-12T11:00:00Z",
+      "isSystemGenerated": true,
+      "confidence": 0.87,
+      "notes": "Churn model prediction - no purchase in 120 days"
+    },
+    {
+      "@type": "CustomerTag",
+      "customer": {
+        "@type": "Customer",
+        "customerNumber": "CUST-2024-00789"
+      },
+      "name": "Enterprise",
+      "slug": "enterprise",
+      "category": "segment",
+      "description": "Enterprise customer with multiple users",
+      "color": "#3B82F6",
+      "icon": "building",
+      "isActive": true,
+      "sortOrder": 2,
+      "assignedAt": "2023-06-10T15:00:00Z",
+      "isSystemGenerated": false
+    },
+    {
+      "@type": "CustomerTag",
+      "customer": {
+        "@type": "Customer",
+        "customerNumber": "CLIENT-2024-00456"
+      },
+      "name": "Black Friday 2024",
+      "slug": "black-friday-2024",
+      "category": "campaign",
+      "description": "Participated in Black Friday 2024 campaign",
+      "color": "#000000",
+      "icon": "tag",
+      "isActive": true,
+      "sortOrder": 10,
+      "assignedAt": "2024-11-01T00:00:00Z",
+      "isSystemGenerated": false
+    }
+  ]
 }
+
+

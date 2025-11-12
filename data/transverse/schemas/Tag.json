@@ -1,0 +1,100 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "Tag",
+  "description": "Universal tag base entity with properties common to all tag types (CustomerTag, ProductTag, DocumentTag, etc.). Contains tag metadata like name, color, icon, category.",
+  "properties": [
+    {
+      "name": "name",
+      "type": "string",
+      "mode": "stored",
+      "description": "Name or label of the tag",
+      "required": true,
+      "example": "VIP"
+    },
+    {
+      "name": "slug",
+      "type": "string",
+      "mode": "stored",
+      "description": "URL-friendly version of the tag name for routing and APIs",
+      "example": "vip"
+    },
+    {
+      "name": "category",
+      "type": "string",
+      "mode": "stored",
+      "description": "Category or group for the tag (e.g., 'segment', 'industry', 'priority', 'status')",
+      "example": "segment"
+    },
+    {
+      "name": "description",
+      "type": "string",
+      "mode": "stored",
+      "description": "Detailed description of what this tag represents",
+      "example": "Very Important Person - top tier customer"
+    },
+    {
+      "name": "color",
+      "type": "string",
+      "mode": "stored",
+      "description": "Color code for visual representation in UI (hex color)",
+      "example": "#8B5CF6"
+    },
+    {
+      "name": "icon",
+      "type": "string",
+      "mode": "stored",
+      "description": "Optional icon identifier for the tag",
+      "example": "star"
+    },
+    {
+      "name": "isActive",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this tag is currently active and available for assignment",
+      "example": true
+    },
+    {
+      "name": "sortOrder",
+      "type": "number",
+      "mode": "stored",
+      "description": "Display order for sorting tags in UI",
+      "example": 1
+    }
+  ],
+  "examples": [
+    {
+      "@type": "Tag",
+      "name": "VIP",
+      "slug": "vip",
+      "category": "segment",
+      "description": "Very Important Person - top tier",
+      "color": "#8B5CF6",
+      "icon": "star",
+      "isActive": true,
+      "sortOrder": 1
+    },
+    {
+      "@type": "Tag",
+      "name": "New",
+      "slug": "new",
+      "category": "status",
+      "description": "Recently added",
+      "color": "#10B981",
+      "icon": "sparkles",
+      "isActive": true,
+      "sortOrder": 2
+    },
+    {
+      "@type": "Tag",
+      "name": "Urgent",
+      "slug": "urgent",
+      "category": "priority",
+      "description": "Requires immediate attention",
+      "color": "#EF4444",
+      "icon": "alert-circle",
+      "isActive": true,
+      "sortOrder": 10
+    }
+  ]
+}

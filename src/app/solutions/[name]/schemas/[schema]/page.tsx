@@ -56,7 +56,7 @@ export default function SchemaPage({ params }: SchemaPageProps) {
             </p>
           )}
         </div>
-        <PropertyTable properties={schema.properties} />
+        <PropertyTable properties={schema.properties} solutionName={params.name} />
       </div>
 
       {/* Example Section */}

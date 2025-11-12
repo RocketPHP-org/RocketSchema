@@ -1,0 +1,31 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "DocumentTag",
+  "extends": "Tag",
+  "description": "Tag for categorizing and searching documents and content. Extends Tag with document-specific properties.",
+  "properties": [
+    {
+      "name": "document",
+      "type": "Document",
+      "mode": "stored",
+      "description": "Reference to the document being tagged",
+      "required": true
+    },
+    {
+      "name": "assignedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Timestamp when the tag was assigned to this document",
+      "required": true,
+      "example": "2024-11-12T10:00:00Z"
+    },
+    {
+      "name": "assignedBy",
+      "type": "User",
+      "mode": "stored",
+      "description": "User who assigned the tag to this document"
+    }
+  ],
+  "examples": []
+}
