@@ -5,6 +5,7 @@ import path from 'path';
 
 const DATA_DIR = path.join(process.cwd(), 'data');
 const DOMAINS_FILE = path.join(DATA_DIR, 'domains.json');
+const SOLUTIONS_FILE = path.join(DATA_DIR, 'solutions.json');
 
 /**
  * Load all categories from domains.json
@@ -191,4 +192,30 @@ export function getAllCategories(): CategoryMetadata[] {
 export function getCategory(name: string): CategoryMetadata | undefined {
   const cats = loadCategories();
   return cats[name];
+}
+
+/**
+ * Solution metadata interface
+ */
+export interface SolutionMetadata {
+  name: string;
+  label: string;
+  description: string;
+  icon: string;
+  color: string;
+  domains: string[];
+  features: string[];
+  useCases: string[];
+}
+
+/**
+ * Get all solutions (reloads from disk in dev)
+ */
+export function getAllSolutions(): SolutionMetadata[] {
+  if (!fs.existsSync(SOLUTIONS_FILE)) {
+    return [];
+  }
+
+  const solutionsData = JSON.parse(fs.readFileSync(SOLUTIONS_FILE, 'utf-8'));
+  return Array.isArray(solutionsData) ? solutionsData : [];
 }

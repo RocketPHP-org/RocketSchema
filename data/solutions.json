@@ -1,0 +1,252 @@
+[
+  {
+    "name": "crm-complete",
+    "label": "CRM Solution",
+    "description": "Complete Customer Relationship Management solution with customer data, marketing, sales, and GDPR compliance",
+    "icon": "user-heart",
+    "color": "purple",
+    "domains": [
+      "support-types",
+      "reference-data",
+      "core-entities",
+      "transverse",
+      "crm"
+    ],
+    "features": [
+      "Customer Management",
+      "Marketing Consent (GDPR)",
+      "Customer Segmentation",
+      "Loyalty Programs",
+      "Contact Management",
+      "Audit Trail"
+    ],
+    "useCases": [
+      "B2C Customer Management",
+      "B2B Account Management",
+      "Marketing Automation",
+      "GDPR Compliance",
+      "Customer Analytics"
+    ]
+  },
+  {
+    "name": "ecommerce-platform",
+    "label": "E-Commerce Platform",
+    "description": "Full e-commerce solution with product catalog, shopping cart, orders, payments, and customer management",
+    "icon": "shopping-cart",
+    "color": "blue",
+    "domains": [
+      "support-types",
+      "reference-data",
+      "core-entities",
+      "transverse",
+      "crm",
+      "e-commerce",
+      "financial"
+    ],
+    "features": [
+      "Product Catalog",
+      "Shopping Cart",
+      "Order Management",
+      "Payment Processing",
+      "Inventory Management",
+      "Customer Accounts",
+      "Reviews & Ratings",
+      "Shipping & Fulfillment"
+    ],
+    "useCases": [
+      "Online Store",
+      "Marketplace Platform",
+      "B2B E-commerce",
+      "Subscription Commerce",
+      "Multi-vendor Platform"
+    ]
+  },
+  {
+    "name": "erp-suite",
+    "label": "ERP Suite",
+    "description": "Enterprise Resource Planning with financials, HR, inventory, fleet, and operations management",
+    "icon": "building",
+    "color": "green",
+    "domains": [
+      "support-types",
+      "reference-data",
+      "core-entities",
+      "transverse",
+      "crm",
+      "financial",
+      "human-resources",
+      "fleet",
+      "e-commerce"
+    ],
+    "features": [
+      "Financial Management",
+      "HR & Payroll",
+      "Inventory Control",
+      "Fleet Management",
+      "Customer Relations",
+      "Supplier Management",
+      "Document Management"
+    ],
+    "useCases": [
+      "Manufacturing ERP",
+      "Distribution ERP",
+      "Service Business ERP",
+      "Retail ERP",
+      "Multi-company Management"
+    ]
+  },
+  {
+    "name": "healthcare-ehr",
+    "label": "Healthcare EHR",
+    "description": "Electronic Health Records system with patient management, clinical data, and medical compliance",
+    "icon": "heart-pulse",
+    "color": "red",
+    "domains": [
+      "support-types",
+      "reference-data",
+      "core-entities",
+      "transverse",
+      "health",
+      "financial"
+    ],
+    "features": [
+      "Patient Records",
+      "Clinical Documentation",
+      "Appointment Scheduling",
+      "Prescription Management",
+      "Lab Results",
+      "Medical Billing",
+      "HIPAA Compliance"
+    ],
+    "useCases": [
+      "Hospital EHR",
+      "Clinic Management",
+      "Telehealth Platform",
+      "Medical Practice",
+      "Health Information Exchange"
+    ]
+  },
+  {
+    "name": "hr-platform",
+    "label": "HR Management Platform",
+    "description": "Complete human resources solution with recruitment, payroll, performance, and employee management",
+    "icon": "user-check",
+    "color": "orange",
+    "domains": [
+      "support-types",
+      "reference-data",
+      "core-entities",
+      "transverse",
+      "human-resources",
+      "financial"
+    ],
+    "features": [
+      "Employee Records",
+      "Recruitment & ATS",
+      "Payroll Processing",
+      "Performance Management",
+      "Time & Attendance",
+      "Training & Development",
+      "Benefits Administration"
+    ],
+    "useCases": [
+      "HRIS System",
+      "Recruitment Platform",
+      "Payroll System",
+      "Performance Management",
+      "Learning Management"
+    ]
+  },
+  {
+    "name": "fleet-management",
+    "label": "Fleet Management System",
+    "description": "Complete fleet operations with vehicle tracking, maintenance, fuel management, and driver management",
+    "icon": "truck",
+    "color": "yellow",
+    "domains": [
+      "support-types",
+      "reference-data",
+      "core-entities",
+      "transverse",
+      "fleet",
+      "financial"
+    ],
+    "features": [
+      "Vehicle Tracking",
+      "Maintenance Scheduling",
+      "Fuel Management",
+      "Driver Management",
+      "Accident Reporting",
+      "Fleet Analytics",
+      "Cost Management"
+    ],
+    "useCases": [
+      "Logistics Fleet",
+      "Delivery Services",
+      "Transportation Company",
+      "Car Rental",
+      "Field Service Management"
+    ]
+  },
+  {
+    "name": "knowledge-base",
+    "label": "Knowledge Management",
+    "description": "Document and knowledge management with articles, search, versioning, and collaboration",
+    "icon": "book-open",
+    "color": "indigo",
+    "domains": [
+      "support-types",
+      "reference-data",
+      "core-entities",
+      "transverse",
+      "knowledge"
+    ],
+    "features": [
+      "Document Repository",
+      "Article Management",
+      "Version Control",
+      "Search & Discovery",
+      "Permissions & ACL",
+      "Categories & Tags",
+      "Comments & Collaboration"
+    ],
+    "useCases": [
+      "Internal Wiki",
+      "Help Center",
+      "Documentation Portal",
+      "Knowledge Base",
+      "Content Management"
+    ]
+  },
+  {
+    "name": "saas-starter",
+    "label": "SaaS Starter Kit",
+    "description": "Foundation for SaaS applications with users, organizations, subscriptions, and core features",
+    "icon": "rocket",
+    "color": "cyan",
+    "domains": [
+      "support-types",
+      "reference-data",
+      "core-entities",
+      "transverse",
+      "crm",
+      "financial"
+    ],
+    "features": [
+      "User Management",
+      "Organization/Tenants",
+      "Authentication",
+      "Subscription Billing",
+      "Audit Logging",
+      "External Integrations",
+      "GDPR Compliance"
+    ],
+    "useCases": [
+      "B2B SaaS",
+      "Multi-tenant Platform",
+      "Subscription Service",
+      "API Platform",
+      "Marketplace"
+    ]
+  }
+]

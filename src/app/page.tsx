@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { Button } from '@/components/ui/button';
-import { getAllSchemas, getAllCategories, getSchemasByCategory } from '@/lib/schemas';
+import { getAllSchemas, getAllCategories, getSchemasByCategory, getAllSolutions } from '@/lib/schemas';
 import { Github } from 'lucide-react';
 import { SchemaGrid } from '@/components/SchemaGrid';
 
@@ -12,6 +12,7 @@ export const revalidate = 0;
 export default function Home() {
   const schemas = getAllSchemas();
   const categories = getAllCategories();
+  const solutions = getAllSolutions();
 
   // Prepare schemas by category for the client component
   const schemasByCategory: Record<string, any[]> = {};
@@ -62,28 +63,12 @@ export default function Home() {
             </p>
           </div>
 
-          {/* Stats */}
-          <div className="flex justify-center gap-8 pt-2">
-            <div className="text-center">
-              <div className="text-3xl font-bold text-primary">
-                {categories.length}
-              </div>
-              <div className="text-sm text-muted-foreground">Domains</div>
-            </div>
-            <div className="w-px bg-border"></div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-primary">
-                {schemas.length}
-              </div>
-              <div className="text-sm text-muted-foreground">Schemas</div>
-            </div>
-          </div>
         </div>
       </section>
 
       {/* Schemas Grid with Search */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
-        <SchemaGrid categories={categories} schemasByCategory={schemasByCategory} />
+        <SchemaGrid categories={categories} schemasByCategory={schemasByCategory} solutions={solutions} />
       </section>
 
       {/* Footer */}
