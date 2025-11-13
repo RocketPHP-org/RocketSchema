@@ -112,20 +112,22 @@ export function SchemaGrid({ categories, schemasByCategory, solutions, solutionN
                 <TableBody>
                   {filteredSchemas.map((schema) => (
                     <TableRow key={schema.name} className="hover:bg-muted/50">
-                      <TableCell className="font-medium w-[250px]">
+                      <TableCell className="font-medium">
                         <Link href={getSchemaLink(schema.name)} className="hover:text-primary hover:underline">
                           {schema.name}
                         </Link>
                       </TableCell>
                       <TableCell className="text-muted-foreground">
-                        {schema.description}
+                        <div className="max-w-md line-clamp-2">
+                          {schema.description}
+                        </div>
                       </TableCell>
-                      <TableCell className="text-right w-[120px]">
+                      <TableCell className="text-right">
                         <Badge variant="secondary">
                           {schema.properties.length}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-right w-[80px]">
+                      <TableCell className="text-right">
                         <Link href={getSchemaLink(schema.name)}>
                           <Badge variant="outline" className="cursor-pointer hover:bg-primary/10">
                             <ArrowRight className="h-3 w-3" />
@@ -172,20 +174,22 @@ export function SchemaGrid({ categories, schemasByCategory, solutions, solutionN
                     <TableBody>
                       {filteredSchemas.map((schema) => (
                         <TableRow key={schema.name} className="hover:bg-muted/50">
-                          <TableCell className="font-medium w-[250px]">
+                          <TableCell className="font-medium">
                             <Link href={getSchemaLink(schema.name)} className="hover:text-primary hover:underline">
                               {schema.name}
                             </Link>
                           </TableCell>
                           <TableCell className="text-muted-foreground">
-                            {schema.description}
+                            <div className="max-w-md line-clamp-2">
+                              {schema.description}
+                            </div>
                           </TableCell>
-                          <TableCell className="text-right w-[120px]">
+                          <TableCell className="text-right">
                             <Badge variant="secondary">
                               {schema.properties.length}
                             </Badge>
                           </TableCell>
-                          <TableCell className="text-right w-[80px]">
+                          <TableCell className="text-right">
                             <Link href={getSchemaLink(schema.name)}>
                               <Badge variant="outline" className="cursor-pointer hover:bg-primary/10">
                                 <ArrowRight className="h-3 w-3" />

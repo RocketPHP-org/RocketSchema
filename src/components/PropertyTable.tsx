@@ -156,7 +156,7 @@ export default function PropertyTable({ properties, solutionName }: PropertyTabl
                 {property.example && (
                   <p className="text-xs text-muted-foreground">
                     Example:{' '}
-                    <code className="bg-muted px-1.5 py-0.5 rounded font-mono">
+                    <code className="bg-muted px-1.5 py-0.5 rounded font-mono break-all whitespace-pre-wrap max-w-full overflow-wrap-anywhere">
                       {JSON.stringify(property.example)}
                     </code>
                   </p>
