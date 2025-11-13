@@ -1,0 +1,209 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "CareRecord",
+  "description": "Care and nursing record for daily care activities, ADL (Activities of Daily Living) assessments, nursing interventions, and care team observations. Separate from MedicalRecord to focus on care team workflows and prevent information overload. Based on Ogirys dual-record pattern.",
+  "properties": [
+    {
+      "name": "patient",
+      "type": "Patient",
+      "mode": "stored",
+      "description": "Reference to the patient this care record belongs to",
+      "required": true
+    },
+    {
+      "name": "recordType",
+      "type": "string",
+      "mode": "enum",
+      "enum": [
+        "nursing",
+        "therapy",
+        "social_work",
+        "nutrition",
+        "psychology",
+        "rehabilitation",
+        "general_care"
+      ],
+      "description": "Type of care record (which care discipline)",
+      "required": true,
+      "example": "nursing"
+    },
+    {
+      "name": "recordedBy",
+      "type": "Practitioner",
+      "mode": "stored",
+      "description": "Care professional who created/updated this record",
+      "required": true
+    },
+    {
+      "name": "recordedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Timestamp when this care record was documented",
+      "required": true,
+      "example": "2024-11-12T14:30:00Z"
+    },
+    {
+      "name": "adlAssessment",
+      "type": "object",
+      "mode": "stored",
+      "description": "Activities of Daily Living assessment (bathing, dressing, eating, toileting, transferring, continence)",
+      "example": {
+        "bathing": "independent",
+        "dressing": "needs_assistance",
+        "eating": "independent",
+        "toileting": "independent",
+        "transferring": "needs_supervision",
+        "continence": "independent"
+      }
+    },
+    {
+      "name": "mobilityStatus",
+      "type": "string",
+      "mode": "enum",
+      "enum": [
+        "independent",
+        "needs_assistance",
+        "wheelchair",
+        "bedridden"
+      ],
+      "description": "Current mobility status of the patient",
+      "example": "needs_assistance"
+    },
+    {
+      "name": "nutritionStatus",
+      "type": "string",
+      "mode": "enum",
+      "enum": [
+        "normal",
+        "at_risk",
+        "malnourished",
+        "tube_feeding",
+        "parenteral_nutrition"
+      ],
+      "description": "Nutritional status assessment",
+      "example": "normal"
+    },
+    {
+      "name": "skinCondition",
+      "type": "string",
+      "mode": "enum",
+      "enum": [
+        "intact",
+        "at_risk",
+        "pressure_ulcer_stage_1",
+        "pressure_ulcer_stage_2",
+        "pressure_ulcer_stage_3",
+        "pressure_ulcer_stage_4"
+      ],
+      "description": "Skin integrity assessment (pressure ulcer prevention)",
+      "example": "intact"
+    },
+    {
+      "name": "painLevel",
+      "type": "number",
+      "mode": "stored",
+      "description": "Pain level assessment (0-10 scale)",
+      "example": 3
+    },
+    {
+      "name": "riskFlags",
+      "type": "object",
+      "mode": "stored",
+      "description": "Embedded risk flags for quick identification",
+      "example": {
+        "fallRisk": true,
+        "pressureUlcerRisk": false,
+        "malnutritionRisk": false,
+        "elopementRisk": false,
+        "selfHarmRisk": false
+      }
+    },
+    {
+      "name": "nursingInterventions",
+      "type": "string[]",
+      "mode": "stored",
+      "description": "List of nursing interventions performed",
+      "example": ["vital_signs_monitoring", "wound_care", "medication_administration"]
+    },
+    {
+      "name": "careNotes",
+      "type": "string",
+      "mode": "stored",
+      "description": "Free-text care notes and observations",
+      "example": "Patient ate 75% of lunch. Assisted with afternoon walk in corridor."
+    },
+    {
+      "name": "vitalSigns",
+      "type": "object",
+      "mode": "stored",
+      "description": "Vital signs measurements",
+      "example": {
+        "temperature": 36.8,
+        "bloodPressure": "120/80",
+        "heartRate": 72,
+        "respiratoryRate": 16,
+        "oxygenSaturation": 98
+      }
+    },
+    {
+      "name": "relatedCarePlan",
+      "type": "CarePlan",
+      "mode": "stored",
+      "description": "Reference to the active care plan this record relates to"
+    },
+    {
+      "name": "relatedEncounter",
+      "type": "Encounter",
+      "mode": "stored",
+      "description": "Reference to the clinical encounter if applicable"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "CareRecord",
+      "patient": {
+        "@type": "Patient",
+        "patientId": "PAT-2024-1234"
+      },
+      "recordType": "nursing",
+      "recordedBy": {
+        "@type": "Practitioner",
+        "practitionerId": "NURSE-001",
+        "name": "Marie Dubois",
+        "profession": "Registered Nurse"
+      },
+      "recordedAt": "2024-11-12T14:30:00Z",
+      "adlAssessment": {
+        "bathing": "needs_assistance",
+        "dressing": "independent",
+        "eating": "independent",
+        "toileting": "independent",
+        "transferring": "needs_supervision",
+        "continence": "independent"
+      },
+      "mobilityStatus": "needs_assistance",
+      "nutritionStatus": "normal",
+      "skinCondition": "intact",
+      "painLevel": 2,
+      "riskFlags": {
+        "fallRisk": true,
+        "pressureUlcerRisk": false,
+        "malnutritionRisk": false
+      },
+      "nursingInterventions": [
+        "vital_signs_monitoring",
+        "medication_administration",
+        "fall_prevention_measures"
+      ],
+      "careNotes": "Patient ate 75% of lunch. Assisted with afternoon walk in corridor. Gait steady with walker.",
+      "vitalSigns": {
+        "temperature": 36.8,
+        "bloodPressure": "130/85",
+        "heartRate": 76,
+        "respiratoryRate": 16,
+        "oxygenSaturation": 98
+      }
+    }
+  ]
+}
