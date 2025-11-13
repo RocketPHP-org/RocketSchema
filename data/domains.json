@@ -192,6 +192,20 @@
     "order": 14
   },
   {
+    "name": "nursing-care",
+    "label": "Nursing & Care Services",
+    "description": "Daily care activities, ADL assessments, nursing interventions, and care team observations",
+    "tags": [
+      "nursing",
+      "care",
+      "adl",
+      "interventions",
+      "care-team"
+    ],
+    "icon": "heart-handshake",
+    "order": 15
+  },
+  {
     "name": "healthcare-admin",
     "label": "Healthcare Administration",
     "description": "Appointment scheduling, insurance, and healthcare administrative functions",
@@ -202,7 +216,7 @@
       "scheduling"
     ],
     "icon": "calendar-check",
-    "order": 15
+    "order": 16
   },
   {
     "name": "fleet",
@@ -215,7 +229,7 @@
       "logistics"
     ],
     "icon": "truck",
-    "order": 16
+    "order": 17
   },
   {
     "name": "knowledge",
@@ -228,6 +242,6 @@
       "content"
     ],
     "icon": "book-open",
-    "order": 17
+    "order": 18
   }
 ]
