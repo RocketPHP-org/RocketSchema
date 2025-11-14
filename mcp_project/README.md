@@ -52,7 +52,12 @@ The server implements the following tools:
     `required`, `format`, `example`). Each property must specify a `mode`
     of `stored`, `enum`, or `computed`. Examples must include `@type`.
 - update-entity: Updates description/properties/examples of an existing entity
+  (always provide `name`; `domain` is optional if you want to constrain the
+  lookup to a specific domain)
 - delete-entity: Deletes an entity schema file from the domain’s `schemas/`
+- list-entities: Lists all entity schemas (optionally filter by `domain`)
+- get-entity: Returns the JSON schema for a specific entity (always provide
+  `name`; `domain` is optional and can be used to disambiguate duplicate names)
 
 ## Configuration
 

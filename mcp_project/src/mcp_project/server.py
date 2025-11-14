@@ -180,6 +180,89 @@ def _ensure_domain_exists(domain_id: str) -> None:
         raise ValueError(f"Domain '{domain_id}' not found in domains.json")
 
 
+def _find_entity_path(
+    entity_name: str,
+    domain_filter: str | None = None,
+) -> tuple[str, Path]:
+    normalized_name = _normalize_identifier(entity_name, "name")
+
+    if domain_filter:
+        domain_id = _normalize_identifier(domain_filter, "domain")
+        _ensure_domain_exists(domain_id)
+        path = _entity_schema_path(domain_id, normalized_name)
+        if not path.exists():
+            raise ValueError(
+                f"Entity '{normalized_name}' not found under domain '{domain_id}'"
+            )
+        return domain_id, path
+
+    for domain_id, schema_dir in _enumerate_domain_dirs():
+        candidate = schema_dir / f"{normalized_name}.json"
+        if candidate.exists():
+            candidate = _ensure_within_base(candidate, _data_root())
+            return domain_id, candidate
+
+    raise ValueError(
+        f"Entity '{normalized_name}' not found in any domain. Provide 'domain' to disambiguate."
+    )
+
+
+def _enumerate_domain_dirs(domain_filter: str | None = None) -> list[tuple[str, Path]]:
+    base = _data_root()
+    domains = []
+
+    if domain_filter:
+        domain_id = _normalize_identifier(domain_filter, "domain")
+        _ensure_domain_exists(domain_id)
+        domains = [domain_id]
+    else:
+        domain_names = sorted(_domain_names_cache or [])
+        if not domain_names:
+            _load_domains(refresh=False)
+            domain_names = sorted(_domain_names_cache or [])
+        domains = domain_names
+
+    result: list[tuple[str, Path]] = []
+    for domain in domains:
+        domain_dir = base / domain / "schemas"
+        if domain_dir.exists() and domain_dir.is_dir():
+            result.append((domain, domain_dir))
+    return result
+
+
+def _list_entities(domain_filter: str | None = None) -> list[dict[str, Any]]:
+    entities: list[dict[str, Any]] = []
+    for domain, schema_dir in _enumerate_domain_dirs(domain_filter):
+        for schema_path in sorted(schema_dir.glob("*.json")):
+            try:
+                with schema_path.open("r", encoding="utf-8") as file:
+                    data = json.load(file)
+            except json.JSONDecodeError as exc:
+                raise ValueError(f"Invalid JSON in {schema_path}: {exc}") from exc
+
+            entities.append(
+                {
+                    "domain": domain,
+                    "name": data.get("name") or schema_path.stem,
+                    "description": data.get("description", ""),
+                    "path": str(schema_path),
+                }
+            )
+
+    return entities
+
+
+def _get_entity(domain_id: str | None, entity_name: str) -> dict[str, Any]:
+    resolved_domain, path = _find_entity_path(entity_name, domain_id)
+    schema = _load_entity_schema(path)
+    schema.setdefault("@context", SCHEMA_CONTEXT)
+    schema.setdefault("@type", "Schema")
+    schema["name"] = schema.get("name", entity_name)
+    schema["domain"] = resolved_domain
+    schema["path"] = str(path)
+    return schema
+
+
 def _normalize_string(value: Any, field: str) -> str:
     if not isinstance(value, str):
         raise ValueError(f"'{field}' must be a string")
@@ -716,7 +799,7 @@ async def handle_list_tools() -> list[types.Tool]:
                     "properties": properties_array_schema,
                     "examples": examples_array_schema,
                 },
-                "required": ["domain", "name"],
+                "required": ["name"],
                 "anyOf": [
                     {"required": ["description"]},
                     {"required": ["properties"]},
@@ -734,6 +817,28 @@ async def handle_list_tools() -> list[types.Tool]:
                     "name": {"type": "string"},
                 },
                 "required": ["domain", "name"],
+            },
+        ),
+        types.Tool(
+            name="list-entities",
+            description="List entity schemas, optionally filtered by domain",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "domain": {"type": "string"},
+                },
+            },
+        ),
+        types.Tool(
+            name="get-entity",
+            description="Fetch a single entity schema",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "domain": {"type": "string"},
+                    "name": {"type": "string"},
+                },
+                "required": ["name"],
             },
         ),
     ]
@@ -1001,13 +1106,19 @@ async def handle_call_tool(
         if not arguments:
             raise ValueError("Missing arguments")
 
-        domain_id = _normalize_identifier(arguments.get("domain"), "domain")
-        entity_name = _normalize_identifier(arguments.get("name"), "name")
-        _ensure_domain_exists(domain_id)
+        if "name" not in arguments:
+            raise ValueError("'name' is required")
+
+        domain_argument = arguments.get("domain")
+        domain_filter = (
+            _normalize_identifier(domain_argument, "domain") if domain_argument else None
+        )
+
+        entity_name = _normalize_identifier(arguments["name"], "name")
+        resolved_domain, path = _find_entity_path(entity_name, domain_filter)
 
         fields_to_change: list[str] = []
 
-        path = _entity_schema_path(domain_id, entity_name)
         schema = _load_entity_schema(path)
 
         if "description" in arguments:
@@ -1028,6 +1139,7 @@ async def handle_call_tool(
         schema.setdefault("@type", "Schema")
         schema.setdefault("@context", SCHEMA_CONTEXT)
         schema["name"] = schema.get("name", entity_name)
+        schema["domain"] = resolved_domain
 
         _write_entity_schema(path, schema)
 
@@ -1060,6 +1172,40 @@ async def handle_call_tool(
             types.TextContent(
                 type="text",
                 text=f"Entity '{entity_name}' deleted from domain '{domain_id}'",
+            )
+        ]
+
+    if name == "list-entities":
+        domain_filter = None
+        if arguments and arguments.get("domain"):
+            domain_filter = _normalize_identifier(arguments["domain"], "domain")
+
+        entities = _list_entities(domain_filter)
+
+        return [
+            types.TextContent(
+                type="text",
+                text=json.dumps(entities, indent=2),
+            )
+        ]
+
+    if name == "get-entity":
+        if not arguments or "name" not in arguments:
+            raise ValueError("'name' is required")
+
+        entity_name = _normalize_identifier(arguments["name"], "name")
+
+        domain_argument = arguments.get("domain")
+        domain_filter = (
+            _normalize_identifier(domain_argument, "domain") if domain_argument else None
+        )
+
+        schema = _get_entity(domain_filter, entity_name)
+
+        return [
+            types.TextContent(
+                type="text",
+                text=json.dumps(schema, indent=2),
             )
         ]
 
