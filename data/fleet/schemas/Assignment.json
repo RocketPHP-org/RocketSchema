@@ -1,0 +1,136 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "Assignment",
+  "description": "Vehicle assignment to drivers, tracking which driver is assigned to which vehicle for a specific period",
+  "properties": [
+    {
+      "name": "assignmentId",
+      "type": "string",
+      "description": "Unique identifier for the assignment",
+      "required": true,
+      "example": "ASSIGN-2024-001"
+    },
+    {
+      "name": "vehicleId",
+      "type": "string",
+      "description": "Reference to the vehicle being assigned",
+      "required": true,
+      "example": "VEH-12345"
+    },
+    {
+      "name": "driverId",
+      "type": "string",
+      "description": "Reference to the driver receiving the vehicle assignment",
+      "required": true,
+      "example": "DRV-67890"
+    },
+    {
+      "name": "startDate",
+      "type": "string",
+      "description": "Start date and time of the assignment",
+      "required": true,
+      "format": "date-time",
+      "example": "2024-01-15T08:00:00Z"
+    },
+    {
+      "name": "endDate",
+      "type": "string",
+      "description": "End date and time of the assignment (null if ongoing)",
+      "required": false,
+      "format": "date-time",
+      "example": "2024-12-31T17:00:00Z"
+    },
+    {
+      "name": "assignmentType",
+      "type": "string",
+      "description": "Type of assignment (permanent, temporary, short-term)",
+      "required": true,
+      "example": "permanent"
+    },
+    {
+      "name": "status",
+      "type": "string",
+      "description": "Current status of the assignment (active, completed, cancelled)",
+      "required": true,
+      "example": "active"
+    },
+    {
+      "name": "startMileage",
+      "type": "number",
+      "description": "Vehicle mileage at the start of assignment",
+      "required": false,
+      "example": 45000
+    },
+    {
+      "name": "endMileage",
+      "type": "number",
+      "description": "Vehicle mileage at the end of assignment",
+      "required": false,
+      "example": 52000
+    },
+    {
+      "name": "notes",
+      "type": "string",
+      "description": "Additional notes or comments about the assignment",
+      "required": false,
+      "example": "Driver requires vehicle for regional deliveries"
+    },
+    {
+      "name": "assignedBy",
+      "type": "string",
+      "description": "Person or system that created the assignment",
+      "required": false,
+      "example": "fleet-manager-001"
+    },
+    {
+      "name": "createdAt",
+      "type": "string",
+      "description": "Timestamp when the assignment record was created",
+      "required": true,
+      "format": "date-time",
+      "example": "2024-01-14T10:30:00Z"
+    },
+    {
+      "name": "updatedAt",
+      "type": "string",
+      "description": "Timestamp when the assignment record was last updated",
+      "required": false,
+      "format": "date-time",
+      "example": "2024-01-15T09:00:00Z"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "Assignment",
+      "assignmentId": "ASSIGN-2024-001",
+      "vehicleId": "VEH-12345",
+      "driverId": "DRV-67890",
+      "startDate": "2024-01-15T08:00:00Z",
+      "endDate": null,
+      "assignmentType": "permanent",
+      "status": "active",
+      "startMileage": 45000,
+      "notes": "Primary vehicle for regional deliveries",
+      "assignedBy": "fleet-manager-001",
+      "createdAt": "2024-01-14T10:30:00Z",
+      "updatedAt": "2024-01-15T09:00:00Z"
+    },
+    {
+      "@type": "Assignment",
+      "assignmentId": "ASSIGN-2024-002",
+      "vehicleId": "VEH-54321",
+      "driverId": "DRV-11111",
+      "startDate": "2024-02-01T07:00:00Z",
+      "endDate": "2024-02-28T18:00:00Z",
+      "assignmentType": "temporary",
+      "status": "completed",
+      "startMileage": 30000,
+      "endMileage": 32500,
+      "notes": "Temporary replacement while regular vehicle in maintenance",
+      "assignedBy": "fleet-manager-002",
+      "createdAt": "2024-01-30T14:00:00Z",
+      "updatedAt": "2024-02-28T18:30:00Z"
+    }
+  ]
+}

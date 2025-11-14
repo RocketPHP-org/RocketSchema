@@ -49,7 +49,8 @@ The server implements the following tools:
 - create-entity: Creates a new entity JSON schema under a domain
   - Requires `domain`, `name`, `description`, `properties[]`, and `examples[]`
   - Properties mirror the JSON files (`name`, `type`, `description`, optional
-    `required`, `format`, `example`). Examples must include `@type`.
+    `required`, `format`, `example`). Each property must specify a `mode`
+    of `stored`, `enum`, or `computed`. Examples must include `@type`.
 - update-entity: Updates description/properties/examples of an existing entity
 - delete-entity: Deletes an entity schema file from the domain’s `schemas/`
 

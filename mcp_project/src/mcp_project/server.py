@@ -18,6 +18,7 @@ SOLUTIONS_ENV_VAR = "MCP_SOLUTIONS_PATH"
 DOMAINS_ENV_VAR = "MCP_DOMAINS_PATH"
 SCHEMA_CONTEXT = "https://rocketschema.org/context"
 IDENTIFIER_PATTERN = re.compile(r"^[A-Za-z0-9_-]+$")
+PROPERTY_MODES = {"stored", "enum", "computed"}
 
 _catalog_cache: dict[str, tuple[Path, list[dict[str, Any]]]] = {}
 _domain_names_cache: set[str] | None = None
@@ -268,10 +269,17 @@ def _validate_entity_properties(properties: Any) -> list[dict[str, Any]]:
         name = _normalize_string(prop.get("name"), f"{prefix}.name")
         prop_type = _normalize_string(prop.get("type"), f"{prefix}.type")
         description = _normalize_string(prop.get("description"), f"{prefix}.description")
+        mode = _normalize_string(prop.get("mode"), f"{prefix}.mode")
+        if mode not in PROPERTY_MODES:
+            allowed = ", ".join(sorted(PROPERTY_MODES))
+            raise ValueError(
+                f"{prefix}.mode must be one of: {allowed}"
+            )
 
         normalized_prop: dict[str, Any] = {
             "name": name,
             "type": prop_type,
+            "mode": mode,
             "description": description,
         }
 
@@ -538,12 +546,16 @@ async def handle_list_tools() -> list[types.Tool]:
         "properties": {
             "name": {"type": "string"},
             "type": {"type": "string"},
+            "mode": {
+                "type": "string",
+                "enum": sorted(PROPERTY_MODES),
+            },
             "description": {"type": "string"},
             "required": {"type": "boolean"},
             "format": {"type": "string"},
             "example": {},
         },
-        "required": ["name", "type", "description"],
+        "required": ["name", "type", "mode", "description"],
     }
 
     properties_array_schema = {
