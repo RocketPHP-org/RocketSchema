@@ -55,8 +55,10 @@ services:
     environment:
       - MCP_HTTP_BASE_PATH=/mcp
       - MCP_SOLUTIONS_PATH=/app/data/solutions.json
+      - MCP_DOMAINS_PATH=/app/data/domains.json
     volumes:
-      - ./data:/app/data:ro
+      - ./mcp_project/src:/app/src
+      - ./data:/app/data
 
 volumes:
   postgres_data:

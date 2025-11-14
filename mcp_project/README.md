@@ -19,13 +19,39 @@ The server provides a single prompt:
 
 ### Tools
 
-The server implements one tool:
+The server implements the following tools:
 - add-note: Adds a new note to the server
   - Takes "name" and "content" as required string arguments
   - Updates server state and notifies clients of resource changes
 - list-solutions: Returns the entire `data/solutions.json` catalog
   - Optional `refresh` boolean argument reloads the JSON file on demand
   - Override the path with `MCP_SOLUTIONS_PATH` if you store the file elsewhere
+- list-domains: Returns the entire `data/domains.json` catalog
+  - Optional `refresh` boolean argument reloads the JSON file on demand
+  - Override the path with `MCP_DOMAINS_PATH` if you store the file elsewhere
+- create-solution: Adds a new solution entry to `data/solutions.json`
+  - Provide a `solution` object with `name`, `label`, `description`, `icon`,
+    `color`, `domains`, `features`, and `useCases`
+  - Domain references are validated against `data/domains.json` before
+    writing; solutions must use unique `name` values
+- update-solution: Partially updates an existing solution
+  - Requires a `name` and a `patch` object with any subset of fields except
+    `name`; domains/features/use cases must remain non-empty arrays
+  - Domain references are re-validated whenever `domains` changes
+- delete-solution: Removes a solution entry by name
+  - Fails if the target solution does not exist
+- create-domain: Adds a new domain entry to `data/domains.json`
+  - Provide a `domain` object with `name`, `label`, `description`, `icon`,
+    `order`, and non-empty `tags`
+- update-domain: Partially updates an existing domain (all fields except `name`)
+- delete-domain: Removes a domain entry by name
+  - Validates that no solutions reference the domain unless `force=true`
+- create-entity: Creates a new entity JSON schema under a domain
+  - Requires `domain`, `name`, `description`, `properties[]`, and `examples[]`
+  - Properties mirror the JSON files (`name`, `type`, `description`, optional
+    `required`, `format`, `example`). Examples must include `@type`.
+- update-entity: Updates description/properties/examples of an existing entity
+- delete-entity: Deletes an entity schema file from the domain’s `schemas/`
 
 ## Configuration
 
@@ -77,6 +103,12 @@ Environment variables:
   to enable DNS-rebinding protection in production.
 - `MCP_SOLUTIONS_PATH` – absolute path to `solutions.json` if it isn’t located
   under `./data/solutions.json`.
+- `MCP_DOMAINS_PATH` – absolute path to `domains.json` if it isn’t located
+  under `./data/domains.json`.
+
+> **Note:** Tools that mutate the catalog (like `create-solution`) need write
+> access to the JSON files. When using Docker Compose, the `./data` directory
+> is mounted read/write into `/app/data` so changes persist on the host.
 
 With Docker Compose:
 
