@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { CategoryMetadata } from '@/types/category';
 import { SchemaDefinition } from '@/types/schema';
@@ -15,8 +15,11 @@ interface SchemaSidebarProps {
 }
 
 export function SchemaSidebar({ categories, schemasByCategory, solutionName, activeSchema }: SchemaSidebarProps) {
+  // Start with all domains collapsed
+  const [expandedDomains, setExpandedDomains] = useState<Set<string>>(new Set());
+
   // Find which domain contains the active schema
-  const getDomainForSchema = (schemaName: string | undefined) => {
+  const getDomainForSchema = useCallback((schemaName: string | undefined) => {
     if (!schemaName) return null;
     for (const category of categories) {
       const schemas = schemasByCategory[category.name] || [];
@@ -25,20 +28,22 @@ export function SchemaSidebar({ categories, schemasByCategory, solutionName, act
       }
     }
     return null;
-  };
-
-  // Start with all domains collapsed
-  const [expandedDomains, setExpandedDomains] = useState<Set<string>>(new Set());
+  }, [categories, schemasByCategory]);
 
   // Auto-expand domain when active schema changes (but keep others open if manually expanded)
   useEffect(() => {
     if (activeSchema) {
       const activeDomain = getDomainForSchema(activeSchema);
-      if (activeDomain && !expandedDomains.has(activeDomain)) {
-        setExpandedDomains(prev => new Set([...prev, activeDomain]));
+      if (activeDomain) {
+        setExpandedDomains(prev => {
+          if (prev.has(activeDomain)) return prev;
+          const newSet = new Set(prev);
+          newSet.add(activeDomain);
+          return newSet;
+        });
       }
     }
-  }, [activeSchema]);
+  }, [activeSchema, getDomainForSchema]);
 
   const toggleDomain = (domainName: string) => {
     const newExpanded = new Set(expandedDomains);
