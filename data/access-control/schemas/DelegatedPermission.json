@@ -2,13 +2,13 @@
   "@type": "Schema",
   "@context": "https://rocketschema.org/context",
   "name": "DelegatedPermission",
-  "description": "Permission delegation allowing users to temporarily grant their permissions to others",
+  "description": "Enables temporary transfer of permissions from one user to another, supporting scenarios like vacation coverage, emergency access, and task delegation. This entity manages the complex process of permission delegation where a user (delegator) temporarily grants some or all of their permissions to another user (delegate). This is essential for business continuity - when a manager goes on vacation, they can delegate approval permissions to their deputy. The delegation can be partial (only specific permissions) or complete (all permissions), time-bounded (active only during specific dates), and conditional (only for certain resources or contexts). The system tracks the delegation chain to prevent recursive delegations and maintains audit trails showing who used delegated permissions and when. Delegations can require approval from security teams or higher management, especially for sensitive permissions. The entity handles automatic activation and deactivation based on schedules, sends notifications when delegations are used, and can instantly revoke delegations if misuse is detected. This is critical for maintaining operational flexibility while preserving security and accountability, as all actions taken with delegated permissions are traceable back to both the delegate and the original permission holder.",
   "properties": [
     {
       "name": "delegationId",
-      "type": "string",
+      "type": "uuid",
       "mode": "stored",
-      "description": "Unique delegation identifier",
+      "description": "Unique identifier for this delegation",
       "required": true,
       "unique": true
     },
@@ -16,192 +16,197 @@
       "name": "delegator",
       "type": "User",
       "mode": "stored",
-      "description": "User delegating permissions",
+      "description": "User who is delegating their permissions",
       "required": true
     },
     {
-      "name": "delegatee",
+      "name": "delegate",
       "type": "User",
       "mode": "stored",
-      "description": "User receiving delegated permissions",
+      "description": "User receiving the delegated permissions",
       "required": true
+    },
+    {
+      "name": "permissions",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON array of permission IDs being delegated",
+      "required": true,
+      "example": "[\"approve_expenses\",\"manage_team\",\"access_reports\"]"
     },
     {
       "name": "delegationType",
       "type": "string",
       "mode": "enum",
       "description": "Type of delegation",
-      "enum": ["full", "partial", "role_based", "permission_based", "resource_specific"],
+      "enum": ["full", "partial", "role_based", "task_specific", "emergency"],
       "required": true,
       "example": "partial"
-    },
-    {
-      "name": "delegatedPermissions",
-      "type": "Permission[]",
-      "mode": "stored",
-      "description": "Specific permissions being delegated"
-    },
-    {
-      "name": "delegatedRoles",
-      "type": "Role[]",
-      "mode": "stored",
-      "description": "Roles being delegated"
-    },
-    {
-      "name": "resourceScope",
-      "type": "object",
-      "mode": "stored",
-      "description": "Scope of resources the delegation applies to",
-      "example": {
-        "type": "specific",
-        "resourceIds": ["doc_123", "doc_456"],
-        "resourceTypes": ["document"],
-        "conditions": "department = 'finance'"
-      }
-    },
-    {
-      "name": "canSubDelegate",
-      "type": "boolean",
-      "mode": "stored",
-      "description": "Whether the delegatee can further delegate",
-      "default": false
-    },
-    {
-      "name": "maxDelegationDepth",
-      "type": "integer",
-      "mode": "stored",
-      "description": "Maximum delegation chain depth",
-      "default": 1,
-      "min": 1
-    },
-    {
-      "name": "constraints",
-      "type": "object",
-      "mode": "stored",
-      "description": "Additional constraints on delegation",
-      "example": {
-        "maxUsageCount": 10,
-        "allowedActions": ["read", "write"],
-        "deniedActions": ["delete", "share"],
-        "timeRestrictions": {
-          "allowedDays": ["monday", "tuesday", "wednesday"],
-          "allowedHours": "09:00-17:00"
-        },
-        "ipRestrictions": ["10.0.0.0/8"],
-        "requireMFA": true
-      }
     },
     {
       "name": "reason",
       "type": "string",
       "mode": "stored",
-      "description": "Reason for delegation",
+      "description": "Explanation for why delegation is needed",
       "required": true,
-      "example": "Vacation coverage"
+      "example": "Annual vacation coverage from March 1-15"
     },
     {
-      "name": "approvalRequired",
+      "name": "createdAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When the delegation was created",
+      "required": true
+    },
+    {
+      "name": "startsAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When delegation becomes active",
+      "required": true
+    },
+    {
+      "name": "endsAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When delegation expires",
+      "nullable": true
+    },
+    {
+      "name": "scope",
+      "type": "string",
+      "mode": "stored",
+      "description": "Specific context or resources the delegation applies to",
+      "nullable": true,
+      "example": "department:engineering"
+    },
+    {
+      "name": "constraints",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON constraints limiting the delegated permissions",
+      "nullable": true,
+      "example": "{\"max_amount\":5000,\"resource_types\":[\"expense_report\",\"purchase_order\"]}"
+    },
+    {
+      "name": "requiresNotification",
       "type": "boolean",
       "mode": "stored",
-      "description": "Whether delegation requires approval",
+      "description": "Whether to notify delegator when permissions are used",
+      "default": true
+    },
+    {
+      "name": "requiresApproval",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether delegation needed approval",
       "default": false
     },
     {
       "name": "approvedBy",
       "type": "User",
       "mode": "stored",
-      "description": "User who approved the delegation"
+      "description": "Who approved this delegation",
+      "nullable": true
     },
     {
       "name": "approvedAt",
       "type": "DateTime",
       "mode": "stored",
-      "description": "Approval timestamp"
+      "description": "When delegation was approved",
+      "nullable": true
     },
     {
-      "name": "validFrom",
-      "type": "DateTime",
+      "name": "approvalNotes",
+      "type": "string",
       "mode": "stored",
-      "description": "Start of delegation period",
-      "required": true
+      "description": "Comments from approval process",
+      "nullable": true
     },
     {
-      "name": "validUntil",
-      "type": "DateTime",
+      "name": "canSubdelegate",
+      "type": "boolean",
       "mode": "stored",
-      "description": "End of delegation period",
-      "required": true
+      "description": "Whether delegate can further delegate these permissions",
+      "default": false
     },
     {
       "name": "status",
       "type": "string",
       "mode": "enum",
-      "description": "Current delegation status",
+      "description": "Current status of the delegation",
       "enum": ["pending", "active", "expired", "revoked", "suspended"],
       "default": "pending",
       "required": true
     },
     {
+      "name": "activatedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When delegation was actually activated",
+      "nullable": true
+    },
+    {
       "name": "usageCount",
       "type": "integer",
       "mode": "stored",
-      "description": "Number of times delegation has been used",
-      "default": 0,
-      "min": 0
+      "description": "Number of times delegated permissions were used",
+      "default": 0
     },
     {
       "name": "lastUsedAt",
       "type": "DateTime",
       "mode": "stored",
-      "description": "Last time delegation was used"
+      "description": "Last time delegated permissions were exercised",
+      "nullable": true
+    },
+    {
+      "name": "usageLog",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON array of usage records with timestamps and actions",
+      "nullable": true
+    },
+    {
+      "name": "maxUsage",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Maximum times delegation can be used",
+      "nullable": true
+    },
+    {
+      "name": "emergencyAccess",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this is emergency delegation (bypasses some checks)",
+      "default": false
     },
     {
       "name": "revokedAt",
       "type": "DateTime",
       "mode": "stored",
-      "description": "When delegation was revoked"
+      "description": "When delegation was revoked early",
+      "nullable": true
     },
     {
       "name": "revokedBy",
       "type": "User",
       "mode": "stored",
-      "description": "Who revoked the delegation"
+      "description": "Who revoked the delegation",
+      "nullable": true
     },
     {
       "name": "revokedReason",
       "type": "string",
       "mode": "stored",
-      "description": "Reason for revocation"
-    },
-    {
-      "name": "auditTrail",
-      "type": "object[]",
-      "mode": "stored",
-      "description": "Audit trail of delegation usage",
-      "example": [
-        {
-          "timestamp": "2024-03-15T10:00:00Z",
-          "action": "document.read",
-          "resource": "doc_123",
-          "result": "allowed",
-          "context": {
-            "ip": "10.0.1.50"
-          }
-        }
-      ]
-    },
-    {
-      "name": "createdAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "Creation timestamp",
-      "required": true
+      "description": "Why delegation was revoked",
+      "nullable": true
     },
     {
       "name": "metadata",
       "type": "object",
       "mode": "stored",
-      "description": "Additional metadata"
+      "description": "Additional delegation configuration"
     }
   ],
   "examples": [
@@ -209,19 +214,53 @@
       "@type": "DelegatedPermission",
       "delegationId": "del_vacation_123",
       "delegationType": "partial",
-      "reason": "Annual vacation - backup coverage",
-      "canSubDelegate": false,
-      "constraints": {
-        "allowedActions": ["read", "write", "approve"],
-        "deniedActions": ["delete", "share"],
-        "requireMFA": true
-      },
-      "approvalRequired": true,
-      "validFrom": "2024-03-20T00:00:00Z",
-      "validUntil": "2024-04-05T23:59:59Z",
+      "reason": "Two-week vacation coverage for team management duties",
+      "permissions": "[\"approve_timesheets\",\"approve_expenses_under_1000\",\"manage_team_calendar\",\"conduct_one_on_ones\"]",
+      "createdAt": "2024-02-25T10:00:00Z",
+      "startsAt": "2024-03-01T00:00:00Z",
+      "endsAt": "2024-03-15T23:59:59Z",
+      "scope": "team:backend_engineering",
+      "constraints": "{\"expense_limit\":1000,\"cannot_approve\":[\"salary_changes\",\"promotions\",\"terminations\"]}",
+      "requiresNotification": true,
+      "requiresApproval": true,
+      "approvedBy": "director_engineering",
+      "approvedAt": "2024-02-26T14:00:00Z",
+      "approvalNotes": "Approved for standard vacation coverage",
+      "canSubdelegate": false,
       "status": "active",
-      "usageCount": 5,
-      "createdAt": "2024-03-15T10:00:00Z"
+      "activatedAt": "2024-03-01T00:00:00Z",
+      "usageCount": 8,
+      "lastUsedAt": "2024-03-08T11:30:00Z",
+      "metadata": {
+        "vacation_request_id": "VAC-2024-089",
+        "original_return_date": "2024-03-15"
+      }
+    },
+    {
+      "@type": "DelegatedPermission",
+      "delegationId": "del_emergency_456",
+      "delegationType": "emergency",
+      "reason": "Emergency access for critical production incident while primary admin unreachable",
+      "permissions": "[\"production_deploy\",\"database_write\",\"configuration_change\",\"service_restart\"]",
+      "createdAt": "2024-03-15T02:00:00Z",
+      "startsAt": "2024-03-15T02:00:00Z",
+      "endsAt": "2024-03-15T06:00:00Z",
+      "constraints": "{\"services\":[\"api\",\"database\"],\"actions_require_dual_approval\":true}",
+      "requiresNotification": true,
+      "requiresApproval": false,
+      "canSubdelegate": false,
+      "emergencyAccess": true,
+      "status": "active",
+      "activatedAt": "2024-03-15T02:01:00Z",
+      "usageCount": 3,
+      "lastUsedAt": "2024-03-15T02:45:00Z",
+      "usageLog": "[{\"timestamp\":\"2024-03-15T02:15:00Z\",\"action\":\"restart_api_service\"},{\"timestamp\":\"2024-03-15T02:30:00Z\",\"action\":\"update_config\"},{\"timestamp\":\"2024-03-15T02:45:00Z\",\"action\":\"deploy_hotfix\"}]",
+      "maxUsage": 10,
+      "metadata": {
+        "incident_id": "INC-2024-0315",
+        "escalation_level": "critical",
+        "on_call_override": true
+      }
     }
   ]
 }

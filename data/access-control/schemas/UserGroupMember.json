@@ -2,69 +2,254 @@
   "@type": "Schema",
   "@context": "https://rocketschema.org/context",
   "name": "UserGroupMember",
-  "description": "Junction table for group members (many-to-many, 2NF compliance)",
+  "description": "Manages the membership of users within groups, tracking who belongs to which group, their role within the group, and the complete lifecycle of their membership. This junction table goes beyond simple user-to-group mapping by recording how users joined (invitation, request, automatic), who approved their membership, when they joined and will leave, and what special roles they have within the group (owner, moderator, member). It handles complex membership scenarios like temporary project assignments where a consultant joins for 3 months, or rotating leadership where the 'team lead' role passes between members monthly. The entity tracks membership status changes, from pending approval through active membership to eventual departure, maintaining history for audit purposes. It supports group-specific roles that are different from system-wide roles - someone might be a 'Viewer' globally but an 'Admin' within their department group. The entity also manages membership inheritance in hierarchical groups and handles conflicts when users belong to multiple groups with different permission sets. This detailed tracking is essential for compliance reporting ('Who had access to financial data last quarter?') and security investigations ('Which groups was this user part of when the breach occurred?').",
   "properties": [
     {
-      "name": "userGroup",
+      "name": "membershipId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "Unique identifier for this membership record",
+      "required": true,
+      "unique": true
+    },
+    {
+      "name": "group",
       "type": "UserGroup",
       "mode": "stored",
-      "description": "Group reference",
+      "description": "The group the user belongs to",
       "required": true
     },
     {
       "name": "user",
       "type": "User",
       "mode": "stored",
-      "description": "Member user",
+      "description": "The user who is a member",
       "required": true
+    },
+    {
+      "name": "memberRole",
+      "type": "string",
+      "mode": "enum",
+      "description": "User's role within this specific group",
+      "enum": ["owner", "admin", "moderator", "member", "guest", "observer"],
+      "default": "member"
     },
     {
       "name": "joinedAt",
       "type": "DateTime",
       "mode": "stored",
-      "description": "When user joined the group",
+      "description": "When the user joined this group",
       "required": true
     },
     {
-      "name": "addedBy",
-      "type": "User",
-      "mode": "stored",
-      "description": "User who added this member"
-    },
-    {
-      "name": "membershipType",
+      "name": "joinMethod",
       "type": "string",
       "mode": "enum",
-      "description": "Type of membership",
-      "enum": ["regular", "manager", "owner"],
-      "default": "regular"
+      "description": "How the user became a member",
+      "enum": ["invited", "requested", "assigned", "automatic", "inherited", "migrated"],
+      "required": true,
+      "example": "invited"
     },
     {
-      "name": "isActive",
+      "name": "invitedBy",
+      "type": "User",
+      "mode": "stored",
+      "description": "Who invited the user to join",
+      "nullable": true
+    },
+    {
+      "name": "approvedBy",
+      "type": "User",
+      "mode": "stored",
+      "description": "Who approved the membership request",
+      "nullable": true
+    },
+    {
+      "name": "approvedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When membership was approved",
+      "nullable": true
+    },
+    {
+      "name": "status",
+      "type": "string",
+      "mode": "enum",
+      "description": "Current membership status",
+      "enum": ["pending", "active", "suspended", "expired", "removed"],
+      "default": "active",
+      "required": true
+    },
+    {
+      "name": "statusReason",
+      "type": "string",
+      "mode": "stored",
+      "description": "Explanation for current status",
+      "nullable": true
+    },
+    {
+      "name": "expiresAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When membership automatically expires",
+      "nullable": true
+    },
+    {
+      "name": "renewalDate",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When membership needs renewal",
+      "nullable": true
+    },
+    {
+      "name": "isPrimary",
       "type": "boolean",
       "mode": "stored",
-      "description": "Whether membership is active",
+      "description": "Whether this is user's primary group",
+      "default": false
+    },
+    {
+      "name": "isInherited",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether membership comes from parent group",
+      "default": false
+    },
+    {
+      "name": "inheritedFrom",
+      "type": "UserGroup",
+      "mode": "stored",
+      "description": "Parent group membership is inherited from",
+      "nullable": true
+    },
+    {
+      "name": "canLeave",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether user can leave voluntarily",
       "default": true
+    },
+    {
+      "name": "canInvite",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether member can invite others",
+      "default": false
+    },
+    {
+      "name": "canManage",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether member can manage group settings",
+      "default": false
+    },
+    {
+      "name": "customPermissions",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON array of group-specific permissions",
+      "nullable": true,
+      "example": "[\"edit_group_resources\",\"view_member_list\"]"
+    },
+    {
+      "name": "lastActiveAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Last activity within group context",
+      "nullable": true
+    },
+    {
+      "name": "contributionScore",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Measure of member's group participation",
+      "default": 0
     },
     {
       "name": "leftAt",
       "type": "DateTime",
       "mode": "stored",
-      "description": "When user left the group"
+      "description": "When user left or was removed",
+      "nullable": true
+    },
+    {
+      "name": "leftReason",
+      "type": "string",
+      "mode": "enum",
+      "description": "Why membership ended",
+      "enum": ["voluntary", "removed", "expired", "group_deleted", "policy", "inactive"],
+      "nullable": true
+    },
+    {
+      "name": "removedBy",
+      "type": "User",
+      "mode": "stored",
+      "description": "Who removed the user from group",
+      "nullable": true
+    },
+    {
+      "name": "notes",
+      "type": "string",
+      "mode": "stored",
+      "description": "Administrative notes about this membership",
+      "nullable": true
+    },
+    {
+      "name": "metadata",
+      "type": "object",
+      "mode": "stored",
+      "description": "Additional membership-specific data"
     }
   ],
-  "indexes": [
+  "examples": [
     {
-      "fields": ["userGroup", "user"],
-      "unique": true
+      "@type": "UserGroupMember",
+      "membershipId": "mem_abc123",
+      "memberRole": "admin",
+      "joinedAt": "2024-01-15T10:00:00Z",
+      "joinMethod": "invited",
+      "invitedBy": "user_cto",
+      "approvedBy": "user_cto",
+      "approvedAt": "2024-01-15T10:30:00Z",
+      "status": "active",
+      "isPrimary": true,
+      "isInherited": false,
+      "canLeave": true,
+      "canInvite": true,
+      "canManage": true,
+      "customPermissions": "[\"manage_team_budget\",\"approve_time_off\",\"conduct_reviews\"]",
+      "lastActiveAt": "2024-03-15T14:30:00Z",
+      "contributionScore": 847,
+      "metadata": {
+        "teamLead": true,
+        "directReports": 8
+      }
     },
     {
-      "fields": ["user"],
-      "name": "idx_user"
-    },
-    {
-      "fields": ["userGroup", "membershipType"],
-      "name": "idx_group_type"
+      "@type": "UserGroupMember",
+      "membershipId": "mem_temp_789",
+      "memberRole": "guest",
+      "joinedAt": "2024-03-01T09:00:00Z",
+      "joinMethod": "requested",
+      "approvedBy": "user_project_manager",
+      "approvedAt": "2024-03-02T11:00:00Z",
+      "status": "active",
+      "statusReason": "External contractor for Q2 project",
+      "expiresAt": "2024-06-01T00:00:00Z",
+      "renewalDate": "2024-05-15T00:00:00Z",
+      "isPrimary": false,
+      "isInherited": false,
+      "canLeave": false,
+      "canInvite": false,
+      "canManage": false,
+      "customPermissions": "[\"view_project_docs\",\"comment_on_tasks\"]",
+      "lastActiveAt": "2024-03-14T16:00:00Z",
+      "contributionScore": 23,
+      "notes": "Contractor from TechCorp, working on API integration",
+      "metadata": {
+        "contractorCompany": "TechCorp",
+        "contractNumber": "CTR-2024-089"
+      }
     }
   ]
 }

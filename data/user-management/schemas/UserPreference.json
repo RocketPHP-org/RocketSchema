@@ -2,108 +2,137 @@
   "@type": "Schema",
   "@context": "https://rocketschema.org/context",
   "name": "UserPreference",
-  "description": "User preferences and settings for customization",
+  "description": "Stores personalized settings and preferences for each user's experience in the application. This entity allows users to customize how the application looks, behaves, and communicates with them. Preferences can range from UI themes and layout choices to notification settings, privacy options, and feature toggles. Each preference is stored as a key-value pair, making the system extensible - new preferences can be added without changing the database schema. The entity supports different data types (boolean, string, number, JSON) and can organize preferences into categories like 'appearance', 'notifications', or 'privacy'. Default values ensure new users get a sensible starting configuration, while user-specific values override these defaults. This personalization improves user satisfaction by letting each person tailor the application to their needs and working style.",
   "properties": [
     {
       "name": "user",
       "type": "User",
       "mode": "stored",
-      "description": "User these preferences belong to",
+      "description": "The user who owns these preferences",
       "required": true
-    },
-    {
-      "name": "category",
-      "type": "string",
-      "mode": "stored",
-      "description": "Preference category",
-      "required": true,
-      "example": "notification"
     },
     {
       "name": "key",
       "type": "string",
       "mode": "stored",
-      "description": "Preference key within the category",
+      "description": "Unique identifier for the preference setting",
       "required": true,
-      "example": "email_marketing"
+      "example": "theme.colorScheme"
     },
     {
       "name": "value",
-      "type": "object",
+      "type": "string",
       "mode": "stored",
-      "description": "Preference value (can be any JSON value)",
-      "required": true
+      "description": "The preference value stored as a string (can be parsed based on type)",
+      "required": true,
+      "example": "dark"
     },
     {
       "name": "type",
       "type": "string",
       "mode": "enum",
-      "description": "Type of preference value",
-      "enum": ["boolean", "string", "number", "array", "object"],
-      "example": "boolean"
+      "description": "Data type of the preference value for proper parsing",
+      "enum": ["string", "number", "boolean", "json", "date"],
+      "default": "string",
+      "example": "string"
     },
     {
-      "name": "isUserModifiable",
-      "type": "boolean",
+      "name": "category",
+      "type": "string",
       "mode": "stored",
-      "description": "Whether users can modify this preference",
-      "default": true
+      "description": "Grouping category for organizing related preferences",
+      "example": "appearance"
     },
     {
-      "name": "defaultValue",
-      "type": "object",
+      "name": "label",
+      "type": "string",
       "mode": "stored",
-      "description": "Default value if not set"
-    },
-    {
-      "name": "validValues",
-      "type": "object",
-      "mode": "stored",
-      "description": "List of valid values or validation rules"
+      "description": "Human-readable name for the preference",
+      "example": "Color Scheme"
     },
     {
       "name": "description",
       "type": "string",
       "mode": "stored",
-      "description": "Description of what this preference controls"
+      "description": "Help text explaining what this preference does",
+      "example": "Choose between light and dark theme"
     },
     {
-      "name": "updatedAt",
+      "name": "defaultValue",
+      "type": "string",
+      "mode": "stored",
+      "description": "System default if user hasn't set a value",
+      "example": "light"
+    },
+    {
+      "name": "possibleValues",
+      "type": "string[]",
+      "mode": "stored",
+      "description": "List of allowed values for validation",
+      "example": ["light", "dark", "auto"]
+    },
+    {
+      "name": "isPublic",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether other users can see this preference (for social features)",
+      "default": false
+    },
+    {
+      "name": "isEditable",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether the user can change this preference",
+      "default": true
+    },
+    {
+      "name": "lastModifiedAt",
       "type": "DateTime",
       "mode": "stored",
-      "description": "Last update timestamp",
-      "required": true
+      "description": "When the user last changed this preference"
     },
     {
       "name": "metadata",
       "type": "object",
       "mode": "stored",
-      "description": "Additional metadata"
+      "description": "Additional configuration or validation rules"
     }
   ],
   "examples": [
     {
       "@type": "UserPreference",
-      "category": "notification",
-      "key": "email_marketing",
-      "value": true,
+      "key": "notifications.email.marketing",
+      "value": "false",
       "type": "boolean",
-      "isUserModifiable": true,
-      "defaultValue": false,
-      "description": "Receive marketing emails",
-      "updatedAt": "2024-03-15T10:00:00Z"
+      "category": "notifications",
+      "label": "Marketing Emails",
+      "description": "Receive promotional emails and newsletters about new features and updates",
+      "defaultValue": "true",
+      "possibleValues": ["true", "false"],
+      "isPublic": false,
+      "isEditable": true,
+      "lastModifiedAt": "2024-03-10T14:00:00Z",
+      "metadata": {
+        "frequency": "weekly",
+        "lastOptOut": "2024-03-10T14:00:00Z"
+      }
     },
     {
       "@type": "UserPreference",
-      "category": "ui",
-      "key": "theme",
-      "value": "dark",
-      "type": "string",
-      "isUserModifiable": true,
-      "defaultValue": "light",
-      "validValues": ["light", "dark", "auto"],
-      "description": "UI theme preference",
-      "updatedAt": "2024-03-15T10:00:00Z"
+      "key": "dashboard.widgets.layout",
+      "value": "{\"columns\":3,\"widgets\":[{\"id\":\"stats\",\"position\":1},{\"id\":\"chart\",\"position\":2},{\"id\":\"tasks\",\"position\":3}]}",
+      "type": "json",
+      "category": "dashboard",
+      "label": "Dashboard Layout",
+      "description": "Customized arrangement of widgets on your dashboard",
+      "defaultValue": "{\"columns\":2,\"widgets\":[]}",
+      "isPublic": false,
+      "isEditable": true,
+      "lastModifiedAt": "2024-02-28T09:30:00Z",
+      "metadata": {
+        "maxWidgets": 10,
+        "allowedWidgets": ["stats", "chart", "tasks", "calendar", "news"]
+      }
     }
   ]
 }

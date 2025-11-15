@@ -2,36 +2,76 @@
   "@type": "Schema",
   "@context": "https://rocketschema.org/context",
   "name": "PermissionConditionLink",
-  "description": "Junction table linking permissions to conditions (many-to-many, 2NF compliance)",
+  "description": "Associates conditions with permissions, roles, or policies, creating dynamic authorization rules where access rights are contingent upon runtime condition evaluation. This junction entity bridges static permission definitions with dynamic conditions, enabling context-aware access control. Rather than granting permissions unconditionally, this link makes them dependent on specific circumstances being met. For example, linking 'delete_records' permission with 'business_hours' condition ensures deletion only occurs during monitored times. The entity supports multiple conditions per permission with complex boolean combinations (ALL must pass, ANY can pass, custom logic), weighted conditions where some are more important than others, and fallback chains where alternative conditions apply if primary ones fail. It handles condition precedence, determining which conditions to evaluate first for performance optimization, and short-circuit evaluation to skip unnecessary checks. The link can be temporary (conditions only apply during specific periods), progressive (different conditions at different trust levels), or contextual (different conditions in different environments). This mechanism enables sophisticated scenarios like escalating approval requirements based on risk, time-based permission activation for temporary access, and compliance rules that overlay business permissions. The entity maintains evaluation history for audit purposes and performance metrics for optimization.",
   "properties": [
     {
-      "name": "permission",
-      "type": "Permission",
+      "name": "linkId",
+      "type": "uuid",
       "mode": "stored",
-      "description": "Permission reference",
+      "description": "Unique identifier for this condition link",
+      "required": true,
+      "unique": true
+    },
+    {
+      "name": "targetType",
+      "type": "string",
+      "mode": "enum",
+      "description": "Type of entity this condition is linked to",
+      "enum": ["permission", "role", "policy", "group", "resource"],
       "required": true
     },
     {
-      "name": "condition",
-      "type": "PermissionCondition",
+      "name": "targetId",
+      "type": "string",
       "mode": "stored",
-      "description": "Condition reference",
+      "description": "ID of the linked entity",
+      "required": true
+    },
+    {
+      "name": "conditionId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "The condition being linked",
       "required": true
     },
     {
       "name": "linkType",
       "type": "string",
       "mode": "enum",
-      "description": "Type of link",
-      "enum": ["required", "optional", "negative"],
+      "description": "Nature of the link",
+      "enum": ["required", "optional", "enhancing", "restricting", "alternative"],
       "default": "required"
     },
     {
       "name": "evaluationOrder",
       "type": "integer",
       "mode": "stored",
-      "description": "Order in which to evaluate conditions",
+      "description": "Order in which this condition is evaluated",
       "default": 0
+    },
+    {
+      "name": "combineOperator",
+      "type": "string",
+      "mode": "enum",
+      "description": "How to combine with other conditions",
+      "enum": ["AND", "OR", "XOR", "NOT", "CUSTOM"],
+      "default": "AND"
+    },
+    {
+      "name": "customLogic",
+      "type": "string",
+      "mode": "stored",
+      "description": "Custom combination logic if operator is CUSTOM",
+      "nullable": true
+    },
+    {
+      "name": "weight",
+      "type": "number",
+      "mode": "stored",
+      "description": "Importance weight for weighted evaluation",
+      "min": 0,
+      "max": 1,
+      "default": 1
     },
     {
       "name": "shortCircuit",
@@ -41,6 +81,99 @@
       "default": false
     },
     {
+      "name": "mandatory",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this condition must be evaluated",
+      "default": true
+    },
+    {
+      "name": "scope",
+      "type": "string",
+      "mode": "stored",
+      "description": "Context where this link applies",
+      "nullable": true,
+      "example": "production_environment"
+    },
+    {
+      "name": "parameters",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON parameters passed to condition",
+      "nullable": true,
+      "example": "{\"threshold\":1000,\"time_window\":\"business_hours\"}"
+    },
+    {
+      "name": "overrideValues",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON values that override condition defaults",
+      "nullable": true
+    },
+    {
+      "name": "fallbackConditionId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "Alternative condition if primary fails",
+      "nullable": true
+    },
+    {
+      "name": "negateResult",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether to invert the condition result",
+      "default": false
+    },
+    {
+      "name": "validFrom",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When this link becomes active",
+      "nullable": true
+    },
+    {
+      "name": "validUntil",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When this link expires",
+      "nullable": true
+    },
+    {
+      "name": "evaluationCount",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Number of times evaluated",
+      "default": 0
+    },
+    {
+      "name": "successCount",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Number of successful evaluations",
+      "default": 0
+    },
+    {
+      "name": "failureCount",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Number of failed evaluations",
+      "default": 0
+    },
+    {
+      "name": "avgEvaluationTime",
+      "type": "number",
+      "mode": "stored",
+      "description": "Average milliseconds for evaluation",
+      "nullable": true
+    },
+    {
+      "name": "lastEvaluatedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Last evaluation timestamp",
+      "nullable": true
+    },
+    {
       "name": "isActive",
       "type": "boolean",
       "mode": "stored",
@@ -48,21 +181,81 @@
       "default": true
     },
     {
+      "name": "createdBy",
+      "type": "User",
+      "mode": "stored",
+      "description": "Who created this link"
+    },
+    {
       "name": "createdAt",
       "type": "DateTime",
       "mode": "stored",
-      "description": "Creation timestamp",
+      "description": "When link was created",
       "required": true
-    }
-  ],
-  "indexes": [
-    {
-      "fields": ["permission", "condition"],
-      "unique": true
     },
     {
-      "fields": ["permission", "evaluationOrder"],
-      "name": "idx_permission_order"
+      "name": "metadata",
+      "type": "object",
+      "mode": "stored",
+      "description": "Additional link configuration"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "PermissionConditionLink",
+      "linkId": "link_001",
+      "targetType": "permission",
+      "targetId": "perm_delete_records",
+      "conditionId": "cond_business_hours",
+      "linkType": "required",
+      "evaluationOrder": 1,
+      "combineOperator": "AND",
+      "weight": 1,
+      "shortCircuit": true,
+      "mandatory": true,
+      "scope": "production",
+      "parameters": "{\"timezone\":\"America/New_York\",\"include_holidays\":false}",
+      "negateResult": false,
+      "evaluationCount": 1523,
+      "successCount": 1245,
+      "failureCount": 278,
+      "avgEvaluationTime": 12.5,
+      "lastEvaluatedAt": "2024-03-15T14:30:00Z",
+      "isActive": true,
+      "createdAt": "2024-01-01T00:00:00Z",
+      "metadata": {
+        "business_justification": "Prevent accidental deletions outside monitored hours",
+        "compliance_requirement": "SOX-404"
+      }
+    },
+    {
+      "@type": "PermissionConditionLink",
+      "linkId": "link_002",
+      "targetType": "role",
+      "targetId": "role_financial_approver",
+      "conditionId": "cond_amount_limit",
+      "linkType": "restricting",
+      "evaluationOrder": 2,
+      "combineOperator": "AND",
+      "weight": 0.8,
+      "shortCircuit": false,
+      "mandatory": true,
+      "parameters": "{\"max_amount\":50000,\"currency\":\"USD\",\"check_budget\":true}",
+      "overrideValues": "{\"escalation_threshold\":40000}",
+      "fallbackConditionId": "cond_request_approval",
+      "negateResult": false,
+      "validFrom": "2024-01-01T00:00:00Z",
+      "validUntil": "2024-12-31T23:59:59Z",
+      "evaluationCount": 892,
+      "successCount": 756,
+      "failureCount": 136,
+      "avgEvaluationTime": 25.3,
+      "isActive": true,
+      "createdAt": "2024-01-01T00:00:00Z",
+      "metadata": {
+        "annual_review_required": true,
+        "auto_adjust_for_inflation": true
+      }
     }
   ]
 }

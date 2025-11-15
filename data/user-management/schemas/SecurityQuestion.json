@@ -2,119 +2,181 @@
   "@type": "Schema",
   "@context": "https://rocketschema.org/context",
   "name": "SecurityQuestion",
-  "description": "Security questions for account recovery and additional authentication",
+  "description": "Manages security questions and answers used as a backup authentication method for account recovery. Security questions provide an additional layer of identity verification when users forget their password or need to prove their identity from an unrecognized device. This entity stores both predefined questions (like 'What was your first pet's name?') and allows custom questions that users can create themselves. The answers are always stored in hashed format, never in plain text, to protect against data breaches. Security questions are particularly useful as a fallback when other recovery methods (email, phone) are unavailable. They work by asking personal questions that ideally only the account owner would know the answer to. The system typically requires users to answer multiple questions correctly to prevent guessing attacks. While not as secure as modern methods like SMS or authenticator apps, security questions remain popular because they don't require external devices or services, making them accessible to all users regardless of their technical capabilities.",
   "properties": [
     {
       "name": "user",
       "type": "User",
       "mode": "stored",
-      "description": "User who set up this security question",
+      "description": "The user who owns this security question",
       "required": true
+    },
+    {
+      "name": "questionId",
+      "type": "string",
+      "mode": "stored",
+      "description": "Unique identifier for the question",
+      "required": true,
+      "example": "sq_mother_maiden"
     },
     {
       "name": "question",
       "type": "string",
       "mode": "stored",
-      "description": "The security question",
+      "description": "The security question text",
       "required": true,
-      "example": "What was the name of your first pet?"
+      "example": "What is your mother's maiden name?"
     },
     {
-      "name": "questionCategory",
+      "name": "questionType",
       "type": "string",
       "mode": "enum",
-      "description": "Category of question",
-      "enum": ["personal", "family", "education", "location", "preferences", "custom"],
-      "default": "personal"
+      "description": "Whether this is a system-provided or user-created question",
+      "enum": ["predefined", "custom"],
+      "default": "predefined",
+      "example": "predefined"
+    },
+    {
+      "name": "category",
+      "type": "string",
+      "mode": "stored",
+      "description": "Category grouping for the question",
+      "example": "family"
     },
     {
       "name": "answerHash",
       "type": "string",
       "mode": "stored",
-      "description": "Hashed answer (normalized and hashed)",
+      "description": "Cryptographically hashed answer for security",
       "required": true,
       "private": true
     },
     {
-      "name": "hint",
+      "name": "answerHint",
       "type": "string",
       "mode": "stored",
-      "description": "Optional hint for the answer"
+      "description": "Optional hint to help remember the answer (user-provided)",
+      "example": "Starts with 'M'"
     },
     {
-      "name": "order",
+      "name": "answerFormat",
+      "type": "string",
+      "mode": "enum",
+      "description": "Expected format of the answer for validation",
+      "enum": ["text", "date", "number", "email"],
+      "default": "text"
+    },
+    {
+      "name": "caseSensitive",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether the answer matching is case-sensitive",
+      "default": false
+    },
+    {
+      "name": "minAnswerLength",
       "type": "integer",
       "mode": "stored",
-      "description": "Display order for multiple questions",
-      "default": 1,
-      "min": 1
+      "description": "Minimum required length for the answer",
+      "default": 3,
+      "example": 4
     },
     {
       "name": "isActive",
       "type": "boolean",
       "mode": "stored",
-      "description": "Whether this question is active",
+      "description": "Whether this question is currently active for authentication",
       "default": true
+    },
+    {
+      "name": "usageCount",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Number of times this question has been used for verification",
+      "default": 0
     },
     {
       "name": "lastUsedAt",
       "type": "DateTime",
       "mode": "stored",
-      "description": "Last time this question was used for verification"
+      "description": "Last time this question was used for authentication"
     },
     {
       "name": "failedAttempts",
       "type": "integer",
       "mode": "stored",
-      "description": "Number of consecutive failed attempts",
-      "default": 0,
-      "min": 0
+      "description": "Number of consecutive failed answer attempts",
+      "default": 0
     },
     {
       "name": "lockedUntil",
       "type": "DateTime",
       "mode": "stored",
-      "description": "Question locked until this timestamp"
+      "description": "Question locked until this time due to too many failures"
+    },
+    {
+      "name": "priority",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Display order when showing multiple questions",
+      "default": 0
+    },
+    {
+      "name": "expiresAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When this security question expires and must be updated"
     },
     {
       "name": "createdAt",
       "type": "DateTime",
       "mode": "stored",
-      "description": "Creation timestamp",
+      "description": "When this security question was set up",
       "required": true
     },
     {
       "name": "updatedAt",
       "type": "DateTime",
       "mode": "stored",
-      "description": "Last update timestamp"
-    },
-    {
-      "name": "metadata",
-      "type": "object",
-      "mode": "stored",
-      "description": "Additional metadata"
+      "description": "Last time the question or answer was modified"
     }
   ],
   "examples": [
     {
       "@type": "SecurityQuestion",
+      "questionId": "sq_first_pet",
       "question": "What was the name of your first pet?",
-      "questionCategory": "personal",
-      "hint": "Golden Retriever",
-      "order": 1,
+      "questionType": "predefined",
+      "category": "personal",
+      "answerHint": "Golden retriever from childhood",
+      "answerFormat": "text",
+      "caseSensitive": false,
+      "minAnswerLength": 2,
       "isActive": true,
+      "usageCount": 3,
+      "lastUsedAt": "2024-02-20T10:30:00Z",
       "failedAttempts": 0,
-      "createdAt": "2024-01-15T10:00:00Z"
+      "priority": 1,
+      "createdAt": "2024-01-01T12:00:00Z",
+      "updatedAt": "2024-01-01T12:00:00Z"
     },
     {
       "@type": "SecurityQuestion",
-      "question": "In what city were you born?",
-      "questionCategory": "location",
-      "order": 2,
+      "questionId": "sq_custom_001",
+      "question": "What is the name of the street where you lived in 2010?",
+      "questionType": "custom",
+      "category": "location",
+      "answerHint": "Downtown area",
+      "answerFormat": "text",
+      "caseSensitive": false,
+      "minAnswerLength": 5,
       "isActive": true,
-      "failedAttempts": 0,
-      "createdAt": "2024-01-15T10:00:00Z"
+      "usageCount": 0,
+      "failedAttempts": 2,
+      "priority": 2,
+      "expiresAt": "2025-01-01T00:00:00Z",
+      "createdAt": "2024-01-15T09:00:00Z",
+      "updatedAt": "2024-03-10T14:00:00Z"
     }
   ]
 }

@@ -2,163 +2,199 @@
   "@type": "Schema",
   "@context": "https://rocketschema.org/context",
   "name": "PolicySet",
-  "description": "A collection of permissions and rules that work together for complex access control scenarios",
+  "description": "Groups related access policies into cohesive sets that can be managed, deployed, and evaluated together, providing organizational structure for complex policy landscapes. Policy sets are containers that bundle policies sharing common purposes, compliance requirements, or organizational scope - like 'GDPR Compliance Policies' or 'Financial Data Protection'. This hierarchical organization allows policy administrators to manage hundreds of policies efficiently, deploy entire policy frameworks at once, and ensure comprehensive coverage without gaps or conflicts. Each set can contain other sets (nested hierarchy), individual policies, and rules, with sophisticated combination algorithms determining how multiple policies interact. The entity supports different policy combination methods: permit-overrides (any allow wins), deny-overrides (any deny wins), first-applicable (stop at first match), or consensus-based. Policy sets can be versioned as a unit, enabling rollback of entire policy frameworks if issues arise. They support staged deployment where sets are tested in non-production before enterprise-wide activation. The entity handles policy inheritance where child organizations inherit parent policy sets but can add local policies. This is essential for multi-tenant systems where base policies apply to all while allowing customization, regulatory compliance where entire frameworks must be adopted together, and enterprise governance where consistent policy application across divisions is required.",
   "properties": [
+    {
+      "name": "policySetId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "Unique identifier for this policy set",
+      "required": true,
+      "unique": true
+    },
     {
       "name": "code",
       "type": "string",
       "mode": "stored",
-      "description": "Unique policy set identifier",
+      "description": "Unique machine-readable identifier",
       "required": true,
       "unique": true,
-      "example": "financial_data_access"
+      "example": "PS_FINANCIAL_COMPLIANCE"
     },
     {
       "name": "name",
       "type": "string",
       "mode": "stored",
-      "description": "Human-readable name",
+      "description": "Human-readable name of the policy set",
       "required": true,
-      "example": "Financial Data Access Policy"
+      "example": "Financial Services Compliance Policy Set"
     },
     {
       "name": "description",
       "type": "string",
       "mode": "stored",
-      "description": "Detailed description of the policy set",
-      "example": "Controls access to sensitive financial data based on role, department, and data classification"
+      "description": "Detailed explanation of the policy set's purpose",
+      "required": true,
+      "example": "Comprehensive policies ensuring compliance with SOX, PCI-DSS, and internal financial controls"
     },
     {
-      "name": "type",
+      "name": "category",
       "type": "string",
       "mode": "enum",
-      "description": "Type of policy set",
-      "enum": ["access_control", "data_governance", "compliance", "security", "custom"],
-      "default": "access_control",
-      "example": "compliance"
+      "description": "Category of policy set",
+      "enum": ["compliance", "security", "privacy", "operational", "custom"],
+      "required": true
     },
     {
-      "name": "permissions",
-      "type": "Permission[]",
+      "name": "scope",
+      "type": "string",
       "mode": "stored",
-      "description": "Permissions included in this policy set"
+      "description": "Organizational scope where this set applies",
+      "example": "organization:finance_dept"
+    },
+    {
+      "name": "parentSetId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "Parent policy set in hierarchy",
+      "nullable": true
+    },
+    {
+      "name": "policies",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON array of policy IDs in this set",
+      "example": "[\"pol_001\",\"pol_002\",\"pol_003\"]"
+    },
+    {
+      "name": "childSets",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON array of child policy set IDs",
+      "nullable": true
     },
     {
       "name": "combiningAlgorithm",
       "type": "string",
       "mode": "enum",
-      "description": "Algorithm for combining multiple permissions",
-      "enum": ["first_applicable", "deny_overrides", "permit_overrides", "deny_unless_permit", "permit_unless_deny", "custom"],
-      "default": "deny_overrides",
-      "example": "deny_overrides"
-    },
-    {
-      "name": "customAlgorithm",
-      "type": "string",
-      "mode": "stored",
-      "description": "Custom combining algorithm expression",
-      "example": "if any(deny) then deny else if any(permit) then permit else deny"
-    },
-    {
-      "name": "target",
-      "type": "object",
-      "mode": "stored",
-      "description": "Target specification for when this policy set applies",
-      "example": {
-        "subjects": ["role:financial_analyst", "department:finance"],
-        "resources": ["type:financial_report", "classification:confidential"],
-        "actions": ["read", "export"],
-        "environments": ["network:internal", "time:business_hours"]
-      }
-    },
-    {
-      "name": "obligations",
-      "type": "object[]",
-      "mode": "stored",
-      "description": "Actions that must be performed when policy is applied",
-      "example": [
-        {
-          "type": "audit",
-          "action": "log_access",
-          "details": "Log all access to financial data"
-        },
-        {
-          "type": "notification",
-          "action": "notify_manager",
-          "condition": "resource.value > 1000000"
-        }
-      ]
-    },
-    {
-      "name": "advice",
-      "type": "object[]",
-      "mode": "stored",
-      "description": "Recommended actions (non-mandatory)",
-      "example": [
-        {
-          "type": "security",
-          "recommendation": "enable_mfa",
-          "reason": "Accessing sensitive financial data"
-        }
-      ]
-    },
-    {
-      "name": "conflictResolution",
-      "type": "object",
-      "mode": "stored",
-      "description": "Rules for resolving conflicts between permissions",
-      "example": {
-        "strategy": "priority_based",
-        "defaultDecision": "deny"
-      }
-    },
-    {
-      "name": "parentPolicySet",
-      "type": "PolicySet",
-      "mode": "stored",
-      "description": "Parent policy set for inheritance"
-    },
-    {
-      "name": "inheritanceMode",
-      "type": "string",
-      "mode": "enum",
-      "description": "How to inherit from parent",
-      "enum": ["override", "merge", "append", "none"],
-      "default": "merge"
+      "description": "How to combine policy decisions",
+      "enum": ["permit_overrides", "deny_overrides", "first_applicable", "only_one_applicable", "consensus"],
+      "default": "deny_overrides"
     },
     {
       "name": "priority",
       "type": "integer",
       "mode": "stored",
-      "description": "Priority for evaluation order",
-      "default": 0,
-      "min": 0
+      "description": "Evaluation order when multiple sets apply",
+      "default": 0
+    },
+    {
+      "name": "target",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON criteria for when this set applies",
+      "example": "{\"resource_type\":[\"financial_data\",\"payment_info\"],\"user_department\":\"finance\"}"
+    },
+    {
+      "name": "obligations",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON array of required actions when set is evaluated",
+      "nullable": true
+    },
+    {
+      "name": "advice",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON array of optional recommendations",
+      "nullable": true
     },
     {
       "name": "version",
       "type": "string",
       "mode": "stored",
-      "description": "Version of the policy set",
-      "example": "1.2.0"
+      "description": "Version identifier for the policy set",
+      "required": true,
+      "example": "2.1.0"
     },
     {
-      "name": "isActive",
-      "type": "boolean",
-      "mode": "stored",
-      "description": "Whether this policy set is active",
-      "default": true
+      "name": "status",
+      "type": "string",
+      "mode": "enum",
+      "description": "Current status of the policy set",
+      "enum": ["draft", "testing", "active", "deprecated", "archived"],
+      "default": "draft"
     },
     {
-      "name": "validFrom",
+      "name": "effectiveFrom",
       "type": "DateTime",
       "mode": "stored",
-      "description": "Start of validity period"
+      "description": "When this policy set becomes effective",
+      "nullable": true
     },
     {
-      "name": "validUntil",
+      "name": "effectiveUntil",
       "type": "DateTime",
       "mode": "stored",
-      "description": "End of validity period"
+      "description": "When this policy set expires",
+      "nullable": true
+    },
+    {
+      "name": "complianceFrameworks",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON array of compliance requirements addressed",
+      "example": "[\"SOX\",\"PCI-DSS\",\"GDPR\"]"
+    },
+    {
+      "name": "testResults",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON results from policy testing",
+      "nullable": true
+    },
+    {
+      "name": "deploymentStage",
+      "type": "string",
+      "mode": "enum",
+      "description": "Current deployment stage",
+      "enum": ["development", "testing", "staging", "production"],
+      "default": "development"
+    },
+    {
+      "name": "approvedBy",
+      "type": "User",
+      "mode": "stored",
+      "description": "Who approved this policy set",
+      "nullable": true
+    },
+    {
+      "name": "approvedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When the set was approved",
+      "nullable": true
+    },
+    {
+      "name": "lastReviewDate",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Last compliance review",
+      "nullable": true
+    },
+    {
+      "name": "nextReviewDate",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When next review is due",
+      "nullable": true
+    },
+    {
+      "name": "createdBy",
+      "type": "User",
+      "mode": "stored",
+      "description": "Policy set author",
+      "required": true
     },
     {
       "name": "createdAt",
@@ -168,59 +204,72 @@
       "required": true
     },
     {
-      "name": "createdBy",
-      "type": "User",
-      "mode": "stored",
-      "description": "User who created this policy set"
-    },
-    {
-      "name": "approvedBy",
-      "type": "User",
-      "mode": "stored",
-      "description": "User who approved this policy set"
-    },
-    {
-      "name": "approvedAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "Approval timestamp"
-    },
-    {
       "name": "metadata",
       "type": "object",
       "mode": "stored",
-      "description": "Additional metadata"
+      "description": "Additional configuration"
     }
   ],
   "examples": [
     {
       "@type": "PolicySet",
-      "code": "gdpr_compliance",
-      "name": "GDPR Compliance Policy Set",
-      "description": "Ensures GDPR compliance for EU citizen data access",
-      "type": "compliance",
+      "policySetId": "ps_financial_001",
+      "code": "PS_FINANCIAL_COMPLIANCE",
+      "name": "Financial Services Compliance Suite",
+      "description": "Complete policy framework for financial data protection, transaction security, and regulatory compliance",
+      "category": "compliance",
+      "scope": "department:finance",
+      "policies": "[\"pol_transaction_limits\",\"pol_dual_approval\",\"pol_audit_logging\",\"pol_data_encryption\"]",
+      "childSets": "[\"ps_sox_compliance\",\"ps_pci_compliance\"]",
       "combiningAlgorithm": "deny_overrides",
-      "target": {
-        "subjects": ["all"],
-        "resources": ["type:personal_data", "geography:eu"],
-        "actions": ["read", "write", "delete", "export"]
-      },
-      "obligations": [
-        {
-          "type": "audit",
-          "action": "log_gdpr_access",
-          "details": "Detailed logging for GDPR compliance"
-        },
-        {
-          "type": "consent",
-          "action": "verify_consent",
-          "required": true
-        }
-      ],
       "priority": 100,
+      "target": "{\"resource_classification\":[\"financial\",\"pii\"],\"transaction_value\":{\"$gt\":1000}}",
+      "obligations": "[{\"action\":\"audit_log\",\"level\":\"detailed\"},{\"action\":\"encrypt\",\"algorithm\":\"AES-256\"}]",
+      "version": "3.2.1",
+      "status": "active",
+      "effectiveFrom": "2024-01-01T00:00:00Z",
+      "complianceFrameworks": "[\"SOX\",\"PCI-DSS\",\"Basel III\"]",
+      "deploymentStage": "production",
+      "approvedBy": "compliance_officer",
+      "approvedAt": "2023-12-15T10:00:00Z",
+      "lastReviewDate": "2024-02-01T00:00:00Z",
+      "nextReviewDate": "2024-05-01T00:00:00Z",
+      "createdAt": "2023-11-01T00:00:00Z",
+      "metadata": {
+        "regulatory_citations": ["SOX-404", "PCI-DSS-3.2.1"],
+        "risk_rating": "critical"
+      }
+    },
+    {
+      "@type": "PolicySet",
+      "policySetId": "ps_gdpr_002",
+      "code": "PS_GDPR_PRIVACY",
+      "name": "GDPR Privacy Protection Framework",
+      "description": "EU data protection policies ensuring GDPR compliance for personal data processing",
+      "category": "privacy",
+      "scope": "global",
+      "parentSetId": "ps_master_privacy",
+      "policies": "[\"pol_consent_management\",\"pol_right_to_erasure\",\"pol_data_portability\",\"pol_breach_notification\"]",
+      "combiningAlgorithm": "deny_overrides",
+      "priority": 90,
+      "target": "{\"data_subjects\":[\"eu_resident\"],\"data_type\":\"personal_data\"}",
+      "obligations": "[{\"action\":\"obtain_consent\"},{\"action\":\"maintain_processing_records\"},{\"action\":\"enable_data_export\"}]",
+      "advice": "[{\"recommendation\":\"privacy_impact_assessment\"}]",
       "version": "2.0.0",
-      "isActive": true,
-      "createdAt": "2024-01-01T00:00:00Z"
+      "status": "active",
+      "effectiveFrom": "2018-05-25T00:00:00Z",
+      "complianceFrameworks": "[\"GDPR\",\"ePrivacy\"]",
+      "deploymentStage": "production",
+      "approvedBy": "dpo",
+      "approvedAt": "2018-05-01T00:00:00Z",
+      "lastReviewDate": "2024-01-15T00:00:00Z",
+      "nextReviewDate": "2024-07-15T00:00:00Z",
+      "createdBy": "privacy_team",
+      "createdAt": "2018-03-01T00:00:00Z",
+      "metadata": {
+        "gdpr_articles": ["6", "7", "15-22", "25", "32"],
+        "automated_enforcement": true
+      }
     }
   ]
 }

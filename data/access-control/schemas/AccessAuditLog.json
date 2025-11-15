@@ -2,13 +2,13 @@
   "@type": "Schema",
   "@context": "https://rocketschema.org/context",
   "name": "AccessAuditLog",
-  "description": "Comprehensive audit log for all access control decisions and activities",
+  "description": "Comprehensive audit trail of all access control decisions and security events in the system, providing forensic evidence for security investigations, compliance reporting, and behavioral analysis. This entity records every authorization attempt, whether successful or failed, capturing the complete context: who tried to access what, when, from where, why it was allowed or denied, and which policies were evaluated. Unlike general activity logs, this focuses specifically on access control events like permission checks, role changes, policy violations, and authentication events. Each entry includes the decision path showing which rules, roles, and permissions were evaluated, making it possible to understand exactly why access was granted or denied. This is crucial for debugging permission problems ('Why can't user X access resource Y?'), investigating breaches ('Who accessed sensitive data last month?'), and proving compliance ('Show all access to patient records'). The log captures risk indicators like unusual access patterns, privilege escalations, or access from new locations. It supports real-time alerting for high-risk events and provides data for machine learning models that detect anomalous behavior. Retention policies ensure logs are kept as long as required by regulations while managing storage costs. The immutable nature of these logs makes them admissible as evidence in legal proceedings.",
   "properties": [
     {
       "name": "auditId",
-      "type": "string",
+      "type": "uuid",
       "mode": "stored",
-      "description": "Unique audit entry identifier",
+      "description": "Unique identifier for this audit entry",
       "required": true,
       "unique": true
     },
@@ -16,138 +16,271 @@
       "name": "timestamp",
       "type": "DateTime",
       "mode": "stored",
-      "description": "When the access event occurred",
+      "description": "Exact time of the access attempt",
       "required": true
     },
     {
       "name": "eventType",
       "type": "string",
       "mode": "enum",
-      "description": "Type of access event",
-      "enum": ["access_granted", "access_denied", "permission_changed", "role_assigned", "role_revoked", "policy_evaluated", "delegation_used", "resource_accessed", "data_exported"],
-      "required": true,
-      "example": "access_granted"
+      "description": "Category of access event",
+      "enum": ["permission_check", "authentication", "authorization", "role_change", "policy_evaluation", "privilege_escalation", "access_denied", "access_granted", "suspicious_activity"],
+      "required": true
     },
     {
-      "name": "subject",
-      "type": "object",
+      "name": "userId",
+      "type": "uuid",
       "mode": "stored",
-      "description": "Subject of the access attempt",
-      "required": true,
-      "example": {
-        "type": "user",
-        "id": "user_123",
-        "name": "john.doe@example.com",
-        "roles": ["employee", "analyst"]
-      }
+      "description": "User who attempted access",
+      "required": true
     },
     {
-      "name": "resource",
-      "type": "object",
+      "name": "userContext",
+      "type": "string",
       "mode": "stored",
-      "description": "Resource being accessed",
-      "example": {
-        "type": "document",
-        "id": "doc_456",
-        "path": "/finance/reports/q1.pdf",
-        "classification": "confidential"
-      }
+      "description": "JSON context about the user at time of access",
+      "example": "{\"roles\":[\"engineer\"],\"groups\":[\"backend_team\"],\"clearance_level\":2}"
+    },
+    {
+      "name": "resourceType",
+      "type": "string",
+      "mode": "stored",
+      "description": "Type of resource accessed",
+      "example": "database"
+    },
+    {
+      "name": "resourceId",
+      "type": "string",
+      "mode": "stored",
+      "description": "Identifier of the specific resource",
+      "example": "db_customers_prod"
+    },
+    {
+      "name": "resourceContext",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON context about the resource",
+      "example": "{\"classification\":\"sensitive\",\"owner\":\"finance_dept\",\"encryption\":\"AES256\"}"
     },
     {
       "name": "action",
       "type": "string",
       "mode": "stored",
-      "description": "Action attempted",
+      "description": "Action attempted on the resource",
       "required": true,
-      "example": "read"
+      "example": "write"
     },
     {
       "name": "decision",
       "type": "string",
       "mode": "enum",
-      "description": "Access decision",
-      "enum": ["allow", "deny", "partial", "conditional"],
-      "required": true,
-      "example": "allow"
+      "description": "Access control decision",
+      "enum": ["allow", "deny", "partial", "conditional", "error"],
+      "required": true
+    },
+    {
+      "name": "decisionReason",
+      "type": "string",
+      "mode": "stored",
+      "description": "Explanation of why decision was made",
+      "example": "Denied: User lacks required permission 'database.write'"
     },
     {
       "name": "evaluatedPolicies",
-      "type": "string[]",
-      "mode": "stored",
-      "description": "Policies evaluated for this decision",
-      "example": ["policy_data_access", "policy_time_restriction"]
-    },
-    {
-      "name": "matchedRules",
-      "type": "string[]",
-      "mode": "stored",
-      "description": "Rules that matched",
-      "example": ["rule_dept_access", "rule_clearance_level"]
-    },
-    {
-      "name": "denialReason",
       "type": "string",
       "mode": "stored",
-      "description": "Reason for denial if access was denied",
-      "example": "Insufficient clearance level"
+      "description": "JSON array of policies that were checked",
+      "example": "[{\"policy\":\"data_classification\",\"result\":\"pass\"},{\"policy\":\"time_restriction\",\"result\":\"fail\"}]"
     },
     {
-      "name": "context",
-      "type": "object",
+      "name": "evaluatedRoles",
+      "type": "string",
       "mode": "stored",
-      "description": "Additional context information",
-      "example": {
-        "ipAddress": "192.168.1.100",
-        "userAgent": "Mozilla/5.0...",
-        "sessionId": "sess_789",
-        "location": {
-          "country": "US",
-          "city": "New York"
-        }
-      }
+      "description": "JSON array of roles that were evaluated",
+      "example": "[\"engineer\",\"employee\"]"
+    },
+    {
+      "name": "evaluatedPermissions",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON array of permissions that were checked",
+      "example": "[\"database.read\",\"database.write\"]"
+    },
+    {
+      "name": "decisionPath",
+      "type": "string",
+      "mode": "stored",
+      "description": "Complete evaluation path showing how decision was reached",
+      "nullable": true
     },
     {
       "name": "riskScore",
-      "type": "number",
+      "type": "integer",
       "mode": "stored",
-      "description": "Calculated risk score",
+      "description": "Calculated risk level of this access (0-100)",
       "min": 0,
       "max": 100
     },
     {
+      "name": "riskFactors",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON array of detected risk indicators",
+      "example": "[\"after_hours\",\"new_location\",\"sensitive_data\"]"
+    },
+    {
+      "name": "ipAddress",
+      "type": "string",
+      "mode": "stored",
+      "description": "Source IP of the access attempt"
+    },
+    {
+      "name": "userAgent",
+      "type": "string",
+      "mode": "stored",
+      "description": "Browser or application information"
+    },
+    {
+      "name": "location",
+      "type": "string",
+      "mode": "stored",
+      "description": "Geographic location of access",
+      "nullable": true
+    },
+    {
+      "name": "deviceId",
+      "type": "string",
+      "mode": "stored",
+      "description": "Device identifier if known",
+      "nullable": true
+    },
+    {
+      "name": "sessionId",
+      "type": "string",
+      "mode": "stored",
+      "description": "Session during which access occurred",
+      "nullable": true
+    },
+    {
+      "name": "requestId",
+      "type": "string",
+      "mode": "stored",
+      "description": "Unique request identifier for correlation",
+      "nullable": true
+    },
+    {
+      "name": "responseTime",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Milliseconds taken to make decision"
+    },
+    {
       "name": "dataAccessed",
-      "type": "object",
+      "type": "string",
       "mode": "stored",
-      "description": "Details of data accessed",
-      "example": {
-        "fields": ["name", "email", "department"],
-        "recordCount": 150,
-        "sensitive": true
-      }
+      "description": "Description of data that was accessed",
+      "nullable": true,
+      "private": true
     },
     {
-      "name": "obligations",
-      "type": "string[]",
+      "name": "dataVolume",
+      "type": "integer",
       "mode": "stored",
-      "description": "Obligations fulfilled",
-      "example": ["encrypt", "watermark", "notify_owner"]
+      "description": "Amount of data accessed in bytes",
+      "nullable": true
     },
     {
-      "name": "performanceMetrics",
-      "type": "object",
+      "name": "alertsTriggered",
+      "type": "string",
       "mode": "stored",
-      "description": "Performance metrics for the evaluation",
-      "example": {
-        "evaluationTime": 45,
-        "policiesEvaluated": 5,
-        "rulesEvaluated": 12
-      }
+      "description": "JSON array of alerts generated",
+      "nullable": true
+    },
+    {
+      "name": "complianceFlags",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON compliance-related markers",
+      "example": "{\"gdpr\":true,\"hipaa\":false,\"pci\":true}"
+    },
+    {
+      "name": "retentionDate",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When this log entry can be deleted"
     },
     {
       "name": "metadata",
       "type": "object",
       "mode": "stored",
-      "description": "Additional metadata"
+      "description": "Additional audit context"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "AccessAuditLog",
+      "auditId": "audit_abc123",
+      "timestamp": "2024-03-15T14:30:45.123Z",
+      "eventType": "access_denied",
+      "userId": "user_john_doe",
+      "userContext": "{\"roles\":[\"developer\"],\"groups\":[\"engineering\"],\"mfa_verified\":false}",
+      "resourceType": "database",
+      "resourceId": "db_financial_prod",
+      "resourceContext": "{\"classification\":\"highly_sensitive\",\"contains_pii\":true}",
+      "action": "delete",
+      "decision": "deny",
+      "decisionReason": "Multiple policy violations: Missing required MFA, insufficient permissions for delete operation on financial data",
+      "evaluatedPolicies": "[{\"policy\":\"mfa_required_sensitive\",\"result\":\"fail\",\"reason\":\"MFA not verified\"},{\"policy\":\"financial_data_protection\",\"result\":\"fail\",\"reason\":\"Role lacks financial permissions\"}]",
+      "evaluatedRoles": "[\"developer\",\"employee\"]",
+      "evaluatedPermissions": "[\"database.read\",\"database.write\"]",
+      "decisionPath": "Check MFA -> FAIL -> Deny; Check Permissions -> Missing 'financial.delete' -> Deny",
+      "riskScore": 85,
+      "riskFactors": "[\"sensitive_data_access\",\"destructive_operation\",\"missing_mfa\",\"permission_elevation_attempt\"]",
+      "ipAddress": "203.0.113.42",
+      "userAgent": "Mozilla/5.0 (X11; Linux x86_64)",
+      "location": "Mumbai, India",
+      "sessionId": "sess_xyz789",
+      "requestId": "req_2024031514304512",
+      "responseTime": 47,
+      "alertsTriggered": "[{\"type\":\"security_team\",\"severity\":\"high\",\"message\":\"Unauthorized financial data access attempt\"}]",
+      "complianceFlags": "{\"sox\":true,\"pci\":true}",
+      "retentionDate": "2031-03-15T14:30:45.123Z",
+      "metadata": {
+        "threat_score": 8,
+        "anomaly_detected": true
+      }
+    },
+    {
+      "@type": "AccessAuditLog",
+      "auditId": "audit_def456",
+      "timestamp": "2024-03-15T09:15:00.000Z",
+      "eventType": "access_granted",
+      "userId": "user_admin",
+      "userContext": "{\"roles\":[\"admin\",\"security_officer\"],\"groups\":[\"security_team\"],\"mfa_verified\":true}",
+      "resourceType": "audit_logs",
+      "resourceId": "security_audit_export",
+      "resourceContext": "{\"classification\":\"internal\",\"purpose\":\"compliance_report\"}",
+      "action": "export",
+      "decision": "allow",
+      "decisionReason": "All policies satisfied: Valid admin role, MFA verified, within allowed time window",
+      "evaluatedPolicies": "[{\"policy\":\"admin_access\",\"result\":\"pass\"},{\"policy\":\"mfa_required\",\"result\":\"pass\"},{\"policy\":\"business_hours\",\"result\":\"pass\"}]",
+      "evaluatedRoles": "[\"admin\",\"security_officer\"]",
+      "evaluatedPermissions": "[\"audit.read\",\"audit.export\",\"compliance.report\"]",
+      "riskScore": 15,
+      "riskFactors": "[\"bulk_export\",\"audit_data\"]",
+      "ipAddress": "10.0.0.50",
+      "userAgent": "SecurityAuditTool/2.1",
+      "location": "Corporate Office, New York",
+      "deviceId": "device_corp_laptop_001",
+      "sessionId": "sess_admin_abc",
+      "responseTime": 23,
+      "dataVolume": 52428800,
+      "complianceFlags": "{\"sox\":true,\"quarterly_audit\":true}",
+      "retentionDate": "2031-03-15T09:15:00.000Z",
+      "metadata": {
+        "export_format": "csv",
+        "report_period": "Q1-2024"
+      }
     }
   ]
 }

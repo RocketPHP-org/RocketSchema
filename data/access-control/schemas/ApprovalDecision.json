@@ -2,92 +2,283 @@
   "@type": "Schema",
   "@context": "https://rocketschema.org/context",
   "name": "ApprovalDecision",
-  "description": "Individual approval decisions for access requests (normalized from AccessRequest)",
+  "description": "Records decisions made on access requests, permission changes, and policy exceptions, capturing the complete decision-making process including approver rationale, conditions, and stipulations. This entity goes beyond simple approve/deny to document the nuanced decisions made in complex authorization scenarios - conditional approvals with restrictions, time-limited grants with review requirements, or partial approvals for subset of requested permissions. Each decision captures the approver's identity, their authority level, the basis for their decision (policy compliance, business need, risk assessment), and any concerns or observations. Decisions can include stipulations like 'approved for 30 days pending security training' or 'denied but can resubmit with manager endorsement'. The entity supports multi-stage approval workflows where each approver adds their decision to build consensus, escalation paths where initial denials can be overridden, and delegation where approvers pass decisions to others. It maintains decision history for audit trails, precedent analysis for consistency, and machine learning to improve future decision-making. Decisions can trigger automated actions like permission provisioning, notification sending, or follow-up scheduling. This comprehensive decision recording is essential for regulatory compliance, demonstrating due diligence in access control, and continuous improvement of authorization processes through decision analytics.",
   "properties": [
     {
-      "name": "accessRequest",
-      "type": "AccessRequest",
+      "name": "decisionId",
+      "type": "uuid",
       "mode": "stored",
-      "description": "Parent access request",
+      "description": "Unique identifier for this decision",
+      "required": true,
+      "unique": true
+    },
+    {
+      "name": "requestId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "The access request being decided on",
       "required": true
     },
     {
       "name": "approver",
       "type": "User",
       "mode": "stored",
-      "description": "User who made the decision",
+      "description": "Person making the decision",
       "required": true
     },
     {
       "name": "decision",
       "type": "string",
       "mode": "enum",
-      "description": "Decision made",
-      "enum": ["approved", "rejected", "conditional", "abstained"],
+      "description": "The decision made",
+      "enum": ["approved", "denied", "conditional", "deferred", "escalated", "partial", "revoked"],
       "required": true
     },
     {
-      "name": "decisionTimestamp",
+      "name": "decisionDate",
       "type": "DateTime",
       "mode": "stored",
-      "description": "When decision was made",
+      "description": "When the decision was made",
       "required": true
     },
     {
-      "name": "comment",
+      "name": "rationale",
       "type": "string",
       "mode": "stored",
-      "description": "Decision comment",
-      "nullable": true
+      "description": "Detailed reasoning for the decision",
+      "required": true,
+      "example": "Approved based on valid business justification and completion of required security training"
+    },
+    {
+      "name": "approvalLevel",
+      "type": "string",
+      "mode": "enum",
+      "description": "Level of approval in hierarchy",
+      "enum": ["initial", "secondary", "final", "override", "emergency"],
+      "required": true
+    },
+    {
+      "name": "authoritySource",
+      "type": "string",
+      "mode": "stored",
+      "description": "Basis for approver's authority",
+      "example": "role:manager,delegation:from_director"
     },
     {
       "name": "conditions",
       "type": "string",
       "mode": "stored",
-      "description": "Conditions for conditional approval (JSON)",
-      "nullable": true
+      "description": "JSON conditions attached to approval",
+      "nullable": true,
+      "example": "{\"valid_until\":\"2024-06-01\",\"restricted_to\":\"read_only\",\"requires_mfa\":true}"
     },
     {
-      "name": "validFor",
-      "type": "integer",
-      "mode": "stored",
-      "description": "Validity duration in seconds",
-      "nullable": true
-    },
-    {
-      "name": "approverRole",
+      "name": "stipulations",
       "type": "string",
       "mode": "stored",
-      "description": "Role of approver at time of decision",
+      "description": "Requirements for approval to remain valid",
+      "nullable": true,
+      "example": "Must complete advanced security training within 30 days"
+    },
+    {
+      "name": "partialGrants",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON subset of permissions granted if partial",
       "nullable": true
     },
     {
-      "name": "isOverride",
+      "name": "riskAssessment",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON risk evaluation performed",
+      "nullable": true,
+      "example": "{\"risk_score\":35,\"risk_factors\":[\"external_contractor\",\"sensitive_data\"],\"mitigation\":\"additional_monitoring\"}"
+    },
+    {
+      "name": "complianceCheck",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON compliance verification results",
+      "nullable": true
+    },
+    {
+      "name": "precedentIds",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON array of similar past decisions",
+      "nullable": true
+    },
+    {
+      "name": "overrides",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON policies or rules overridden",
+      "nullable": true
+    },
+    {
+      "name": "escalationReason",
+      "type": "string",
+      "mode": "stored",
+      "description": "Why decision was escalated",
+      "nullable": true
+    },
+    {
+      "name": "delegatedFrom",
+      "type": "User",
+      "mode": "stored",
+      "description": "Original approver if delegated",
+      "nullable": true
+    },
+    {
+      "name": "reviewRequired",
       "type": "boolean",
       "mode": "stored",
-      "description": "Whether this is an override decision",
+      "description": "Whether decision needs review",
       "default": false
     },
     {
-      "name": "createdAt",
+      "name": "reviewDate",
       "type": "DateTime",
       "mode": "stored",
-      "description": "Creation timestamp",
-      "required": true
+      "description": "When decision should be reviewed",
+      "nullable": true
+    },
+    {
+      "name": "expiryDate",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When approval expires",
+      "nullable": true
+    },
+    {
+      "name": "autoRenewable",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether approval can auto-renew",
+      "default": false
+    },
+    {
+      "name": "comments",
+      "type": "string",
+      "mode": "stored",
+      "description": "Additional approver comments",
+      "nullable": true
+    },
+    {
+      "name": "confidenceLevel",
+      "type": "number",
+      "mode": "stored",
+      "description": "Approver's confidence in decision (0-1)",
+      "min": 0,
+      "max": 1
+    },
+    {
+      "name": "consultedParties",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON array of people consulted",
+      "nullable": true
+    },
+    {
+      "name": "evidenceProvided",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON supporting documentation",
+      "nullable": true
+    },
+    {
+      "name": "notificationsSent",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON array of notifications triggered",
+      "nullable": true
+    },
+    {
+      "name": "followUpActions",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON array of required follow-ups",
+      "nullable": true
+    },
+    {
+      "name": "isActive",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether decision is currently valid",
+      "default": true
+    },
+    {
+      "name": "revocationReason",
+      "type": "string",
+      "mode": "stored",
+      "description": "Why decision was revoked",
+      "nullable": true
+    },
+    {
+      "name": "auditNotes",
+      "type": "string",
+      "mode": "stored",
+      "description": "Notes for audit purposes",
+      "nullable": true
+    },
+    {
+      "name": "metadata",
+      "type": "object",
+      "mode": "stored",
+      "description": "Additional decision data"
     }
   ],
-  "indexes": [
+  "examples": [
     {
-      "fields": ["accessRequest", "approver"],
-      "unique": true
+      "@type": "ApprovalDecision",
+      "decisionId": "dec_001",
+      "requestId": "req_access_001",
+      "decision": "conditional",
+      "decisionDate": "2024-03-15T14:30:00Z",
+      "rationale": "Approved for limited production access based on urgent operational need, with restrictions due to contractor status",
+      "approvalLevel": "final",
+      "authoritySource": "role:engineering_director,policy:emergency_access",
+      "conditions": "{\"valid_until\":\"2024-03-22T00:00:00Z\",\"restricted_operations\":[\"delete\",\"modify_schema\"],\"require_pair_programming\":true}",
+      "stipulations": "Must work with senior engineer for all production changes, daily review of all actions required",
+      "riskAssessment": "{\"risk_score\":65,\"risk_factors\":[\"contractor\",\"production_access\",\"first_time\"],\"mitigation\":[\"time_limit\",\"supervision\",\"audit_enhanced\"]}",
+      "complianceCheck": "{\"sox_compliant\":true,\"requires_documentation\":true}",
+      "reviewRequired": true,
+      "reviewDate": "2024-03-18T00:00:00Z",
+      "expiryDate": "2024-03-22T00:00:00Z",
+      "autoRenewable": false,
+      "comments": "Contractor has demonstrated competence in staging environment. Close monitoring recommended.",
+      "confidenceLevel": 0.75,
+      "consultedParties": "[\"security_team\",\"senior_architect\"]",
+      "followUpActions": "[{\"action\":\"security_training\",\"due_date\":\"2024-03-20\"},{\"action\":\"access_review\",\"frequency\":\"daily\"}]",
+      "isActive": true,
+      "createdAt": "2024-03-15T14:30:00Z",
+      "metadata": {
+        "ticket": "OPS-2024-1234",
+        "approval_chain": "complete"
+      }
     },
     {
-      "fields": ["approver"],
-      "name": "idx_approver"
-    },
-    {
-      "fields": ["accessRequest", "decision"],
-      "name": "idx_request_decision"
+      "@type": "ApprovalDecision",
+      "decisionId": "dec_002",
+      "requestId": "req_role_002",
+      "decision": "denied",
+      "decisionDate": "2024-03-15T10:00:00Z",
+      "rationale": "Denied due to insufficient justification and availability of alternative solutions that don't require elevated privileges",
+      "approvalLevel": "initial",
+      "authoritySource": "role:team_lead",
+      "escalationReason": "Requester may appeal to department head with additional justification",
+      "riskAssessment": "{\"risk_score\":78,\"risk_factors\":[\"unnecessary_elevation\",\"alternative_exists\"],\"recommendation\":\"use_existing_tools\"}",
+      "comments": "Suggested using existing reporting tools instead of direct database access. Happy to reconsider with stronger business case.",
+      "confidenceLevel": 0.9,
+      "evidenceProvided": "{\"similar_requests_denied\":3,\"policy_reference\":\"MIN_PRIVILEGE_POLICY\"}",
+      "notificationsSent": "[{\"recipient\":\"requester\",\"type\":\"email\"},{\"recipient\":\"manager\",\"type\":\"notification\"}]",
+      "isActive": true,
+      "createdAt": "2024-03-15T10:00:00Z",
+      "metadata": {
+        "alternative_suggested": true,
+        "can_appeal": true
+      }
     }
   ]
 }

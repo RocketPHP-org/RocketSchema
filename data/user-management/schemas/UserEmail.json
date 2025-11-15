@@ -2,50 +2,51 @@
   "@type": "Schema",
   "@context": "https://rocketschema.org/context",
   "name": "UserEmail",
-  "description": "Secondary emails for users (normalized from User for multi-email support)",
+  "description": "Manages multiple email addresses for a single user account, supporting various use cases like work emails, personal emails, and recovery addresses. Modern users often have multiple email addresses they use for different purposes - this entity allows them to associate all these addresses with their account while maintaining one as primary. Each email can serve different functions: the primary email for login and important notifications, secondary emails for specific types of communications, recovery emails for account access issues, and notification-only emails for subscriptions or alerts. The entity tracks verification status for each email independently, as users must prove ownership before an email can be used for authentication or sensitive operations. This multi-email support is essential for professional users who might change jobs but want to maintain account access, or for users who want different notification types sent to different addresses (bills to personal email, newsletters to a dedicated inbox). The system ensures email uniqueness across all users - no two accounts can claim the same email address. When users change their primary email, the old one can be retained as secondary for account recovery purposes, providing a safety net against account lockouts.",
   "properties": [
     {
       "name": "userId",
       "type": "uuid",
       "mode": "stored",
-      "description": "User reference",
+      "description": "User who owns this email address",
       "required": true
     },
     {
       "name": "email",
       "type": "string",
       "mode": "stored",
-      "description": "Email address",
+      "description": "The email address",
       "required": true,
-      "format": "email"
+      "format": "email",
+      "unique": true
     },
     {
       "name": "emailType",
       "type": "string",
       "mode": "enum",
-      "description": "Type of email",
-      "enum": ["primary", "secondary", "recovery", "notification"],
+      "description": "Purpose of this email address",
+      "enum": ["primary", "secondary", "recovery", "notification", "billing", "work", "personal"],
       "default": "secondary"
     },
     {
       "name": "isVerified",
       "type": "boolean",
       "mode": "stored",
-      "description": "Whether email is verified",
+      "description": "Whether ownership of this email has been confirmed",
       "default": false
     },
     {
       "name": "verifiedAt",
       "type": "DateTime",
       "mode": "stored",
-      "description": "Verification timestamp",
+      "description": "When the email verification was completed",
       "nullable": true
     },
     {
       "name": "verificationToken",
       "type": "string",
       "mode": "stored",
-      "description": "Token for email verification",
+      "description": "Unique token sent to email for verification",
       "nullable": true,
       "private": true
     },
@@ -53,51 +54,142 @@
       "name": "verificationSentAt",
       "type": "DateTime",
       "mode": "stored",
-      "description": "When verification was sent",
+      "description": "When the verification email was sent",
+      "nullable": true
+    },
+    {
+      "name": "verificationAttempts",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Number of verification emails sent",
+      "default": 0
+    },
+    {
+      "name": "verificationExpiresAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When the verification token expires",
       "nullable": true
     },
     {
       "name": "isPrimary",
       "type": "boolean",
       "mode": "stored",
-      "description": "Whether this is the primary email",
+      "description": "Whether this is the main contact email",
       "default": false
     },
     {
       "name": "canReceiveNotifications",
       "type": "boolean",
       "mode": "stored",
-      "description": "Whether to send notifications to this email",
+      "description": "Whether to send notifications to this address",
+      "default": true
+    },
+    {
+      "name": "notificationPreferences",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON object of notification types allowed for this email",
+      "nullable": true,
+      "example": "{\"marketing\":false,\"security\":true,\"updates\":true}"
+    },
+    {
+      "name": "canBeUsedForLogin",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this email can be used as username for login",
+      "default": false
+    },
+    {
+      "name": "canBeUsedForRecovery",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether password resets can be sent here",
       "default": true
     },
     {
       "name": "addedAt",
       "type": "DateTime",
       "mode": "stored",
-      "description": "When email was added",
+      "description": "When this email was added to the account",
       "required": true
+    },
+    {
+      "name": "addedBy",
+      "type": "string",
+      "mode": "enum",
+      "description": "How this email was added",
+      "enum": ["user", "admin", "system", "import", "oauth"],
+      "default": "user"
     },
     {
       "name": "lastUsedAt",
       "type": "DateTime",
       "mode": "stored",
-      "description": "Last time email was used",
+      "description": "Last time this email was used for any operation",
+      "nullable": true
+    },
+    {
+      "name": "bounceCount",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Number of email delivery failures",
+      "default": 0
+    },
+    {
+      "name": "isBlacklisted",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this email is blocked due to bounces or complaints",
+      "default": false
+    },
+    {
+      "name": "metadata",
+      "type": "string",
+      "mode": "stored",
+      "description": "Additional data about this email address",
       "nullable": true
     }
   ],
-  "indexes": [
+  "examples": [
     {
-      "fields": ["email"],
-      "unique": true
+      "@type": "UserEmail",
+      "userId": "user_550e8400",
+      "email": "john.smith@techcorp.com",
+      "emailType": "work",
+      "isVerified": true,
+      "verifiedAt": "2024-01-15T10:30:00Z",
+      "verificationAttempts": 1,
+      "isPrimary": true,
+      "canReceiveNotifications": true,
+      "notificationPreferences": "{\"marketing\":true,\"security\":true,\"updates\":true,\"billing\":true}",
+      "canBeUsedForLogin": true,
+      "canBeUsedForRecovery": true,
+      "addedAt": "2024-01-15T10:00:00Z",
+      "addedBy": "user",
+      "lastUsedAt": "2024-03-15T14:30:00Z",
+      "bounceCount": 0,
+      "isBlacklisted": false
     },
     {
-      "fields": ["userId", "emailType"],
-      "name": "idx_user_type"
-    },
-    {
-      "fields": ["userId", "isPrimary"],
-      "name": "idx_user_primary",
-      "where": "isPrimary = true"
+      "@type": "UserEmail",
+      "userId": "user_550e8400",
+      "email": "jsmith.personal@gmail.com",
+      "emailType": "personal",
+      "isVerified": true,
+      "verifiedAt": "2024-02-01T09:00:00Z",
+      "verificationAttempts": 2,
+      "isPrimary": false,
+      "canReceiveNotifications": true,
+      "notificationPreferences": "{\"marketing\":false,\"security\":true,\"updates\":false,\"billing\":true}",
+      "canBeUsedForLogin": false,
+      "canBeUsedForRecovery": true,
+      "addedAt": "2024-02-01T08:30:00Z",
+      "addedBy": "user",
+      "lastUsedAt": "2024-03-10T11:00:00Z",
+      "bounceCount": 0,
+      "isBlacklisted": false,
+      "metadata": "{\"provider\":\"gmail\",\"preferred_for\":\"personal_receipts\"}"
     }
   ]
 }

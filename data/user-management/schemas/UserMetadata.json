@@ -2,34 +2,36 @@
   "@type": "Schema",
   "@context": "https://rocketschema.org/context",
   "name": "UserMetadata",
-  "description": "Key-value metadata for users (normalized from User.metadata)",
+  "description": "Provides a flexible key-value storage system for user-specific data that doesn't fit into the standard user schema. This entity acts as an extension mechanism, allowing applications to store custom attributes, feature flags, integration data, or any additional information about users without modifying the core database schema. It's particularly useful for storing data from third-party integrations (like CRM IDs, external system references), A/B testing flags, user-specific feature toggles, custom profile fields that vary by deployment, or temporary data during migrations. Each metadata entry can be typed (string, number, boolean, JSON) to ensure proper handling, encrypted for sensitive data, and indexed for searchability. The category field helps organize related metadata, making it easier to retrieve all settings for a specific feature or integration. This pattern provides unlimited extensibility while maintaining database performance, as only frequently accessed metadata needs to be indexed. It's commonly used for multi-tenant applications where different customers need different user attributes, or for gradually rolling out features by storing beta access flags.",
   "properties": [
     {
       "name": "userId",
       "type": "uuid",
       "mode": "stored",
-      "description": "User reference",
+      "description": "The user this metadata belongs to",
       "required": true
     },
     {
       "name": "metadataKey",
       "type": "string",
       "mode": "stored",
-      "description": "Metadata key",
-      "required": true
+      "description": "Unique key identifying this piece of metadata",
+      "required": true,
+      "example": "crm.customerId"
     },
     {
       "name": "metadataValue",
       "type": "string",
       "mode": "stored",
-      "description": "Metadata value (stored as string, can be JSON)",
-      "required": true
+      "description": "The actual value stored as a string (parsed based on valueType)",
+      "required": true,
+      "example": "CUST-12345"
     },
     {
       "name": "valueType",
       "type": "string",
       "mode": "enum",
-      "description": "Type of value",
+      "description": "Data type for proper parsing and validation",
       "enum": ["string", "number", "boolean", "date", "json", "binary"],
       "default": "string"
     },
@@ -37,57 +39,128 @@
       "name": "category",
       "type": "string",
       "mode": "stored",
-      "description": "Metadata category",
+      "description": "Grouping category for related metadata",
+      "nullable": true,
+      "example": "integration"
+    },
+    {
+      "name": "description",
+      "type": "string",
+      "mode": "stored",
+      "description": "Human-readable explanation of what this metadata represents",
       "nullable": true
+    },
+    {
+      "name": "source",
+      "type": "string",
+      "mode": "stored",
+      "description": "System or integration that created this metadata",
+      "example": "salesforce"
     },
     {
       "name": "isEncrypted",
       "type": "boolean",
       "mode": "stored",
-      "description": "Whether value is encrypted",
+      "description": "Whether the value is encrypted for sensitive data",
       "default": false
     },
     {
       "name": "isIndexed",
       "type": "boolean",
       "mode": "stored",
-      "description": "Whether to index this metadata",
+      "description": "Whether this metadata should be indexed for fast searching",
       "default": false
+    },
+    {
+      "name": "isPublic",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this metadata is visible to the user",
+      "default": false
+    },
+    {
+      "name": "isEditable",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether users can modify this value themselves",
+      "default": false
+    },
+    {
+      "name": "validFrom",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When this metadata becomes valid/active",
+      "nullable": true
+    },
+    {
+      "name": "validUntil",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When this metadata expires",
+      "nullable": true
     },
     {
       "name": "createdAt",
       "type": "DateTime",
       "mode": "stored",
-      "description": "Creation timestamp",
+      "description": "When this metadata was first created",
       "required": true
     },
     {
       "name": "updatedAt",
       "type": "DateTime",
       "mode": "stored",
-      "description": "Last update timestamp"
+      "description": "Last time this metadata was modified"
     },
     {
       "name": "createdBy",
       "type": "User",
       "mode": "stored",
-      "description": "Who created this metadata",
+      "description": "Who created this metadata entry",
+      "nullable": true
+    },
+    {
+      "name": "updatedBy",
+      "type": "User",
+      "mode": "stored",
+      "description": "Who last modified this metadata",
       "nullable": true
     }
   ],
-  "indexes": [
+  "examples": [
     {
-      "fields": ["userId", "metadataKey"],
-      "unique": true
+      "@type": "UserMetadata",
+      "userId": "user_123456",
+      "metadataKey": "feature_flags.new_dashboard",
+      "metadataValue": "true",
+      "valueType": "boolean",
+      "category": "feature_flags",
+      "description": "Beta access to the new dashboard interface",
+      "source": "admin_panel",
+      "isEncrypted": false,
+      "isIndexed": true,
+      "isPublic": false,
+      "isEditable": false,
+      "validFrom": "2024-03-01T00:00:00Z",
+      "validUntil": "2024-06-01T00:00:00Z",
+      "createdAt": "2024-03-01T10:00:00Z",
+      "createdBy": "admin_789"
     },
     {
-      "fields": ["userId", "category"],
-      "name": "idx_user_category"
-    },
-    {
-      "fields": ["metadataKey", "metadataValue"],
-      "name": "idx_key_value",
-      "where": "isIndexed = true"
+      "@type": "UserMetadata",
+      "userId": "user_789012",
+      "metadataKey": "integrations.stripe.customerId",
+      "metadataValue": "cus_P0K9mNbVcXyZ123",
+      "valueType": "string",
+      "category": "integrations",
+      "description": "Stripe customer ID for billing integration",
+      "source": "stripe_webhook",
+      "isEncrypted": true,
+      "isIndexed": true,
+      "isPublic": false,
+      "isEditable": false,
+      "createdAt": "2024-01-15T14:30:00Z",
+      "updatedAt": "2024-03-10T09:00:00Z"
     }
   ]
 }

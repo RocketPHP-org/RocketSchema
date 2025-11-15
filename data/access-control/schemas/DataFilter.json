@@ -2,180 +2,277 @@
   "@type": "Schema",
   "@context": "https://rocketschema.org/context",
   "name": "DataFilter",
-  "description": "Data-level filters for row-level and cell-level security in ABAC",
+  "description": "Defines row-level and attribute-based filtering rules that restrict which data records a user can access within their permitted resources, implementing fine-grained data access control beyond simple resource permissions. While permissions determine if a user can access a database or API, data filters determine which specific records they see - a manager might have 'read employees' permission but filters ensure they only see their direct reports. This entity enables multi-tenant isolation (customers see only their data), hierarchical visibility (see only your department's data), temporal filtering (hide records older than X), and conditional exposure (show salary only for employees below your level). Filters use expressions that evaluate against record attributes, user properties, and contextual factors. They support complex boolean logic combining multiple conditions with AND/OR/NOT operators. Filters can be positive (defining what to include) or negative (defining what to exclude), with precedence rules for conflicts. They enable dynamic data masking where sensitive fields are hidden or redacted based on viewer privileges. The entity handles filter composition when users have multiple roles, each contributing different filters. This is essential for regulatory compliance (GDPR's data minimization), implementing Chinese walls in financial services, and maintaining data confidentiality in shared systems while allowing necessary access for business operations.",
   "properties": [
     {
-      "name": "permission",
-      "type": "Permission",
+      "name": "filterId",
+      "type": "uuid",
       "mode": "stored",
-      "description": "Permission this filter belongs to",
-      "required": true
+      "description": "Unique identifier for this data filter",
+      "required": true,
+      "unique": true
     },
     {
       "name": "filterName",
       "type": "string",
       "mode": "stored",
-      "description": "Name of the filter",
+      "description": "Human-readable name for the filter",
       "required": true,
-      "example": "department_filter"
+      "example": "Department Data Isolation"
+    },
+    {
+      "name": "description",
+      "type": "string",
+      "mode": "stored",
+      "description": "Explanation of what this filter does",
+      "example": "Restricts data access to records within user's department"
+    },
+    {
+      "name": "resourceType",
+      "type": "string",
+      "mode": "stored",
+      "description": "Type of resource this filter applies to",
+      "required": true,
+      "example": "employee_records"
     },
     {
       "name": "filterType",
       "type": "string",
       "mode": "enum",
-      "description": "Type of data filter",
-      "enum": ["row", "column", "cell", "aggregate", "temporal"],
-      "required": true,
-      "example": "row"
+      "description": "Type of filtering",
+      "enum": ["row_level", "column_level", "cell_level", "aggregate", "dynamic"],
+      "required": true
     },
     {
-      "name": "entityType",
+      "name": "filterMode",
       "type": "string",
-      "mode": "stored",
-      "description": "Entity type this filter applies to",
-      "required": true,
-      "example": "Document"
+      "mode": "enum",
+      "description": "How the filter operates",
+      "enum": ["include", "exclude", "mask", "transform"],
+      "default": "include"
     },
     {
       "name": "filterExpression",
       "type": "string",
       "mode": "stored",
-      "description": "Filter expression in query language",
+      "description": "The filter logic expression",
       "required": true,
-      "example": "departmentId = :userDepartmentId OR visibility = 'public'"
+      "example": "record.department_id == user.department_id OR record.visibility == 'public'"
     },
     {
-      "name": "parameters",
-      "type": "object",
+      "name": "sqlWhere",
+      "type": "string",
       "mode": "stored",
-      "description": "Parameters for the filter expression",
-      "example": {
-        "userDepartmentId": "${user.departmentId}"
-      }
+      "description": "SQL WHERE clause implementation",
+      "nullable": true,
+      "example": "department_id = :user_dept_id OR visibility = 'public'"
     },
     {
-      "name": "allowedFields",
-      "type": "string[]",
+      "name": "jsonPath",
+      "type": "string",
       "mode": "stored",
-      "description": "Fields allowed to be accessed (for column filters)",
-      "example": ["id", "name", "description", "publicData"]
+      "description": "JSONPath expression for document filtering",
+      "nullable": true,
+      "example": "$[?(@.department == $.user.department)]"
     },
     {
-      "name": "deniedFields",
-      "type": "string[]",
+      "name": "scope",
+      "type": "string",
       "mode": "stored",
-      "description": "Fields explicitly denied (for column filters)",
-      "example": ["salary", "ssn", "privateNotes"]
-    },
-    {
-      "name": "maskingRules",
-      "type": "object[]",
-      "mode": "stored",
-      "description": "Rules for data masking",
-      "example": [
-        {
-          "field": "email",
-          "maskingType": "partial",
-          "pattern": "****@${domain}"
-        },
-        {
-          "field": "phone",
-          "maskingType": "full",
-          "replacement": "***-***-****"
-        }
-      ]
-    },
-    {
-      "name": "aggregationRules",
-      "type": "object",
-      "mode": "stored",
-      "description": "Rules for aggregate queries",
-      "example": {
-        "minGroupSize": 5,
-        "allowedAggregations": ["count", "avg"],
-        "deniedAggregations": ["sum", "max", "min"]
-      }
-    },
-    {
-      "name": "temporalRules",
-      "type": "object",
-      "mode": "stored",
-      "description": "Time-based data access rules",
-      "example": {
-        "maxAge": "90 days",
-        "allowFuture": false,
-        "timeField": "createdAt"
-      }
-    },
-    {
-      "name": "joinRestrictions",
-      "type": "object[]",
-      "mode": "stored",
-      "description": "Restrictions on joining with other entities",
-      "example": [
-        {
-          "entity": "User",
-          "allowed": false,
-          "reason": "PII protection"
-        }
-      ]
+      "description": "Where this filter applies",
+      "example": "global"
     },
     {
       "name": "priority",
       "type": "integer",
       "mode": "stored",
-      "description": "Filter priority for conflict resolution",
-      "default": 0,
-      "min": 0
+      "description": "Evaluation order when multiple filters exist",
+      "default": 0
+    },
+    {
+      "name": "combineStrategy",
+      "type": "string",
+      "mode": "enum",
+      "description": "How to combine with other filters",
+      "enum": ["and", "or", "override", "merge"],
+      "default": "and"
+    },
+    {
+      "name": "parameters",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON parameters used in filter expression",
+      "nullable": true,
+      "example": "{\"max_age_days\":90,\"classification_levels\":[\"public\",\"internal\"]}"
+    },
+    {
+      "name": "userAttributes",
+      "type": "string",
+      "mode": "stored",
+      "description": "User attributes referenced in filter",
+      "example": "[\"department_id\",\"clearance_level\",\"region\"]"
+    },
+    {
+      "name": "recordAttributes",
+      "type": "string",
+      "mode": "stored",
+      "description": "Record attributes checked by filter",
+      "example": "[\"department_id\",\"classification\",\"owner_id\",\"created_date\"]"
+    },
+    {
+      "name": "appliesTo",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON criteria for who gets this filter",
+      "example": "{\"roles\":[\"employee\",\"contractor\"],\"departments\":[\"*\"]}"
+    },
+    {
+      "name": "exceptions",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON array of exception conditions",
+      "nullable": true,
+      "example": "[{\"role\":\"admin\",\"bypass\":true},{\"user_id\":\"auditor_001\",\"bypass\":true}]"
+    },
+    {
+      "name": "temporalRestriction",
+      "type": "string",
+      "mode": "stored",
+      "description": "Time-based filtering rules",
+      "nullable": true,
+      "example": "{\"hide_before\":\"30_days_ago\",\"hide_after\":\"current_date\"}"
+    },
+    {
+      "name": "dataClassification",
+      "type": "string",
+      "mode": "stored",
+      "description": "Data classifications this filter handles",
+      "nullable": true,
+      "example": "[\"public\",\"internal\",\"confidential\"]"
+    },
+    {
+      "name": "performanceImpact",
+      "type": "string",
+      "mode": "enum",
+      "description": "Expected performance impact",
+      "enum": ["minimal", "low", "medium", "high"],
+      "default": "low"
+    },
+    {
+      "name": "cacheable",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether filter results can be cached",
+      "default": true
+    },
+    {
+      "name": "cacheTimeout",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Seconds to cache filter results",
+      "default": 300
+    },
+    {
+      "name": "auditBypass",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether to log when filter is bypassed",
+      "default": true
     },
     {
       "name": "isActive",
       "type": "boolean",
       "mode": "stored",
-      "description": "Whether this filter is active",
+      "description": "Whether this filter is currently active",
       "default": true
+    },
+    {
+      "name": "testMode",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Run in test mode (log but don't filter)",
+      "default": false
+    },
+    {
+      "name": "createdBy",
+      "type": "User",
+      "mode": "stored",
+      "description": "Who created this filter"
+    },
+    {
+      "name": "createdAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When filter was created",
+      "required": true
     },
     {
       "name": "metadata",
       "type": "object",
       "mode": "stored",
-      "description": "Additional metadata"
+      "description": "Additional filter configuration"
     }
   ],
   "examples": [
     {
       "@type": "DataFilter",
-      "filterName": "department_row_filter",
-      "filterType": "row",
-      "entityType": "Document",
-      "filterExpression": "departmentId = :userDepartmentId OR visibility = 'public'",
-      "parameters": {
-        "userDepartmentId": "${user.departmentId}"
-      },
-      "priority": 10,
-      "isActive": true
+      "filterId": "filter_dept_001",
+      "filterName": "Department Data Isolation",
+      "description": "Ensures users only see data from their own department unless marked as public",
+      "resourceType": "employee_records",
+      "filterType": "row_level",
+      "filterMode": "include",
+      "filterExpression": "(record.department_id == user.department_id OR record.visibility == 'public') AND record.status != 'deleted'",
+      "sqlWhere": "(department_id = :user_dept_id OR visibility = 'public') AND status != 'deleted'",
+      "scope": "global",
+      "priority": 100,
+      "combineStrategy": "and",
+      "userAttributes": "[\"department_id\",\"role\"]",
+      "recordAttributes": "[\"department_id\",\"visibility\",\"status\"]",
+      "appliesTo": "{\"roles\":[\"employee\",\"manager\",\"contractor\"]}",
+      "exceptions": "[{\"role\":\"hr_admin\",\"bypass\":true},{\"role\":\"executive\",\"bypass\":true}]",
+      "dataClassification": "[\"internal\",\"departmental\"]",
+      "performanceImpact": "low",
+      "cacheable": true,
+      "cacheTimeout": 600,
+      "auditBypass": true,
+      "isActive": true,
+      "testMode": false,
+      "createdAt": "2024-01-01T00:00:00Z",
+      "metadata": {
+        "filter_version": "2.0",
+        "indexed_columns": ["department_id", "visibility"]
+      }
     },
     {
       "@type": "DataFilter",
-      "filterName": "pii_column_filter",
-      "filterType": "column",
-      "entityType": "User",
-      "allowedFields": ["id", "name", "email", "department"],
-      "deniedFields": ["ssn", "salary", "medicalRecords", "performanceScore"],
-      "maskingRules": [
-        {
-          "field": "email",
-          "maskingType": "partial",
-          "pattern": "****@${domain}"
-        },
-        {
-          "field": "phone",
-          "maskingType": "full",
-          "replacement": "***-***-****"
-        }
-      ],
-      "priority": 20,
-      "isActive": true
+      "filterId": "filter_pii_002",
+      "filterName": "PII Data Masking",
+      "description": "Masks personally identifiable information based on user clearance level",
+      "resourceType": "customer_data",
+      "filterType": "cell_level",
+      "filterMode": "mask",
+      "filterExpression": "user.clearance_level < 3 ? mask_fields(['ssn', 'dob', 'bank_account']) : show_all()",
+      "jsonPath": "$[?(@.clearance < 3)].{ssn: '***-**-****', dob: '****-**-**'}",
+      "scope": "global",
+      "priority": 200,
+      "combineStrategy": "override",
+      "parameters": "{\"mask_pattern\":\"***\",\"fields_to_mask\":[\"ssn\",\"dob\",\"bank_account\",\"credit_card\"]}",
+      "userAttributes": "[\"clearance_level\",\"department\",\"pii_authorization\"]",
+      "recordAttributes": "[\"contains_pii\",\"sensitivity_level\"]",
+      "appliesTo": "{\"all_users\":true}",
+      "exceptions": "[{\"role\":\"compliance_officer\",\"bypass\":true}]",
+      "dataClassification": "[\"pii\",\"sensitive\"]",
+      "performanceImpact": "medium",
+      "cacheable": false,
+      "auditBypass": true,
+      "isActive": true,
+      "testMode": false,
+      "createdAt": "2024-01-15T00:00:00Z",
+      "metadata": {
+        "gdpr_compliant": true,
+        "masking_algorithm": "deterministic"
+      }
     }
   ]
 }

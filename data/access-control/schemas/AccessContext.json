@@ -2,226 +2,300 @@
   "@type": "Schema",
   "@context": "https://rocketschema.org/context",
   "name": "AccessContext",
-  "description": "Contextual information for ABAC evaluation including environment and request details",
+  "description": "Captures the complete environmental and situational context in which an access request occurs, providing crucial information for context-aware authorization decisions. This entity represents the 'circumstances' of access - not just who wants what, but when, where, how, and under what conditions. It includes technical context (IP address, device, browser), temporal context (time of day, day of week, timezone), geographic context (location, jurisdiction), behavioral context (access patterns, risk indicators), and business context (project phase, emergency status). Modern zero-trust architectures use this rich context to make dynamic authorization decisions - the same user might be granted access from the office during business hours but denied from an unknown location at midnight. The context enables adaptive security where access requirements change based on threat level, implements conditional access policies ('require MFA from untrusted networks'), and supports compliance requirements ('EU data only accessible from EU locations'). It captures session information, authentication strength, device trust level, and network security posture. The entity also tracks anomalies and risk signals that might indicate compromised credentials or insider threats. This contextual awareness transforms static permission checks into dynamic, risk-based access decisions that adapt to changing security landscapes and business needs.",
   "properties": [
     {
       "name": "contextId",
-      "type": "string",
+      "type": "uuid",
       "mode": "stored",
-      "description": "Unique context identifier",
+      "description": "Unique identifier for this access context",
       "required": true,
       "unique": true
     },
     {
-      "name": "requestor",
-      "type": "User",
-      "mode": "stored",
-      "description": "User making the request",
-      "required": true
-    },
-    {
-      "name": "requestTime",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "Time of the request",
-      "required": true
-    },
-    {
-      "name": "resource",
-      "type": "object",
-      "mode": "stored",
-      "description": "Resource being accessed",
-      "required": true,
-      "example": {
-        "type": "document",
-        "id": "doc_123",
-        "owner": "user_456",
-        "classification": "confidential",
-        "department": "finance"
-      }
-    },
-    {
-      "name": "action",
+      "name": "sessionId",
       "type": "string",
       "mode": "stored",
-      "description": "Action being performed",
-      "required": true,
-      "example": "read"
+      "description": "Associated user session",
+      "required": true
     },
     {
-      "name": "environment",
-      "type": "object",
+      "name": "userId",
+      "type": "uuid",
       "mode": "stored",
-      "description": "Environmental context",
-      "example": {
-        "ipAddress": "192.168.1.100",
-        "location": {
-          "country": "US",
-          "region": "CA",
-          "city": "San Francisco"
-        },
-        "network": "corporate",
-        "deviceType": "laptop",
-        "deviceId": "device_789",
-        "deviceTrust": "managed"
-      }
+      "description": "User making the access request",
+      "required": true
     },
     {
-      "name": "session",
-      "type": "object",
+      "name": "timestamp",
+      "type": "DateTime",
       "mode": "stored",
-      "description": "Session information",
-      "example": {
-        "sessionId": "sess_abc",
-        "authMethod": "mfa",
-        "authTime": "2024-03-15T08:00:00Z",
-        "sessionAge": 3600,
-        "idleTime": 300
-      }
+      "description": "When the access context was captured",
+      "required": true
     },
     {
-      "name": "subjectAttributes",
-      "type": "object",
+      "name": "ipAddress",
+      "type": "string",
       "mode": "stored",
-      "description": "Additional subject attributes for evaluation",
-      "example": {
-        "department": "engineering",
-        "clearanceLevel": 3,
-        "employmentType": "full_time",
-        "yearsOfService": 5,
-        "certifications": ["security_cleared", "data_handler"]
-      }
+      "description": "Source IP address",
+      "required": true
     },
     {
-      "name": "resourceAttributes",
-      "type": "object",
+      "name": "ipReputation",
+      "type": "string",
       "mode": "stored",
-      "description": "Additional resource attributes",
-      "example": {
-        "createdDate": "2024-01-01",
-        "lastModified": "2024-03-01",
-        "size": 1024000,
-        "tags": ["financial", "q1_2024"],
-        "encryption": "AES256"
-      }
+      "description": "IP reputation score and category",
+      "example": "{\"score\":85,\"category\":\"corporate\",\"threat_level\":\"low\"}"
     },
     {
-      "name": "requestAttributes",
-      "type": "object",
+      "name": "location",
+      "type": "string",
       "mode": "stored",
-      "description": "Request-specific attributes",
-      "example": {
-        "purpose": "audit",
-        "projectId": "proj_123",
-        "ticketId": "ticket_456",
-        "delegatedBy": "user_789"
-      }
+      "description": "Geographic location data",
+      "example": "{\"country\":\"US\",\"region\":\"California\",\"city\":\"San Francisco\",\"coordinates\":{\"lat\":37.7749,\"lng\":-122.4194}}"
     },
     {
-      "name": "riskIndicators",
-      "type": "object",
+      "name": "deviceId",
+      "type": "string",
       "mode": "stored",
-      "description": "Risk-related indicators",
-      "example": {
-        "riskScore": 35,
-        "anomalyScore": 0.2,
-        "threatLevel": "low",
-        "suspiciousPatterns": [],
-        "recentFailures": 0
-      }
+      "description": "Unique device identifier",
+      "nullable": true
     },
     {
-      "name": "obligations",
-      "type": "object[]",
+      "name": "deviceInfo",
+      "type": "string",
       "mode": "stored",
-      "description": "Obligations to be fulfilled",
-      "example": [
-        {
-          "type": "audit",
-          "level": "detailed"
-        },
-        {
-          "type": "notification",
-          "target": "data_owner"
-        }
-      ]
+      "description": "JSON device characteristics",
+      "example": "{\"type\":\"laptop\",\"os\":\"macOS 14.2\",\"browser\":\"Chrome 120\",\"managed\":true,\"compliant\":true}"
     },
     {
-      "name": "parentContext",
-      "type": "AccessContext",
+      "name": "deviceTrustLevel",
+      "type": "integer",
       "mode": "stored",
-      "description": "Parent context for nested requests"
+      "description": "Device trust score (0-100)",
+      "min": 0,
+      "max": 100
     },
     {
-      "name": "delegationChain",
-      "type": "object[]",
+      "name": "authenticationMethod",
+      "type": "string",
       "mode": "stored",
-      "description": "Chain of delegation if access is delegated",
-      "example": [
-        {
-          "delegator": "user_100",
-          "delegatee": "user_200",
-          "permissions": ["read"],
-          "validUntil": "2024-03-20T00:00:00Z"
-        }
-      ]
+      "description": "How user authenticated",
+      "example": "mfa_biometric"
     },
     {
-      "name": "evaluationResult",
-      "type": "object",
+      "name": "authenticationStrength",
+      "type": "string",
+      "mode": "enum",
+      "description": "Strength of authentication",
+      "enum": ["none", "weak", "medium", "strong", "very_strong"],
+      "required": true
+    },
+    {
+      "name": "mfaVerified",
+      "type": "boolean",
       "mode": "stored",
-      "description": "Result of access evaluation",
-      "example": {
-        "decision": "permit",
-        "appliedPolicies": ["policy_1", "policy_2"],
-        "matchedRules": ["rule_1", "rule_3"],
-        "obligations": ["audit", "encrypt"],
-        "confidence": 0.95
-      }
+      "description": "Whether MFA was completed",
+      "default": false
+    },
+    {
+      "name": "networkType",
+      "type": "string",
+      "mode": "enum",
+      "description": "Type of network connection",
+      "enum": ["corporate", "vpn", "public", "home", "mobile", "unknown"],
+      "required": true
+    },
+    {
+      "name": "networkSecurity",
+      "type": "string",
+      "mode": "stored",
+      "description": "Network security assessment",
+      "example": "{\"encrypted\":true,\"vpn\":true,\"firewall\":\"enabled\",\"proxy\":false}"
+    },
+    {
+      "name": "timeOfDay",
+      "type": "string",
+      "mode": "stored",
+      "description": "Time category",
+      "example": "business_hours"
+    },
+    {
+      "name": "dayOfWeek",
+      "type": "string",
+      "mode": "stored",
+      "description": "Day of the week",
+      "example": "monday"
+    },
+    {
+      "name": "timezone",
+      "type": "string",
+      "mode": "stored",
+      "description": "User's timezone",
+      "example": "America/New_York"
+    },
+    {
+      "name": "behaviorAnalysis",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON behavioral indicators",
+      "example": "{\"typical_location\":true,\"typical_time\":false,\"access_velocity\":\"normal\",\"pattern_match\":0.87}"
+    },
+    {
+      "name": "riskScore",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Calculated risk score (0-100)",
+      "min": 0,
+      "max": 100
+    },
+    {
+      "name": "riskFactors",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON array of identified risks",
+      "example": "[\"new_device\",\"unusual_time\",\"sensitive_operation\"]"
+    },
+    {
+      "name": "threatIntelligence",
+      "type": "string",
+      "mode": "stored",
+      "description": "External threat data",
+      "nullable": true,
+      "example": "{\"ip_blocklist\":false,\"known_attacker\":false,\"threat_campaign\":null}"
+    },
+    {
+      "name": "requestPath",
+      "type": "string",
+      "mode": "stored",
+      "description": "Application path or API endpoint",
+      "example": "/api/v1/financial/transactions"
+    },
+    {
+      "name": "requestMethod",
+      "type": "string",
+      "mode": "stored",
+      "description": "HTTP method or operation type",
+      "example": "POST"
+    },
+    {
+      "name": "userAgent",
+      "type": "string",
+      "mode": "stored",
+      "description": "Browser/application user agent"
+    },
+    {
+      "name": "referrer",
+      "type": "string",
+      "mode": "stored",
+      "description": "HTTP referrer if applicable",
+      "nullable": true
+    },
+    {
+      "name": "businessContext",
+      "type": "string",
+      "mode": "stored",
+      "description": "Business situation data",
+      "nullable": true,
+      "example": "{\"project_phase\":\"production\",\"change_freeze\":false,\"audit_mode\":true}"
+    },
+    {
+      "name": "environmentType",
+      "type": "string",
+      "mode": "enum",
+      "description": "System environment",
+      "enum": ["development", "testing", "staging", "production"],
+      "required": true
+    },
+    {
+      "name": "emergencyAccess",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether emergency access was requested",
+      "default": false
+    },
+    {
+      "name": "parentContextId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "Previous context in session chain",
+      "nullable": true
     },
     {
       "name": "metadata",
       "type": "object",
       "mode": "stored",
-      "description": "Additional metadata"
+      "description": "Additional context data"
     }
   ],
   "examples": [
     {
       "@type": "AccessContext",
-      "contextId": "ctx_xyz789",
-      "requestTime": "2024-03-15T10:30:00Z",
-      "resource": {
-        "type": "document",
-        "id": "doc_financial_q1",
-        "classification": "confidential",
-        "department": "finance"
-      },
-      "action": "read",
-      "environment": {
-        "ipAddress": "10.0.1.50",
-        "location": {
-          "country": "US",
-          "region": "NY"
-        },
-        "network": "corporate",
-        "deviceType": "laptop",
-        "deviceTrust": "managed"
-      },
-      "session": {
-        "sessionId": "sess_morning_123",
-        "authMethod": "mfa",
-        "authTime": "2024-03-15T08:00:00Z",
-        "sessionAge": 9000
-      },
-      "subjectAttributes": {
-        "department": "finance",
-        "clearanceLevel": 3,
-        "employmentType": "full_time"
-      },
-      "riskIndicators": {
-        "riskScore": 15,
-        "threatLevel": "low"
+      "contextId": "ctx_abc123",
+      "sessionId": "sess_xyz789",
+      "userId": "user_john_doe",
+      "timestamp": "2024-03-15T14:30:00Z",
+      "ipAddress": "203.0.113.42",
+      "ipReputation": "{\"score\":95,\"category\":\"corporate\",\"threat_level\":\"low\",\"asn\":\"AS12345\"}",
+      "location": "{\"country\":\"US\",\"region\":\"California\",\"city\":\"San Francisco\",\"coordinates\":{\"lat\":37.7749,\"lng\":-122.4194},\"accuracy\":\"city\"}",
+      "deviceId": "device_laptop_001",
+      "deviceInfo": "{\"type\":\"laptop\",\"os\":\"Windows 11\",\"browser\":\"Edge 120\",\"managed\":true,\"compliant\":true,\"patch_level\":\"current\"}",
+      "deviceTrustLevel": 90,
+      "authenticationMethod": "passwordless_biometric",
+      "authenticationStrength": "very_strong",
+      "mfaVerified": true,
+      "networkType": "corporate",
+      "networkSecurity": "{\"encrypted\":true,\"vpn\":false,\"firewall\":\"enabled\",\"nac\":\"passed\"}",
+      "timeOfDay": "business_hours",
+      "dayOfWeek": "wednesday",
+      "timezone": "America/Los_Angeles",
+      "behaviorAnalysis": "{\"typical_location\":true,\"typical_time\":true,\"access_velocity\":\"normal\",\"pattern_match\":0.94,\"anomaly_score\":5}",
+      "riskScore": 15,
+      "riskFactors": "[]",
+      "requestPath": "/api/v1/reports/financial",
+      "requestMethod": "GET",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+      "businessContext": "{\"quarter_end\":false,\"audit_period\":false,\"normal_operations\":true}",
+      "environmentType": "production",
+      "emergencyAccess": false,
+      "metadata": {
+        "session_age_minutes": 45,
+        "requests_in_session": 23
+      }
+    },
+    {
+      "@type": "AccessContext",
+      "contextId": "ctx_risk_456",
+      "sessionId": "sess_suspicious_001",
+      "userId": "user_contractor",
+      "timestamp": "2024-03-15T02:45:00Z",
+      "ipAddress": "198.51.100.99",
+      "ipReputation": "{\"score\":45,\"category\":\"vpn_exit\",\"threat_level\":\"medium\",\"anonymous_proxy\":true}",
+      "location": "{\"country\":\"RO\",\"region\":\"Bucharest\",\"city\":\"Bucharest\",\"vpn_detected\":true}",
+      "deviceId": null,
+      "deviceInfo": "{\"type\":\"unknown\",\"os\":\"Linux\",\"browser\":\"Firefox 115\",\"managed\":false,\"compliant\":false}",
+      "deviceTrustLevel": 20,
+      "authenticationMethod": "password_only",
+      "authenticationStrength": "weak",
+      "mfaVerified": false,
+      "networkType": "public",
+      "networkSecurity": "{\"encrypted\":true,\"vpn\":true,\"firewall\":\"unknown\",\"tor_exit\":false}",
+      "timeOfDay": "after_hours",
+      "dayOfWeek": "saturday",
+      "timezone": "Europe/Bucharest",
+      "behaviorAnalysis": "{\"typical_location\":false,\"typical_time\":false,\"access_velocity\":\"high\",\"pattern_match\":0.23,\"anomaly_score\":78}",
+      "riskScore": 85,
+      "riskFactors": "[\"new_device\",\"unusual_location\",\"vpn_usage\",\"after_hours\",\"weak_auth\",\"high_velocity\"]",
+      "threatIntelligence": "{\"ip_blocklist\":false,\"known_attacker\":false,\"suspicious_asn\":true}",
+      "requestPath": "/api/v1/data/export",
+      "requestMethod": "POST",
+      "userAgent": "Mozilla/5.0 (X11; Linux x86_64) Firefox/115.0",
+      "businessContext": "{\"contractor_active\":true,\"contract_expires\":\"2024-04-01\"}",
+      "environmentType": "production",
+      "emergencyAccess": false,
+      "metadata": {
+        "alert_triggered": true,
+        "security_review_required": true
       }
     }
   ]

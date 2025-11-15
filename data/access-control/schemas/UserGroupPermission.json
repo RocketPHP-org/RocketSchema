@@ -2,70 +2,262 @@
   "@type": "Schema",
   "@context": "https://rocketschema.org/context",
   "name": "UserGroupPermission",
-  "description": "Direct permissions assigned to groups (many-to-many, 2NF compliance)",
+  "description": "Grants specific permissions directly to groups without using roles, providing fine-grained control for group-specific access needs. While roles bundle multiple permissions, sometimes groups need individual permissions that don't fit into existing roles. This entity allows granting permissions like 'edit team wiki' or 'access project dashboard' directly to a group. All group members inherit these permissions automatically. This is useful for resource ownership - the 'Marketing Team' group might have 'full control' permission on marketing folders, or the 'Security Team' might have 'audit log access' without needing a special role. The entity supports conditional permissions based on context (time, location, resource attributes) and can override role-based permissions when needed. For example, a group might be denied a specific dangerous permission even if their roles would normally grant it. The system tracks permission inheritance through group hierarchies and resolves conflicts using priority levels. This direct permission assignment is essential for implementing resource-based access control where groups own and manage specific assets. It also enables quick, temporary permission grants for urgent situations without creating throwaway roles.",
   "properties": [
     {
-      "name": "userGroup",
+      "name": "assignmentId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "Unique identifier for this permission assignment",
+      "required": true,
+      "unique": true
+    },
+    {
+      "name": "group",
       "type": "UserGroup",
       "mode": "stored",
-      "description": "Group reference",
+      "description": "The group receiving this permission",
       "required": true
     },
     {
       "name": "permission",
       "type": "Permission",
       "mode": "stored",
-      "description": "Assigned permission",
+      "description": "The permission being granted or denied",
       "required": true
     },
     {
-      "name": "assignedAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "When permission was assigned",
+      "name": "grantType",
+      "type": "string",
+      "mode": "enum",
+      "description": "Whether permission is granted or explicitly denied",
+      "enum": ["grant", "deny", "conditional"],
+      "default": "grant",
       "required": true
     },
     {
-      "name": "assignedBy",
+      "name": "grantedBy",
       "type": "User",
       "mode": "stored",
-      "description": "User who assigned the permission"
+      "description": "Administrator who granted this permission",
+      "nullable": true
     },
     {
-      "name": "isGranted",
-      "type": "boolean",
+      "name": "grantedAt",
+      "type": "DateTime",
       "mode": "stored",
-      "description": "Whether permission is granted (true) or denied (false)",
-      "default": true
+      "description": "When this permission was assigned",
+      "required": true
+    },
+    {
+      "name": "reason",
+      "type": "string",
+      "mode": "stored",
+      "description": "Explanation for this permission grant",
+      "nullable": true,
+      "example": "Marketing team needs full control of marketing resources"
+    },
+    {
+      "name": "resourceScope",
+      "type": "string",
+      "mode": "stored",
+      "description": "Specific resources this permission applies to",
+      "nullable": true,
+      "example": "/folders/marketing/*"
+    },
+    {
+      "name": "conditions",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON conditions for when permission applies",
+      "nullable": true,
+      "example": "{\"resource_owner\":\"group\",\"resource_type\":\"document\"}"
+    },
+    {
+      "name": "constraints",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON constraints limiting the permission",
+      "nullable": true,
+      "example": "{\"max_file_size\":\"100MB\",\"allowed_formats\":[\"pdf\",\"docx\"]}"
     },
     {
       "name": "validFrom",
       "type": "DateTime",
       "mode": "stored",
-      "description": "Start of validity"
+      "description": "When this permission becomes active",
+      "nullable": true
     },
     {
       "name": "validUntil",
       "type": "DateTime",
       "mode": "stored",
-      "description": "End of validity"
+      "description": "When this permission expires",
+      "nullable": true
+    },
+    {
+      "name": "priority",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Resolution order for permission conflicts",
+      "default": 0
+    },
+    {
+      "name": "inheritToSubgroups",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether subgroups inherit this permission",
+      "default": false
+    },
+    {
+      "name": "inheritToMembers",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether group members get this permission",
+      "default": true
+    },
+    {
+      "name": "requiresMfa",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether 2FA is required to use this permission",
+      "default": false
+    },
+    {
+      "name": "requiresApproval",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether using this permission needs approval",
+      "default": false
+    },
+    {
+      "name": "approvalConfig",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON configuration for approval workflow",
+      "nullable": true
+    },
+    {
+      "name": "auditLevel",
+      "type": "string",
+      "mode": "enum",
+      "description": "Level of auditing for this permission usage",
+      "enum": ["none", "basic", "detailed", "full"],
+      "default": "basic"
+    },
+    {
+      "name": "usageLimit",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Maximum times this permission can be used per period",
+      "nullable": true
+    },
+    {
+      "name": "usagePeriod",
+      "type": "string",
+      "mode": "stored",
+      "description": "Period for usage limits (hour, day, week, month)",
+      "nullable": true
+    },
+    {
+      "name": "currentUsage",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Current usage count in the period",
+      "default": 0
     },
     {
       "name": "isActive",
       "type": "boolean",
       "mode": "stored",
-      "description": "Whether assignment is active",
+      "description": "Whether this permission grant is active",
       "default": true
-    }
-  ],
-  "indexes": [
-    {
-      "fields": ["userGroup", "permission"],
-      "unique": true
     },
     {
-      "fields": ["permission"],
-      "name": "idx_permission"
+      "name": "suspendedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When this permission was suspended",
+      "nullable": true
+    },
+    {
+      "name": "revokedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When this permission was revoked",
+      "nullable": true
+    },
+    {
+      "name": "revokedBy",
+      "type": "User",
+      "mode": "stored",
+      "description": "Who revoked this permission",
+      "nullable": true
+    },
+    {
+      "name": "lastUsedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Last time this permission was used by the group",
+      "nullable": true
+    },
+    {
+      "name": "metadata",
+      "type": "object",
+      "mode": "stored",
+      "description": "Additional permission configuration"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "UserGroupPermission",
+      "assignmentId": "perm_mkt_folders",
+      "grantType": "grant",
+      "grantedBy": "admin_it",
+      "grantedAt": "2024-01-20T11:00:00Z",
+      "reason": "Marketing team owns and manages all marketing digital assets",
+      "resourceScope": "/resources/marketing/**",
+      "conditions": "{\"resource_path_starts_with\":\"/resources/marketing/\"}",
+      "constraints": "{\"max_file_size\":\"500MB\",\"prohibited_extensions\":[\".exe\",\".bat\"]}",
+      "priority": 100,
+      "inheritToSubgroups": true,
+      "inheritToMembers": true,
+      "requiresMfa": false,
+      "requiresApproval": false,
+      "auditLevel": "detailed",
+      "isActive": true,
+      "lastUsedAt": "2024-03-15T14:30:00Z",
+      "metadata": {
+        "resource_owner": "marketing_department",
+        "storage_quota": "1TB"
+      }
+    },
+    {
+      "@type": "UserGroupPermission",
+      "assignmentId": "perm_sec_audit",
+      "grantType": "grant",
+      "grantedBy": "ciso",
+      "grantedAt": "2024-02-01T09:00:00Z",
+      "reason": "Security team needs access to all audit logs for compliance monitoring",
+      "resourceScope": "/audit-logs/**",
+      "conditions": "{\"log_level\":[\"warning\",\"error\",\"critical\"]}",
+      "validFrom": "2024-02-01T09:00:00Z",
+      "validUntil": "2025-02-01T00:00:00Z",
+      "priority": 150,
+      "inheritToSubgroups": false,
+      "inheritToMembers": true,
+      "requiresMfa": true,
+      "requiresApproval": false,
+      "auditLevel": "full",
+      "usageLimit": 1000,
+      "usagePeriod": "day",
+      "currentUsage": 247,
+      "isActive": true,
+      "lastUsedAt": "2024-03-15T16:00:00Z",
+      "metadata": {
+        "compliance_requirement": "SOC2",
+        "retention_days": 90
+      }
     }
   ]
 }

@@ -2,235 +2,316 @@
   "@type": "Schema",
   "@context": "https://rocketschema.org/context",
   "name": "ResourcePermission",
-  "description": "Fine-grained permissions attached directly to resources for resource-centric access control",
+  "description": "Defines the permission model for different types of resources in the system, establishing what operations are possible on each resource type and how permissions are inherited, delegated, and combined. This entity acts as a template that describes all possible permissions for resource categories like 'documents', 'databases', or 'apis', serving as the blueprint for access control decisions. It defines not just CRUD operations but complex, resource-specific actions like 'publish', 'archive', 'approve', or 'rollback'. Each resource type can have its own permission hierarchy where having 'manage' permission might automatically grant 'write' and 'read'. The entity specifies ownership models (who gets what permissions when creating a resource), inheritance rules (how folder permissions flow to files), and aggregation patterns (how multiple permissions combine). It handles resource lifecycle permissions, defining who can transition resources between states like draft → review → published. The entity also defines permission dependencies (you need 'read' to have 'write'), mutual exclusions (can't have both 'approve' and 'submit'), and contextual variations (different permissions in different environments). This is essential for building flexible yet consistent authorization across diverse resource types while maintaining principle of least privilege. It enables features like temporary access elevation, permission templates for common scenarios, and automated permission assignment based on resource characteristics.",
   "properties": [
+    {
+      "name": "permissionId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "Unique identifier for this resource permission",
+      "required": true,
+      "unique": true
+    },
     {
       "name": "resourceType",
       "type": "string",
       "mode": "stored",
-      "description": "Type of resource",
+      "description": "Type of resource this permission applies to",
       "required": true,
       "example": "document"
     },
     {
-      "name": "resourceId",
+      "name": "permissionCode",
       "type": "string",
       "mode": "stored",
-      "description": "Unique identifier of the resource",
+      "description": "Unique code for this permission",
       "required": true,
-      "example": "doc_12345"
+      "unique": true,
+      "example": "document.publish"
     },
     {
-      "name": "owner",
-      "type": "User",
+      "name": "permissionName",
+      "type": "string",
       "mode": "stored",
-      "description": "Owner of the resource",
+      "description": "Human-readable permission name",
+      "required": true,
+      "example": "Publish Document"
+    },
+    {
+      "name": "description",
+      "type": "string",
+      "mode": "stored",
+      "description": "Detailed explanation of what this permission allows",
+      "example": "Allows publishing documents from draft to public state, making them visible to all authorized users"
+    },
+    {
+      "name": "operation",
+      "type": "string",
+      "mode": "stored",
+      "description": "The operation this permission enables",
+      "required": true,
+      "example": "publish"
+    },
+    {
+      "name": "category",
+      "type": "string",
+      "mode": "enum",
+      "description": "Category of permission",
+      "enum": ["read", "write", "delete", "manage", "share", "workflow", "admin", "system"],
       "required": true
     },
     {
-      "name": "accessControlList",
-      "type": "object[]",
-      "mode": "stored",
-      "description": "Access control list entries",
-      "example": [
-        {
-          "principal": "user:john@example.com",
-          "permissions": ["read", "write"],
-          "granted": true,
-          "conditions": {
-            "timeRange": {
-              "start": "09:00",
-              "end": "18:00"
-            }
-          }
-        },
-        {
-          "principal": "group:finance",
-          "permissions": ["read"],
-          "granted": true
-        },
-        {
-          "principal": "role:external_auditor",
-          "permissions": ["read"],
-          "granted": true,
-          "validUntil": "2024-12-31T23:59:59Z"
-        }
-      ]
+      "name": "riskLevel",
+      "type": "string",
+      "mode": "enum",
+      "description": "Risk assessment of granting this permission",
+      "enum": ["low", "medium", "high", "critical"],
+      "default": "medium"
     },
     {
-      "name": "inheritFromParent",
+      "name": "scope",
+      "type": "string",
+      "mode": "enum",
+      "description": "Scope of the permission",
+      "enum": ["own", "department", "organization", "global", "delegated"],
+      "default": "own"
+    },
+    {
+      "name": "impliedPermissions",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON array of permissions automatically included",
+      "nullable": true,
+      "example": "[\"document.read\",\"document.download\"]"
+    },
+    {
+      "name": "requiredPermissions",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON array of prerequisite permissions",
+      "nullable": true,
+      "example": "[\"document.read\",\"document.write\"]"
+    },
+    {
+      "name": "conflictingPermissions",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON array of mutually exclusive permissions",
+      "nullable": true,
+      "example": "[\"document.archive\",\"document.delete\"]"
+    },
+    {
+      "name": "parentPermission",
+      "type": "ResourcePermission",
+      "mode": "stored",
+      "description": "Parent permission in hierarchy",
+      "nullable": true
+    },
+    {
+      "name": "isInheritable",
       "type": "boolean",
       "mode": "stored",
-      "description": "Whether to inherit permissions from parent resource",
+      "description": "Whether child resources inherit this permission",
       "default": true
     },
     {
-      "name": "parentResourceId",
-      "type": "string",
-      "mode": "stored",
-      "description": "Parent resource for permission inheritance",
-      "example": "folder_789"
-    },
-    {
-      "name": "propagateToChildren",
+      "name": "isDelegatable",
       "type": "boolean",
       "mode": "stored",
-      "description": "Whether permissions propagate to child resources",
+      "description": "Whether holders can delegate this permission",
       "default": false
     },
     {
-      "name": "sharingSettings",
-      "type": "object",
+      "name": "isTransferable",
+      "type": "boolean",
       "mode": "stored",
-      "description": "Resource sharing configuration",
-      "example": {
-        "allowExternalSharing": false,
-        "allowPublicAccess": false,
-        "requireMFA": true,
-        "maxShareDuration": 30,
-        "allowedDomains": ["example.com"],
-        "shareApprovalRequired": true
-      }
+      "description": "Whether permission can be transferred between users",
+      "default": false
     },
     {
-      "name": "classification",
+      "name": "requiresMfa",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether MFA is required to use this permission",
+      "default": false
+    },
+    {
+      "name": "requiresApproval",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether using this permission needs approval",
+      "default": false
+    },
+    {
+      "name": "approvalConfig",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON configuration for approval workflow",
+      "nullable": true
+    },
+    {
+      "name": "auditLevel",
       "type": "string",
       "mode": "enum",
-      "description": "Data classification level",
-      "enum": ["public", "internal", "confidential", "restricted", "top_secret"],
-      "default": "internal"
+      "description": "Required audit level when permission is used",
+      "enum": ["none", "basic", "detailed", "full"],
+      "default": "basic"
     },
     {
-      "name": "tags",
-      "type": "string[]",
+      "name": "validStates",
+      "type": "string",
       "mode": "stored",
-      "description": "Tags for attribute-based control",
-      "example": ["financial", "pii", "regulated"]
+      "description": "JSON array of resource states where permission applies",
+      "nullable": true,
+      "example": "[\"draft\",\"review\",\"approved\"]"
     },
     {
-      "name": "customAttributes",
-      "type": "object",
+      "name": "fieldLevel",
+      "type": "boolean",
       "mode": "stored",
-      "description": "Custom attributes for ABAC evaluation",
-      "example": {
-        "project": "alpha",
-        "costCenter": "CC-100",
-        "dataSubject": "eu_citizens"
-      }
+      "description": "Whether permission can be applied at field level",
+      "default": false
     },
     {
-      "name": "auditSettings",
-      "type": "object",
+      "name": "defaultOwnerGrant",
+      "type": "boolean",
       "mode": "stored",
-      "description": "Audit configuration for this resource",
-      "example": {
-        "auditLevel": "full",
-        "logRetentionDays": 365,
-        "alertOnAccess": true,
-        "notifyOwner": true
-      }
+      "description": "Whether resource owners get this permission by default",
+      "default": false
     },
     {
-      "name": "encryptionSettings",
-      "type": "object",
+      "name": "defaultCreatorGrant",
+      "type": "boolean",
       "mode": "stored",
-      "description": "Encryption requirements",
-      "example": {
-        "encryptionRequired": true,
-        "algorithm": "AES256",
-        "keyRotationDays": 90
-      }
+      "description": "Whether resource creators get this permission by default",
+      "default": false
     },
     {
-      "name": "retentionPolicy",
-      "type": "object",
+      "name": "maxDelegationDepth",
+      "type": "integer",
       "mode": "stored",
-      "description": "Data retention rules",
-      "example": {
-        "retentionDays": 2555,
-        "legalHold": false,
-        "autoDelete": true,
-        "archiveBeforeDelete": true
-      }
+      "description": "Maximum delegation chain length",
+      "default": 0
     },
     {
-      "name": "lastPermissionUpdate",
-      "type": "DateTime",
+      "name": "timeRestrictions",
+      "type": "string",
       "mode": "stored",
-      "description": "Last time permissions were modified"
+      "description": "JSON time-based restrictions",
+      "nullable": true
     },
     {
-      "name": "lastAccessReview",
-      "type": "DateTime",
+      "name": "usageQuota",
+      "type": "integer",
       "mode": "stored",
-      "description": "Last access review date"
+      "description": "Maximum uses per time period",
+      "nullable": true
     },
     {
-      "name": "nextAccessReview",
-      "type": "DateTime",
+      "name": "quotaPeriod",
+      "type": "string",
       "mode": "stored",
-      "description": "Next scheduled access review"
+      "description": "Time period for usage quota",
+      "nullable": true
+    },
+    {
+      "name": "isActive",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this permission is currently available",
+      "default": true
+    },
+    {
+      "name": "isSystem",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this is a system-defined permission",
+      "default": false
     },
     {
       "name": "createdAt",
       "type": "DateTime",
       "mode": "stored",
-      "description": "Creation timestamp",
+      "description": "When this permission was defined",
       "required": true
     },
     {
       "name": "metadata",
       "type": "object",
       "mode": "stored",
-      "description": "Additional metadata"
+      "description": "Additional permission configuration"
     }
   ],
   "examples": [
     {
       "@type": "ResourcePermission",
+      "permissionId": "perm_doc_publish",
       "resourceType": "document",
-      "resourceId": "doc_financial_report_2024",
-      "accessControlList": [
-        {
-          "principal": "user:cfo@example.com",
-          "permissions": ["read", "write", "delete", "share"],
-          "granted": true
-        },
-        {
-          "principal": "group:finance_team",
-          "permissions": ["read", "write"],
-          "granted": true,
-          "conditions": {
-            "ipRange": "10.0.0.0/8"
-          }
-        },
-        {
-          "principal": "role:auditor",
-          "permissions": ["read"],
-          "granted": true,
-          "validFrom": "2024-03-01T00:00:00Z",
-          "validUntil": "2024-03-31T23:59:59Z"
-        },
-        {
-          "principal": "user:*@external.com",
-          "permissions": ["all"],
-          "granted": false
-        }
-      ],
-      "inheritFromParent": false,
-      "classification": "confidential",
-      "tags": ["financial", "q1_2024", "board_review"],
-      "sharingSettings": {
-        "allowExternalSharing": false,
-        "requireMFA": true,
-        "shareApprovalRequired": true
-      },
-      "auditSettings": {
-        "auditLevel": "full",
-        "alertOnAccess": true,
-        "notifyOwner": true
-      },
-      "createdAt": "2024-01-01T00:00:00Z"
+      "permissionCode": "document.publish",
+      "permissionName": "Publish Document",
+      "description": "Allows changing document state from draft/review to published, making it visible to all users with read access",
+      "operation": "publish",
+      "category": "workflow",
+      "riskLevel": "medium",
+      "scope": "own",
+      "impliedPermissions": "[\"document.read\",\"document.view_history\"]",
+      "requiredPermissions": "[\"document.write\",\"document.review\"]",
+      "conflictingPermissions": "[\"document.draft_only\"]",
+      "isInheritable": false,
+      "isDelegatable": true,
+      "isTransferable": false,
+      "requiresMfa": true,
+      "requiresApproval": true,
+      "approvalConfig": "{\"approvers\":[\"document_owner\",\"team_lead\"],\"timeout_hours\":48}",
+      "auditLevel": "detailed",
+      "validStates": "[\"review\",\"approved\"]",
+      "fieldLevel": false,
+      "defaultOwnerGrant": true,
+      "defaultCreatorGrant": false,
+      "maxDelegationDepth": 1,
+      "timeRestrictions": "{\"allowed_hours\":\"09:00-18:00\",\"allowed_days\":[\"mon\",\"tue\",\"wed\",\"thu\",\"fri\"]}",
+      "isActive": true,
+      "isSystem": true,
+      "createdAt": "2024-01-01T00:00:00Z",
+      "metadata": {
+        "workflow_step": "publish",
+        "notification_required": true
+      }
+    },
+    {
+      "@type": "ResourcePermission",
+      "permissionId": "perm_db_export",
+      "resourceType": "database",
+      "permissionCode": "database.export",
+      "permissionName": "Export Database",
+      "description": "Allows exporting entire database contents including schema and data",
+      "operation": "export",
+      "category": "admin",
+      "riskLevel": "critical",
+      "scope": "organization",
+      "impliedPermissions": "[\"database.read\",\"database.query\"]",
+      "requiredPermissions": "[\"database.admin\"]",
+      "conflictingPermissions": "[\"database.readonly\"]",
+      "isInheritable": false,
+      "isDelegatable": false,
+      "isTransferable": false,
+      "requiresMfa": true,
+      "requiresApproval": true,
+      "approvalConfig": "{\"approvers\":[\"dba\",\"security_team\"],\"timeout_hours\":24,\"emergency_bypass\":true}",
+      "auditLevel": "full",
+      "fieldLevel": false,
+      "defaultOwnerGrant": false,
+      "defaultCreatorGrant": false,
+      "maxDelegationDepth": 0,
+      "usageQuota": 5,
+      "quotaPeriod": "month",
+      "isActive": true,
+      "isSystem": true,
+      "createdAt": "2024-01-01T00:00:00Z",
+      "metadata": {
+        "compliance_check": "required",
+        "data_classification": "sensitive"
+      }
     }
   ]
 }

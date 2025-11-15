@@ -2,149 +2,243 @@
   "@type": "Schema",
   "@context": "https://rocketschema.org/context",
   "name": "PermissionCondition",
-  "description": "Complex conditions for ABAC permission evaluation using logical operators",
+  "description": "Defines conditional logic that must be satisfied for permissions to be valid, implementing dynamic authorization where access rights change based on runtime conditions. Unlike static permissions that are always active, conditional permissions adapt to circumstances - a user might have 'approve expenses' permission but only for amounts under $5000, only during business hours, or only for their direct reports. This entity captures complex boolean expressions, mathematical comparisons, temporal constraints, and business rules that gate permission activation. Conditions can evaluate user attributes (seniority level, certifications), resource properties (document state, data classification), environmental factors (time, location, threat level), and business context (project phase, audit mode). The entity supports nested conditions with AND/OR/NOT logic, mathematical operations for numerical comparisons, string matching with regex patterns, and date arithmetic for temporal rules. Conditions can reference external services for dynamic evaluation ('check with risk scoring API'), aggregate functions ('user has approved less than 10 items today'), and historical data ('user has not failed audit in past year'). This conditional approach enables least-privilege access that automatically adjusts to risk, implements separation of duties (can't approve what you created), and enforces business policies (no changes during freeze periods) without constant manual permission updates.",
   "properties": [
     {
-      "name": "permission",
-      "type": "Permission",
+      "name": "conditionId",
+      "type": "uuid",
       "mode": "stored",
-      "description": "Permission this condition belongs to",
-      "required": true
+      "description": "Unique identifier for this condition",
+      "required": true,
+      "unique": true
+    },
+    {
+      "name": "conditionName",
+      "type": "string",
+      "mode": "stored",
+      "description": "Human-readable name for the condition",
+      "required": true,
+      "example": "Business Hours Only"
+    },
+    {
+      "name": "description",
+      "type": "string",
+      "mode": "stored",
+      "description": "Explanation of what this condition checks",
+      "example": "Restricts access to business hours (9 AM - 6 PM) on weekdays"
     },
     {
       "name": "conditionType",
       "type": "string",
       "mode": "enum",
-      "description": "Type of condition",
-      "enum": ["simple", "composite", "expression", "temporal", "geographical", "risk_based"],
-      "required": true,
-      "example": "composite"
-    },
-    {
-      "name": "logicalOperator",
-      "type": "string",
-      "mode": "enum",
-      "description": "Logical operator for composite conditions",
-      "enum": ["AND", "OR", "NOT", "XOR"],
-      "example": "AND"
-    },
-    {
-      "name": "attributes",
-      "type": "PermissionAttribute[]",
-      "mode": "stored",
-      "description": "Attributes for simple conditions"
-    },
-    {
-      "name": "childConditions",
-      "type": "PermissionCondition[]",
-      "mode": "stored",
-      "description": "Nested conditions for composite conditions"
+      "description": "Category of condition",
+      "enum": ["temporal", "numerical", "attribute", "contextual", "aggregate", "external", "composite"],
+      "required": true
     },
     {
       "name": "expression",
       "type": "string",
       "mode": "stored",
-      "description": "Custom expression for complex conditions (CEL or similar)",
-      "example": "user.age >= 18 && user.country in ['US', 'CA', 'UK']"
+      "description": "The condition logic expression",
+      "required": true,
+      "example": "currentTime.hour >= 9 AND currentTime.hour <= 18 AND currentTime.dayOfWeek IN ['Mon','Tue','Wed','Thu','Fri']"
     },
     {
-      "name": "temporalConstraint",
-      "type": "object",
-      "mode": "stored",
-      "description": "Time-based constraints",
-      "example": {
-        "type": "recurring",
-        "daysOfWeek": ["monday", "tuesday", "wednesday", "thursday", "friday"],
-        "timeRange": {
-          "start": "09:00",
-          "end": "18:00"
-        },
-        "timezone": "America/New_York"
-      }
+      "name": "evaluationMode",
+      "type": "string",
+      "mode": "enum",
+      "description": "How the condition is evaluated",
+      "enum": ["static", "dynamic", "cached", "real_time"],
+      "default": "dynamic"
     },
     {
-      "name": "geographicalConstraint",
-      "type": "object",
+      "name": "variables",
+      "type": "string",
       "mode": "stored",
-      "description": "Location-based constraints",
-      "example": {
-        "type": "country",
-        "allowedCountries": ["US", "CA"],
-        "deniedCountries": ["CN", "RU"]
-      }
+      "description": "JSON object of variables used in expression",
+      "nullable": true,
+      "example": "{\"max_amount\":5000,\"allowed_states\":[\"draft\",\"review\"],\"business_hours\":{\"start\":9,\"end\":18}}"
     },
     {
-      "name": "riskConstraint",
-      "type": "object",
+      "name": "operators",
+      "type": "string",
       "mode": "stored",
-      "description": "Risk-based access control constraints",
-      "example": {
-        "maxRiskScore": 50,
-        "requiredTrustLevel": "high",
-        "requireMFA": true
-      }
+      "description": "JSON array of operators used",
+      "example": "[\">\",\"<\",\"==\",\"IN\",\"AND\",\"OR\"]"
+    },
+    {
+      "name": "dataRequirements",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON array of data needed for evaluation",
+      "example": "[\"user.department\",\"user.level\",\"resource.value\",\"context.time\"]"
+    },
+    {
+      "name": "externalDependencies",
+      "type": "string",
+      "mode": "stored",
+      "description": "External services or APIs required",
+      "nullable": true,
+      "example": "{\"risk_api\":\"https://risk.api/evaluate\",\"calendar_service\":\"https://calendar.api/holidays\"}"
+    },
+    {
+      "name": "cacheable",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether condition result can be cached",
+      "default": true
+    },
+    {
+      "name": "cacheTimeout",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Seconds to cache evaluation result",
+      "default": 60
+    },
+    {
+      "name": "fallbackBehavior",
+      "type": "string",
+      "mode": "enum",
+      "description": "What to do if evaluation fails",
+      "enum": ["deny", "allow", "use_default", "require_manual"],
+      "default": "deny"
+    },
+    {
+      "name": "nestedConditions",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON array of sub-condition IDs",
+      "nullable": true
     },
     {
       "name": "priority",
       "type": "integer",
       "mode": "stored",
-      "description": "Evaluation priority",
-      "default": 0,
-      "min": 0
+      "description": "Evaluation order when multiple conditions exist",
+      "default": 0
+    },
+    {
+      "name": "scope",
+      "type": "string",
+      "mode": "stored",
+      "description": "Where this condition can be applied",
+      "example": "global"
+    },
+    {
+      "name": "errorMessage",
+      "type": "string",
+      "mode": "stored",
+      "description": "Message when condition blocks access",
+      "nullable": true,
+      "example": "Access restricted to business hours (9 AM - 6 PM weekdays)"
+    },
+    {
+      "name": "bypassRoles",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON array of roles that bypass this condition",
+      "nullable": true,
+      "example": "[\"admin\",\"emergency_responder\"]"
+    },
+    {
+      "name": "testCases",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON array of test scenarios",
+      "nullable": true
+    },
+    {
+      "name": "performanceMetrics",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON metrics from condition evaluation",
+      "nullable": true
     },
     {
       "name": "isActive",
       "type": "boolean",
       "mode": "stored",
-      "description": "Whether this condition is active",
+      "description": "Whether this condition is currently active",
       "default": true
     },
     {
-      "name": "failureMessage",
-      "type": "string",
+      "name": "version",
+      "type": "integer",
       "mode": "stored",
-      "description": "Custom message when condition fails",
-      "example": "Access denied: Outside of working hours"
+      "description": "Condition version number",
+      "default": 1
+    },
+    {
+      "name": "createdBy",
+      "type": "User",
+      "mode": "stored",
+      "description": "Who created this condition"
+    },
+    {
+      "name": "createdAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When condition was created",
+      "required": true
     },
     {
       "name": "metadata",
       "type": "object",
       "mode": "stored",
-      "description": "Additional metadata"
+      "description": "Additional condition configuration"
     }
   ],
   "examples": [
     {
       "@type": "PermissionCondition",
-      "conditionType": "composite",
-      "logicalOperator": "AND",
-      "priority": 1,
+      "conditionId": "cond_amount_limit",
+      "conditionName": "Expense Approval Limit",
+      "description": "Limits expense approval based on user's approval authority and amount",
+      "conditionType": "numerical",
+      "expression": "resource.amount <= user.approval_limit AND resource.amount < 10000",
+      "evaluationMode": "dynamic",
+      "variables": "{\"default_limit\":5000,\"max_limit\":10000,\"escalation_threshold\":0.8}",
+      "operators": "[\"<=\",\"<\",\"AND\"]",
+      "dataRequirements": "[\"user.approval_limit\",\"user.department\",\"resource.amount\",\"resource.currency\"]",
+      "cacheable": true,
+      "cacheTimeout": 300,
+      "fallbackBehavior": "deny",
+      "priority": 100,
+      "scope": "financial_operations",
+      "errorMessage": "Amount exceeds your approval limit. Please escalate to your manager.",
+      "bypassRoles": "[\"cfo\",\"finance_director\"]",
       "isActive": true,
-      "failureMessage": "Access denied: Multiple conditions not met"
+      "version": 2,
+      "createdAt": "2024-01-01T00:00:00Z",
+      "metadata": {
+        "currency_conversion": true,
+        "include_tax": true
+      }
     },
     {
       "@type": "PermissionCondition",
-      "conditionType": "temporal",
-      "temporalConstraint": {
-        "type": "recurring",
-        "daysOfWeek": ["monday", "tuesday", "wednesday", "thursday", "friday"],
-        "timeRange": {
-          "start": "09:00",
-          "end": "18:00"
-        },
-        "timezone": "America/New_York"
-      },
-      "priority": 2,
+      "conditionId": "cond_separation_duties",
+      "conditionName": "Separation of Duties Check",
+      "description": "Prevents users from approving their own requests or changes",
+      "conditionType": "contextual",
+      "expression": "resource.created_by != user.id AND resource.last_modified_by != user.id AND !resource.stakeholders.includes(user.id)",
+      "evaluationMode": "real_time",
+      "variables": "{\"check_delegation\":true,\"check_reporting_chain\":true}",
+      "operators": "[\"!=\",\"!\",\"includes\",\"AND\"]",
+      "dataRequirements": "[\"resource.created_by\",\"resource.last_modified_by\",\"resource.stakeholders\",\"user.id\",\"user.reports_to\"]",
+      "cacheable": false,
+      "fallbackBehavior": "deny",
+      "priority": 200,
+      "scope": "approval_workflows",
+      "errorMessage": "Cannot approve your own request or changes. Separation of duties policy requires independent approval.",
+      "testCases": "[{\"scenario\":\"user_approves_own\",\"should_fail\":true},{\"scenario\":\"manager_approves_report\",\"should_pass\":true}]",
       "isActive": true,
-      "failureMessage": "Access denied: Outside business hours"
-    },
-    {
-      "@type": "PermissionCondition",
-      "conditionType": "expression",
-      "expression": "user.employmentStatus == 'active' && user.clearanceLevel >= resource.requiredClearance && (user.department == resource.department || user.hasRole('admin'))",
-      "priority": 3,
-      "isActive": true,
-      "failureMessage": "Access denied: Insufficient clearance or wrong department"
+      "version": 1,
+      "createdAt": "2024-01-15T00:00:00Z",
+      "metadata": {
+        "sox_compliant": true,
+        "audit_required": true
+      }
     }
   ]
 }

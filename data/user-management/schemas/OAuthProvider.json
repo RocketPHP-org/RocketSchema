@@ -2,170 +2,216 @@
   "@type": "Schema",
   "@context": "https://rocketschema.org/context",
   "name": "OAuthProvider",
-  "description": "OAuth/SSO provider configuration for external authentication",
+  "description": "Manages third-party authentication providers that allow users to sign in using their existing accounts from services like Google, Facebook, GitHub, or corporate systems like Active Directory. OAuth providers eliminate the need for users to create and remember yet another password by leveraging their existing trusted accounts. This entity stores the configuration needed to connect to each provider, including client credentials, endpoints, and permission scopes. It handles the complex OAuth flow, storing tokens securely and managing token refresh when they expire. Each provider can be configured with specific permissions (scopes) that determine what information the application can access from the user's third-party account. This is essential for 'Sign in with Google' buttons, enterprise Single Sign-On (SSO), and social login features that reduce friction during user registration and improve security by delegating authentication to established providers.",
   "properties": [
     {
-      "name": "user",
-      "type": "User",
-      "mode": "stored",
-      "description": "User account linked to this OAuth provider",
-      "required": true
-    },
-    {
-      "name": "provider",
+      "name": "providerName",
       "type": "string",
-      "mode": "enum",
-      "description": "OAuth provider name",
-      "enum": ["google", "facebook", "github", "microsoft", "apple", "linkedin", "twitter", "gitlab", "okta", "auth0", "saml", "custom"],
+      "mode": "stored",
+      "description": "Unique identifier for the OAuth provider",
       "required": true,
+      "unique": true,
       "example": "google"
     },
     {
-      "name": "providerUserId",
+      "name": "displayName",
       "type": "string",
       "mode": "stored",
-      "description": "User ID from the OAuth provider",
-      "required": true
+      "description": "User-friendly name shown on login buttons",
+      "required": true,
+      "example": "Google"
     },
     {
-      "name": "providerEmail",
+      "name": "providerType",
       "type": "string",
-      "mode": "stored",
-      "description": "Email from the OAuth provider",
-      "format": "email"
+      "mode": "enum",
+      "description": "Category of authentication provider",
+      "enum": ["oauth2", "saml", "oidc", "ldap", "custom"],
+      "default": "oauth2",
+      "example": "oauth2"
     },
     {
-      "name": "providerUsername",
+      "name": "clientId",
       "type": "string",
       "mode": "stored",
-      "description": "Username from the OAuth provider"
+      "description": "Application's unique identifier registered with the provider",
+      "required": true,
+      "example": "1234567890-abc.apps.googleusercontent.com"
     },
     {
-      "name": "providerDisplayName",
+      "name": "clientSecret",
       "type": "string",
       "mode": "stored",
-      "description": "Display name from the OAuth provider"
-    },
-    {
-      "name": "providerAvatarUrl",
-      "type": "string",
-      "mode": "stored",
-      "description": "Avatar URL from the OAuth provider",
-      "format": "uri"
-    },
-    {
-      "name": "accessToken",
-      "type": "string",
-      "mode": "stored",
-      "description": "Encrypted OAuth access token",
+      "description": "Secret key for authenticating with the provider (encrypted)",
+      "required": true,
       "private": true
     },
     {
-      "name": "refreshToken",
+      "name": "authorizationUrl",
       "type": "string",
       "mode": "stored",
-      "description": "Encrypted OAuth refresh token",
-      "private": true
+      "description": "URL where users are sent to grant permissions",
+      "required": true,
+      "format": "uri",
+      "example": "https://accounts.google.com/o/oauth2/v2/auth"
     },
     {
-      "name": "tokenExpiresAt",
-      "type": "DateTime",
+      "name": "tokenUrl",
+      "type": "string",
       "mode": "stored",
-      "description": "When the access token expires"
+      "description": "URL for exchanging authorization codes for access tokens",
+      "required": true,
+      "format": "uri",
+      "example": "https://oauth2.googleapis.com/token"
+    },
+    {
+      "name": "userInfoUrl",
+      "type": "string",
+      "mode": "stored",
+      "description": "URL to fetch user profile information",
+      "format": "uri",
+      "example": "https://www.googleapis.com/oauth2/v2/userinfo"
     },
     {
       "name": "scopes",
       "type": "string[]",
       "mode": "stored",
-      "description": "OAuth scopes granted",
-      "example": ["email", "profile", "openid"]
+      "description": "Permissions requested from the provider",
+      "example": ["openid", "email", "profile"]
     },
     {
-      "name": "isPrimary",
+      "name": "redirectUri",
+      "type": "string",
+      "mode": "stored",
+      "description": "URL where provider sends users after authentication",
+      "required": true,
+      "format": "uri",
+      "example": "https://myapp.com/auth/google/callback"
+    },
+    {
+      "name": "iconUrl",
+      "type": "string",
+      "mode": "stored",
+      "description": "Provider's logo for display on login page",
+      "format": "uri",
+      "example": "https://myapp.com/icons/google.svg"
+    },
+    {
+      "name": "buttonColor",
+      "type": "string",
+      "mode": "stored",
+      "description": "Brand color for the login button",
+      "example": "#4285F4"
+    },
+    {
+      "name": "isEnabled",
       "type": "boolean",
       "mode": "stored",
-      "description": "Whether this is the primary OAuth provider",
-      "default": false
-    },
-    {
-      "name": "isVerified",
-      "type": "boolean",
-      "mode": "stored",
-      "description": "Whether the provider account is verified",
-      "default": false
-    },
-    {
-      "name": "lastSyncAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "Last time profile was synced from provider"
-    },
-    {
-      "name": "linkedAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "When the provider was linked",
-      "required": true
-    },
-    {
-      "name": "lastLoginAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "Last login using this provider"
-    },
-    {
-      "name": "providerData",
-      "type": "object",
-      "mode": "stored",
-      "description": "Additional data from the provider"
-    },
-    {
-      "name": "isActive",
-      "type": "boolean",
-      "mode": "stored",
-      "description": "Whether this provider link is active",
+      "description": "Whether this provider is available for login",
       "default": true
     },
     {
-      "name": "unlinkedAt",
-      "type": "DateTime",
+      "name": "isDefault",
+      "type": "boolean",
       "mode": "stored",
-      "description": "When the provider was unlinked"
+      "description": "Whether this is the preferred login method",
+      "default": false
+    },
+    {
+      "name": "allowSignup",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether new users can register via this provider",
+      "default": true
+    },
+    {
+      "name": "autoLinkAccounts",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Automatically link accounts with matching email addresses",
+      "default": false
+    },
+    {
+      "name": "userFieldMapping",
+      "type": "object",
+      "mode": "stored",
+      "description": "Maps provider fields to application user fields"
     },
     {
       "name": "metadata",
       "type": "object",
       "mode": "stored",
-      "description": "Additional metadata"
+      "description": "Additional provider-specific configuration"
+    },
+    {
+      "name": "createdAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When this provider was configured",
+      "required": true
     }
   ],
   "examples": [
     {
       "@type": "OAuthProvider",
-      "provider": "google",
-      "providerUserId": "118234567890123456789",
-      "providerEmail": "john.doe@gmail.com",
-      "providerDisplayName": "John Doe",
-      "providerAvatarUrl": "https://lh3.googleusercontent.com/a/example",
-      "scopes": ["email", "profile", "openid"],
-      "isPrimary": true,
-      "isVerified": true,
-      "linkedAt": "2024-01-15T10:00:00Z",
-      "lastLoginAt": "2024-03-15T14:30:00Z",
-      "isActive": true
+      "providerName": "google",
+      "displayName": "Google",
+      "providerType": "oauth2",
+      "clientId": "1234567890-abcdefg.apps.googleusercontent.com",
+      "authorizationUrl": "https://accounts.google.com/o/oauth2/v2/auth",
+      "tokenUrl": "https://oauth2.googleapis.com/token",
+      "userInfoUrl": "https://www.googleapis.com/oauth2/v2/userinfo",
+      "scopes": ["openid", "email", "profile"],
+      "redirectUri": "https://myapp.com/auth/google/callback",
+      "iconUrl": "https://myapp.com/icons/google.svg",
+      "buttonColor": "#4285F4",
+      "isEnabled": true,
+      "isDefault": true,
+      "allowSignup": true,
+      "autoLinkAccounts": true,
+      "userFieldMapping": {
+        "id": "sub",
+        "email": "email",
+        "name": "name",
+        "picture": "picture",
+        "emailVerified": "email_verified"
+      },
+      "metadata": {
+        "accessType": "offline",
+        "prompt": "consent"
+      },
+      "createdAt": "2024-01-01T00:00:00Z"
     },
     {
       "@type": "OAuthProvider",
-      "provider": "github",
-      "providerUserId": "12345678",
-      "providerUsername": "johndoe",
-      "providerEmail": "john@example.com",
-      "providerDisplayName": "John Doe",
-      "scopes": ["user", "repo"],
-      "isPrimary": false,
-      "isVerified": true,
-      "linkedAt": "2024-02-01T11:00:00Z",
-      "isActive": true
+      "providerName": "azure-ad",
+      "displayName": "Microsoft Work Account",
+      "providerType": "oidc",
+      "clientId": "98765432-wxyz-1234-5678-fedcba987654",
+      "authorizationUrl": "https://login.microsoftonline.com/tenant-id/oauth2/v2.0/authorize",
+      "tokenUrl": "https://login.microsoftonline.com/tenant-id/oauth2/v2.0/token",
+      "userInfoUrl": "https://graph.microsoft.com/v1.0/me",
+      "scopes": ["openid", "email", "profile", "User.Read"],
+      "redirectUri": "https://enterprise.app/auth/azure/callback",
+      "iconUrl": "https://enterprise.app/icons/microsoft.svg",
+      "buttonColor": "#0078D4",
+      "isEnabled": true,
+      "isDefault": false,
+      "allowSignup": false,
+      "autoLinkAccounts": false,
+      "userFieldMapping": {
+        "id": "id",
+        "email": "userPrincipalName",
+        "name": "displayName",
+        "firstName": "givenName",
+        "lastName": "surname"
+      },
+      "metadata": {
+        "tenant": "organizations",
+        "allowedDomains": ["company.com", "subsidiary.com"],
+        "groupClaimsEnabled": true
+      },
+      "createdAt": "2024-01-15T10:00:00Z"
     }
   ]
 }

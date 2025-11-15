@@ -2,63 +2,255 @@
   "@type": "Schema",
   "@context": "https://rocketschema.org/context",
   "name": "UserGroupRole",
-  "description": "Junction table for roles assigned to groups (many-to-many, 2NF compliance)",
+  "description": "Assigns roles to entire groups, enabling efficient permission management at scale by granting the same role to all group members simultaneously. This entity implements group-level role assignments where every member of a group automatically receives specific roles. For example, assigning the 'Financial Analyst' role to the 'Finance Department' group means all finance team members inherit that role without individual assignments. This dramatically simplifies administration - when someone joins the finance team, they automatically get all finance-related roles. The entity supports conditional assignments where roles might only apply during certain hours or from specific locations. It handles role inheritance through group hierarchies - if 'Company' group has 'Basic Employee' role, all subgroups inherit it. The system tracks who assigned roles to groups and why, maintaining accountability for bulk permission changes. Temporary role assignments are supported for project groups that need elevated permissions for limited periods. The entity also manages precedence when users belong to multiple groups with conflicting roles, using priority levels to resolve conflicts. This is essential for large organizations where managing individual role assignments would be impractical, and for ensuring consistent permissions across teams.",
   "properties": [
     {
-      "name": "userGroup",
+      "name": "assignmentId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "Unique identifier for this group-role assignment",
+      "required": true,
+      "unique": true
+    },
+    {
+      "name": "group",
       "type": "UserGroup",
       "mode": "stored",
-      "description": "Group reference",
+      "description": "The group receiving this role",
       "required": true
     },
     {
       "name": "role",
       "type": "Role",
       "mode": "stored",
-      "description": "Assigned role",
-      "required": true
-    },
-    {
-      "name": "assignedAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "When role was assigned",
+      "description": "The role being assigned to the group",
       "required": true
     },
     {
       "name": "assignedBy",
       "type": "User",
       "mode": "stored",
-      "description": "User who assigned the role"
+      "description": "Administrator who made this assignment",
+      "nullable": true
     },
     {
-      "name": "validFrom",
+      "name": "assignedAt",
       "type": "DateTime",
       "mode": "stored",
-      "description": "Start of validity"
+      "description": "When the role was assigned to the group",
+      "required": true
     },
     {
-      "name": "validUntil",
+      "name": "assignmentReason",
+      "type": "string",
+      "mode": "stored",
+      "description": "Explanation for this role assignment",
+      "nullable": true,
+      "example": "All backend engineers need deployment permissions"
+    },
+    {
+      "name": "effectiveFrom",
       "type": "DateTime",
       "mode": "stored",
-      "description": "End of validity"
+      "description": "When this role becomes active for group members",
+      "required": true
+    },
+    {
+      "name": "effectiveUntil",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When this role expires for the group",
+      "nullable": true
+    },
+    {
+      "name": "scope",
+      "type": "string",
+      "mode": "stored",
+      "description": "Context where this role applies",
+      "nullable": true,
+      "example": "project:phoenix"
+    },
+    {
+      "name": "applyToExisting",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether to apply to current members immediately",
+      "default": true
+    },
+    {
+      "name": "applyToNew",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether new members automatically get this role",
+      "default": true
+    },
+    {
+      "name": "removeOnLeave",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether to remove role when member leaves group",
+      "default": true
+    },
+    {
+      "name": "priority",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Resolution order for conflicting assignments",
+      "default": 0
+    },
+    {
+      "name": "conditions",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON conditions for when role applies",
+      "nullable": true,
+      "example": "{\"location\":\"office\",\"time\":\"business_hours\"}"
+    },
+    {
+      "name": "exceptions",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON array of user IDs excluded from this assignment",
+      "nullable": true
+    },
+    {
+      "name": "inheritToSubgroups",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether child groups inherit this role",
+      "default": false
+    },
+    {
+      "name": "requiresActivation",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether members must activate this role individually",
+      "default": false
+    },
+    {
+      "name": "requiresMfa",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether 2FA is required for this role in group context",
+      "default": false
+    },
+    {
+      "name": "approvalRequired",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether individual approval is needed per member",
+      "default": false
+    },
+    {
+      "name": "approvalConfig",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON configuration for approval workflow",
+      "nullable": true
     },
     {
       "name": "isActive",
       "type": "boolean",
       "mode": "stored",
-      "description": "Whether assignment is active",
+      "description": "Whether this assignment is currently active",
       "default": true
-    }
-  ],
-  "indexes": [
-    {
-      "fields": ["userGroup", "role"],
-      "unique": true
     },
     {
-      "fields": ["role"],
-      "name": "idx_role"
+      "name": "suspendedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When this assignment was suspended",
+      "nullable": true
+    },
+    {
+      "name": "suspendedReason",
+      "type": "string",
+      "mode": "stored",
+      "description": "Why the assignment was suspended",
+      "nullable": true
+    },
+    {
+      "name": "revokedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When this assignment was revoked",
+      "nullable": true
+    },
+    {
+      "name": "revokedBy",
+      "type": "User",
+      "mode": "stored",
+      "description": "Who revoked this assignment",
+      "nullable": true
+    },
+    {
+      "name": "affectedUserCount",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Number of users affected by this assignment",
+      "default": 0
+    },
+    {
+      "name": "metadata",
+      "type": "object",
+      "mode": "stored",
+      "description": "Additional assignment configuration"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "UserGroupRole",
+      "assignmentId": "gra_eng_deploy",
+      "assignedBy": "admin_cto",
+      "assignedAt": "2024-01-15T10:00:00Z",
+      "assignmentReason": "All backend engineers need deployment access to staging and production",
+      "effectiveFrom": "2024-01-15T10:00:00Z",
+      "effectiveUntil": null,
+      "scope": "environment:all",
+      "applyToExisting": true,
+      "applyToNew": true,
+      "removeOnLeave": true,
+      "priority": 50,
+      "conditions": "{\"environments\":[\"staging\",\"production\"],\"approval_required_for\":\"production\"}",
+      "inheritToSubgroups": true,
+      "requiresActivation": false,
+      "requiresMfa": true,
+      "approvalRequired": false,
+      "isActive": true,
+      "affectedUserCount": 25,
+      "metadata": {
+        "deployment_limits": {
+          "staging": "unlimited",
+          "production": "5_per_day"
+        }
+      }
+    },
+    {
+      "@type": "UserGroupRole",
+      "assignmentId": "gra_project_temp",
+      "assignedBy": "manager_projects",
+      "assignedAt": "2024-03-01T09:00:00Z",
+      "assignmentReason": "Q2 project team needs elevated data access for migration project",
+      "effectiveFrom": "2024-03-01T09:00:00Z",
+      "effectiveUntil": "2024-06-30T23:59:59Z",
+      "scope": "project:data_migration_q2",
+      "applyToExisting": true,
+      "applyToNew": true,
+      "removeOnLeave": true,
+      "priority": 75,
+      "exceptions": "[\"user_intern_001\",\"user_contractor_002\"]",
+      "inheritToSubgroups": false,
+      "requiresActivation": true,
+      "requiresMfa": true,
+      "approvalRequired": true,
+      "approvalConfig": "{\"approvers\":[\"data_owner\",\"security_team\"],\"approval_sla_hours\":24}",
+      "isActive": true,
+      "affectedUserCount": 12,
+      "metadata": {
+        "project_code": "MIGR-2024-Q2",
+        "data_classification": "sensitive",
+        "audit_required": true
+      }
     }
   ]
 }

@@ -2,49 +2,263 @@
   "@type": "Schema",
   "@context": "https://rocketschema.org/context",
   "name": "PermissionDependency",
-  "description": "Junction table for permission dependencies (many-to-many relationship)",
+  "description": "Defines relationships and prerequisites between permissions, establishing a dependency graph that ensures permissions are granted in proper order and with necessary prerequisites. This entity captures the complex interdependencies where certain permissions require others to function properly - you can't have 'approve_documents' without 'read_documents', or 'delete_database' without 'modify_database'. Dependencies can be hard requirements (permission won't work without prerequisite), soft recommendations (permission works better with prerequisite), or mutual exclusions (permissions that conflict). The entity supports transitive dependencies where A requires B requires C, circular dependency detection to prevent infinite loops, and conditional dependencies that apply only in certain contexts. It enables permission bundles where granting one permission automatically grants required dependencies, permission hierarchies where higher-level permissions include lower-level ones, and safety checks that prevent dangerous permission combinations. Dependencies can be temporal (permission A must be held for X days before getting B), sequential (must use A before being granted B), or concurrent (must have A while using B). This dependency management is crucial for maintaining system integrity, implementing progressive trust models where users gain permissions over time, and ensuring compliance with security policies that mandate certain permission combinations. The entity helps administrators understand permission relationships and prevents configuration errors.",
   "properties": [
     {
-      "name": "permission",
-      "type": "Permission",
+      "name": "dependencyId",
+      "type": "uuid",
       "mode": "stored",
-      "description": "Permission that has dependencies",
+      "description": "Unique identifier for this dependency",
+      "required": true,
+      "unique": true
+    },
+    {
+      "name": "permissionId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "The permission that has dependencies",
       "required": true
     },
     {
-      "name": "dependsOn",
-      "type": "Permission",
+      "name": "requiredPermissionId",
+      "type": "uuid",
       "mode": "stored",
-      "description": "Required permission",
+      "description": "The permission that is required",
       "required": true
     },
     {
       "name": "dependencyType",
       "type": "string",
       "mode": "enum",
-      "description": "Type of dependency",
-      "enum": ["required", "recommended", "conflict"],
+      "description": "Nature of the dependency",
+      "enum": ["prerequisite", "corequisite", "recommended", "conflicting", "alternative", "hierarchical"],
+      "required": true
+    },
+    {
+      "name": "strength",
+      "type": "string",
+      "mode": "enum",
+      "description": "How strong the dependency is",
+      "enum": ["required", "strongly_recommended", "recommended", "optional"],
       "default": "required"
+    },
+    {
+      "name": "direction",
+      "type": "string",
+      "mode": "enum",
+      "description": "Direction of dependency",
+      "enum": ["depends_on", "required_by", "bidirectional"],
+      "default": "depends_on"
+    },
+    {
+      "name": "scope",
+      "type": "string",
+      "mode": "stored",
+      "description": "Context where dependency applies",
+      "nullable": true,
+      "example": "production_environment"
+    },
+    {
+      "name": "conditions",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON conditions for when dependency applies",
+      "nullable": true,
+      "example": "{\"resource_type\":\"financial_data\",\"user_level\":{\"$gte\":3}}"
+    },
+    {
+      "name": "temporalRequirement",
+      "type": "string",
+      "mode": "stored",
+      "description": "Time-based dependency requirements",
+      "nullable": true,
+      "example": "{\"min_duration_days\":30,\"must_be_active\":true}"
+    },
+    {
+      "name": "propagation",
+      "type": "string",
+      "mode": "enum",
+      "description": "How dependency propagates",
+      "enum": ["none", "grant", "revoke", "both"],
+      "default": "none"
+    },
+    {
+      "name": "autoGrant",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether to auto-grant required permission",
+      "default": false
+    },
+    {
+      "name": "autoRevoke",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether to auto-revoke when dependency is lost",
+      "default": false
+    },
+    {
+      "name": "transitivity",
+      "type": "string",
+      "mode": "enum",
+      "description": "How dependency chains work",
+      "enum": ["direct_only", "transitive", "transitive_limited"],
+      "default": "direct_only"
+    },
+    {
+      "name": "maxTransitiveDepth",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Maximum depth for transitive dependencies",
+      "nullable": true,
+      "default": 3
+    },
+    {
+      "name": "conflictResolution",
+      "type": "string",
+      "mode": "enum",
+      "description": "How to handle conflicts",
+      "enum": ["block", "warn", "override", "escalate"],
+      "default": "block"
+    },
+    {
+      "name": "validationRules",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON rules for validating dependency",
+      "nullable": true
+    },
+    {
+      "name": "alternativePermissions",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON array of alternative permissions",
+      "nullable": true,
+      "example": "[\"perm_alt_001\",\"perm_alt_002\"]"
+    },
+    {
+      "name": "reason",
+      "type": "string",
+      "mode": "stored",
+      "description": "Explanation of why dependency exists",
+      "example": "Write permission requires read permission to function properly"
+    },
+    {
+      "name": "impact",
+      "type": "string",
+      "mode": "stored",
+      "description": "What happens without the dependency",
+      "nullable": true,
+      "example": "Permission will fail with 'insufficient access' error"
+    },
+    {
+      "name": "priority",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Evaluation order for dependencies",
+      "default": 0
+    },
+    {
+      "name": "isCircular",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this creates a circular dependency",
+      "default": false
+    },
+    {
+      "name": "circularPath",
+      "type": "string",
+      "mode": "stored",
+      "description": "Path of circular dependency if detected",
+      "nullable": true
     },
     {
       "name": "isActive",
       "type": "boolean",
       "mode": "stored",
-      "description": "Whether this dependency is active",
+      "description": "Whether dependency is currently enforced",
       "default": true
+    },
+    {
+      "name": "enforcementLevel",
+      "type": "string",
+      "mode": "enum",
+      "description": "How strictly to enforce",
+      "enum": ["strict", "warning", "logging_only"],
+      "default": "strict"
+    },
+    {
+      "name": "createdBy",
+      "type": "User",
+      "mode": "stored",
+      "description": "Who defined this dependency"
     },
     {
       "name": "createdAt",
       "type": "DateTime",
       "mode": "stored",
-      "description": "Creation timestamp",
+      "description": "When dependency was created",
       "required": true
+    },
+    {
+      "name": "metadata",
+      "type": "object",
+      "mode": "stored",
+      "description": "Additional dependency configuration"
     }
   ],
-  "indexes": [
+  "examples": [
     {
-      "fields": ["permission", "dependsOn"],
-      "unique": true
+      "@type": "PermissionDependency",
+      "dependencyId": "dep_001",
+      "permissionId": "perm_write_document",
+      "requiredPermissionId": "perm_read_document",
+      "dependencyType": "prerequisite",
+      "strength": "required",
+      "direction": "depends_on",
+      "scope": "global",
+      "propagation": "grant",
+      "autoGrant": true,
+      "autoRevoke": false,
+      "transitivity": "direct_only",
+      "conflictResolution": "block",
+      "reason": "Cannot write to documents without read access",
+      "impact": "Write operations will fail without read permission",
+      "priority": 100,
+      "isCircular": false,
+      "isActive": true,
+      "enforcementLevel": "strict",
+      "createdAt": "2024-01-01T00:00:00Z",
+      "metadata": {
+        "documented_requirement": true,
+        "security_policy": "least_privilege"
+      }
+    },
+    {
+      "@type": "PermissionDependency",
+      "dependencyId": "dep_002",
+      "permissionId": "perm_approve_transaction",
+      "requiredPermissionId": "perm_create_transaction",
+      "dependencyType": "conflicting",
+      "strength": "required",
+      "direction": "bidirectional",
+      "scope": "financial_operations",
+      "conditions": "{\"transaction_value\":{\"$gt\":1000}}",
+      "propagation": "none",
+      "autoGrant": false,
+      "autoRevoke": true,
+      "transitivity": "direct_only",
+      "conflictResolution": "block",
+      "reason": "Separation of duties - cannot approve own transactions",
+      "impact": "Violates SOX compliance requirements",
+      "priority": 200,
+      "isCircular": false,
+      "isActive": true,
+      "enforcementLevel": "strict",
+      "createdAt": "2024-01-01T00:00:00Z",
+      "metadata": {
+        "compliance_requirement": "SOX",
+        "audit_flag": true
+      }
     }
   ]
 }

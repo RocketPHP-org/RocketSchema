@@ -2,127 +2,183 @@
   "@type": "Schema",
   "@context": "https://rocketschema.org/context",
   "name": "FieldRestriction",
-  "description": "Field-level access control for fine-grained data security",
+  "description": "Controls access to specific fields within data records, implementing column-level security that determines which attributes users can see, modify, or interact with regardless of their access to the parent record. This granular control is essential when users need access to records but shouldn't see all fields - for example, HR staff might access employee records but not see salary information, or customer service reps might view orders but not credit card details. Field restrictions support various protection levels: complete hiding (field doesn't exist), masking (showing '****' instead of values), redaction (showing partial data like last 4 digits), transformation (showing ranges instead of exact values), and read-only (visible but not editable). The entity handles field dependencies where restricting one field affects others, inheritance where child objects inherit parent field restrictions, and conditional restrictions based on field values or user context. It enables compliance with privacy regulations requiring data minimization, implements need-to-know principles for sensitive attributes, and supports dynamic schemas where different users see different views of the same data. Field restrictions can be temporary (hiding data during blackout periods), progressive (revealing more fields as trust increases), or contextual (showing fields only in certain workflows). This field-level security is crucial for multi-tenant SaaS applications, healthcare systems protecting patient data, and financial systems managing sensitive financial information.",
   "properties": [
     {
-      "name": "permission",
-      "type": "Permission",
+      "name": "restrictionId",
+      "type": "uuid",
       "mode": "stored",
-      "description": "Permission this restriction belongs to",
-      "required": true
+      "description": "Unique identifier for this field restriction",
+      "required": true,
+      "unique": true
     },
     {
-      "name": "entityType",
+      "name": "resourceType",
       "type": "string",
       "mode": "stored",
-      "description": "Entity type this restriction applies to",
+      "description": "Type of resource containing the field",
       "required": true,
-      "example": "User"
+      "example": "employee_profile"
+    },
+    {
+      "name": "fieldName",
+      "type": "string",
+      "mode": "stored",
+      "description": "Name of the field being restricted",
+      "required": true,
+      "example": "salary"
     },
     {
       "name": "fieldPath",
       "type": "string",
       "mode": "stored",
-      "description": "Path to the field (dot notation for nested fields)",
-      "required": true,
-      "example": "profile.salary"
+      "description": "Full path for nested fields",
+      "example": "compensation.base_salary"
     },
     {
-      "name": "accessType",
+      "name": "restrictionType",
       "type": "string",
       "mode": "enum",
-      "description": "Type of access allowed",
-      "enum": ["none", "read", "write", "read_masked", "write_validated"],
+      "description": "Type of restriction applied",
+      "enum": ["hide", "mask", "redact", "transform", "readonly", "writeonly", "encrypt"],
+      "required": true
+    },
+    {
+      "name": "restrictionLevel",
+      "type": "string",
+      "mode": "enum",
+      "description": "Severity of restriction",
+      "enum": ["none", "partial", "full"],
+      "default": "full"
+    },
+    {
+      "name": "maskingPattern",
+      "type": "string",
+      "mode": "stored",
+      "description": "Pattern for masking values",
+      "nullable": true,
+      "example": "***-**-####"
+    },
+    {
+      "name": "transformFunction",
+      "type": "string",
+      "mode": "stored",
+      "description": "Transformation to apply to field value",
+      "nullable": true,
+      "example": "round_to_nearest_thousand"
+    },
+    {
+      "name": "appliesTo",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON criteria for who this restriction affects",
       "required": true,
-      "example": "read_masked"
+      "example": "{\"roles\":[\"employee\",\"contractor\"],\"clearance_level\":{\"$lt\":3}}"
+    },
+    {
+      "name": "exemptions",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON array of exemption conditions",
+      "nullable": true,
+      "example": "[{\"role\":\"payroll_admin\"},{\"user_id\":\"cfo_001\"}]"
     },
     {
       "name": "conditions",
-      "type": "object[]",
-      "mode": "stored",
-      "description": "Conditions for field access",
-      "example": [
-        {
-          "type": "ownership",
-          "expression": "resource.ownerId == user.id"
-        },
-        {
-          "type": "role",
-          "requiredRoles": ["hr_manager", "payroll_admin"]
-        }
-      ]
-    },
-    {
-      "name": "maskingRule",
-      "type": "object",
-      "mode": "stored",
-      "description": "How to mask the field value",
-      "example": {
-        "type": "partial",
-        "showFirst": 0,
-        "showLast": 4,
-        "maskChar": "*"
-      }
-    },
-    {
-      "name": "validationRule",
-      "type": "object",
-      "mode": "stored",
-      "description": "Validation rules for write access",
-      "example": {
-        "type": "range",
-        "min": 0,
-        "max": 1000000,
-        "pattern": "^[0-9]+$"
-      }
-    },
-    {
-      "name": "transformRule",
-      "type": "object",
-      "mode": "stored",
-      "description": "Transformation to apply to field value",
-      "example": {
-        "type": "encryption",
-        "algorithm": "AES-256",
-        "keyReference": "field_key_001"
-      }
-    },
-    {
-      "name": "auditLevel",
       "type": "string",
-      "mode": "enum",
-      "description": "Level of auditing for this field",
-      "enum": ["none", "access", "modification", "all"],
-      "default": "access",
-      "example": "all"
-    },
-    {
-      "name": "sensitivityLevel",
-      "type": "string",
-      "mode": "enum",
-      "description": "Data sensitivity classification",
-      "enum": ["public", "internal", "confidential", "restricted", "top_secret"],
-      "default": "internal",
-      "example": "confidential"
-    },
-    {
-      "name": "retentionPolicy",
-      "type": "object",
       "mode": "stored",
-      "description": "Data retention rules for this field",
-      "example": {
-        "retentionDays": 365,
-        "deleteAfter": true,
-        "archiveFirst": true
-      }
+      "description": "JSON conditions for when restriction applies",
+      "nullable": true,
+      "example": "{\"record_status\":\"active\",\"user_department\":{\"$ne\":\"hr\"}}"
+    },
+    {
+      "name": "dependentFields",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON array of fields affected by this restriction",
+      "nullable": true,
+      "example": "[\"total_compensation\",\"bonus_eligible\"]"
+    },
+    {
+      "name": "inheritToChildren",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether child objects inherit this restriction",
+      "default": true
     },
     {
       "name": "priority",
       "type": "integer",
       "mode": "stored",
-      "description": "Priority for conflict resolution",
-      "default": 0,
-      "min": 0
+      "description": "Evaluation order for conflicting restrictions",
+      "default": 0
+    },
+    {
+      "name": "dataClassification",
+      "type": "string",
+      "mode": "stored",
+      "description": "Classification of the protected field",
+      "example": "highly_sensitive"
+    },
+    {
+      "name": "complianceRequirement",
+      "type": "string",
+      "mode": "stored",
+      "description": "Regulatory requirement for this restriction",
+      "nullable": true,
+      "example": "GDPR Article 25 - Data Protection by Design"
+    },
+    {
+      "name": "alternativeValue",
+      "type": "string",
+      "mode": "stored",
+      "description": "Value to show instead of restricted data",
+      "nullable": true,
+      "example": "Contact HR for details"
+    },
+    {
+      "name": "visibilityRules",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON rules for field visibility",
+      "nullable": true,
+      "example": "{\"show_if\":\"user.id == record.manager_id\",\"hide_if\":\"record.confidential == true\"}"
+    },
+    {
+      "name": "auditAccess",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether to audit access attempts",
+      "default": true
+    },
+    {
+      "name": "notifyOnAccess",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether to notify when restricted field is accessed",
+      "default": false
+    },
+    {
+      "name": "temporalRestriction",
+      "type": "string",
+      "mode": "stored",
+      "description": "Time-based restriction rules",
+      "nullable": true,
+      "example": "{\"blackout_period\":\"quarter_end\",\"visible_after\":\"90_days\"}"
+    },
+    {
+      "name": "encryptionRequired",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether field must be encrypted at rest",
+      "default": false
+    },
+    {
+      "name": "retentionPolicy",
+      "type": "string",
+      "mode": "stored",
+      "description": "Special retention rules for this field",
+      "nullable": true
     },
     {
       "name": "isActive",
@@ -132,62 +188,98 @@
       "default": true
     },
     {
+      "name": "effectiveFrom",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When restriction becomes effective",
+      "nullable": true
+    },
+    {
+      "name": "effectiveUntil",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When restriction expires",
+      "nullable": true
+    },
+    {
+      "name": "createdBy",
+      "type": "User",
+      "mode": "stored",
+      "description": "Who created this restriction"
+    },
+    {
+      "name": "createdAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When restriction was created",
+      "required": true
+    },
+    {
       "name": "metadata",
       "type": "object",
       "mode": "stored",
-      "description": "Additional metadata"
+      "description": "Additional restriction configuration"
     }
   ],
   "examples": [
     {
       "@type": "FieldRestriction",
-      "entityType": "Employee",
-      "fieldPath": "salary",
-      "accessType": "read_masked",
-      "conditions": [
-        {
-          "type": "role",
-          "requiredRoles": ["hr_manager", "payroll_admin"]
-        }
-      ],
-      "maskingRule": {
-        "type": "range",
-        "showRange": true,
-        "ranges": [
-          { "min": 0, "max": 50000, "display": "$0-50k" },
-          { "min": 50001, "max": 100000, "display": "$50k-100k" },
-          { "min": 100001, "max": null, "display": "$100k+" }
-        ]
-      },
-      "sensitivityLevel": "confidential",
-      "auditLevel": "all",
+      "restrictionId": "restrict_salary_001",
+      "resourceType": "employee_profile",
+      "fieldName": "salary",
+      "fieldPath": "compensation.base_salary",
+      "restrictionType": "mask",
+      "restrictionLevel": "full",
+      "maskingPattern": "$***,***",
+      "appliesTo": "{\"roles\":[\"employee\",\"manager\"],\"clearance_level\":{\"$lt\":4}}",
+      "exemptions": "[{\"role\":\"hr_admin\"},{\"role\":\"payroll\"},{\"condition\":\"user.id == record.id\"}]",
+      "conditions": "{\"record.employment_status\":\"active\"}",
+      "dependentFields": "[\"total_compensation\",\"bonus_amount\",\"stock_options\"]",
+      "inheritToChildren": true,
       "priority": 100,
-      "isActive": true
+      "dataClassification": "highly_sensitive",
+      "complianceRequirement": "SOX compliance - salary confidentiality",
+      "alternativeValue": "Competitive salary",
+      "visibilityRules": "{\"show_exact_if\":\"user.role == 'compensation_analyst'\",\"show_range_if\":\"user.role == 'recruiter'\"}",
+      "auditAccess": true,
+      "notifyOnAccess": false,
+      "encryptionRequired": true,
+      "isActive": true,
+      "createdAt": "2024-01-01T00:00:00Z",
+      "metadata": {
+        "salary_bands_visible": true,
+        "show_percentile": true
+      }
     },
     {
       "@type": "FieldRestriction",
-      "entityType": "User",
-      "fieldPath": "profile.ssn",
-      "accessType": "none",
-      "conditions": [
-        {
-          "type": "ownership",
-          "expression": "resource.id == user.id"
-        },
-        {
-          "type": "permission",
-          "requiredPermissions": ["user.pii.read"]
-        }
-      ],
-      "sensitivityLevel": "restricted",
-      "auditLevel": "all",
-      "retentionPolicy": {
-        "retentionDays": 2555,
-        "deleteAfter": true,
-        "archiveFirst": true
-      },
+      "restrictionId": "restrict_ssn_002",
+      "resourceType": "customer_record",
+      "fieldName": "social_security_number",
+      "fieldPath": "personal_info.ssn",
+      "restrictionType": "redact",
+      "restrictionLevel": "partial",
+      "maskingPattern": "***-**-####",
+      "appliesTo": "{\"all_users\":true}",
+      "exemptions": "[{\"role\":\"compliance_officer\"},{\"permission\":\"view_full_ssn\"}]",
+      "conditions": "{\"context.purpose\":{\"$ne\":\"identity_verification\"}}",
+      "inheritToChildren": true,
       "priority": 200,
-      "isActive": true
+      "dataClassification": "pii_critical",
+      "complianceRequirement": "PCI DSS - PII Protection",
+      "alternativeValue": "Last 4: ####",
+      "auditAccess": true,
+      "notifyOnAccess": true,
+      "temporalRestriction": "{\"hide_after\":\"30_days\",\"require_reauth_after\":\"5_minutes\"}",
+      "encryptionRequired": true,
+      "retentionPolicy": "{\"delete_after\":\"7_years\",\"archive_after\":\"1_year\"}",
+      "isActive": true,
+      "effectiveFrom": "2024-01-01T00:00:00Z",
+      "createdAt": "2024-01-01T00:00:00Z",
+      "metadata": {
+        "pii_category": "government_id",
+        "requires_legal_basis": true
+      }
     }
   ]
 }

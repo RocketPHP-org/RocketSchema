@@ -2,89 +2,238 @@
   "@type": "Schema",
   "@context": "https://rocketschema.org/context",
   "name": "PolicyObligation",
-  "description": "Obligations that must be fulfilled when a policy is applied (normalized from PolicySet)",
+  "description": "Defines mandatory actions that must be performed when a policy decision is made, ensuring that access control decisions are accompanied by necessary security, compliance, or operational activities. Obligations are the 'must-do' requirements triggered by policy evaluation - when access is granted, specific actions like logging, encryption, notification, or data masking must occur. Unlike the access decision itself (permit/deny), obligations are post-decision requirements that enforce additional controls. For example, accessing sensitive data might obligate the system to create detailed audit logs, send notifications to data owners, or apply encryption to responses. Obligations can be conditional based on the decision outcome - different obligations for permit versus deny. They support compliance requirements like GDPR's notification obligations for data breaches or HIPAA's audit requirements for patient record access. The entity tracks obligation fulfillment to ensure all required actions complete successfully - if an obligation fails, the entire access might be revoked. Obligations can be chained (one triggering another), time-bound (must complete within X seconds), or compensating (alternative actions if primary fails). This mechanism transforms simple yes/no access decisions into complex, auditable, compliant operations that meet regulatory and business requirements while maintaining security posture.",
   "properties": [
     {
-      "name": "policySet",
-      "type": "PolicySet",
+      "name": "obligationId",
+      "type": "uuid",
       "mode": "stored",
-      "description": "Parent policy set",
+      "description": "Unique identifier for this obligation",
+      "required": true,
+      "unique": true
+    },
+    {
+      "name": "policyId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "Policy that defines this obligation",
       "required": true
     },
     {
-      "name": "obligationId",
+      "name": "obligationCode",
       "type": "string",
       "mode": "stored",
-      "description": "Unique obligation identifier",
-      "required": true
+      "description": "Unique code for this obligation type",
+      "required": true,
+      "example": "OBL_AUDIT_DETAILED"
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "mode": "stored",
+      "description": "Human-readable obligation name",
+      "required": true,
+      "example": "Detailed Audit Logging"
+    },
+    {
+      "name": "description",
+      "type": "string",
+      "mode": "stored",
+      "description": "Explanation of what this obligation requires",
+      "example": "Create comprehensive audit log entry with user context, resource details, and full operation parameters"
     },
     {
       "name": "obligationType",
       "type": "string",
       "mode": "enum",
-      "description": "Type of obligation",
-      "enum": ["audit", "notification", "encryption", "consent", "watermark", "approval", "retention"],
+      "description": "Category of obligation",
+      "enum": ["audit", "notification", "encryption", "masking", "approval", "consent", "retention", "deletion"],
       "required": true
     },
     {
-      "name": "action",
-      "type": "string",
-      "mode": "stored",
-      "description": "Action to perform",
-      "required": true
-    },
-    {
-      "name": "triggerOn",
+      "name": "triggerEvent",
       "type": "string",
       "mode": "enum",
-      "description": "When to trigger the obligation",
-      "enum": ["permit", "deny", "always"],
-      "default": "always"
+      "description": "When this obligation is triggered",
+      "enum": ["on_permit", "on_deny", "on_error", "always", "conditional"],
+      "default": "on_permit"
     },
     {
-      "name": "parameters",
+      "name": "executionTime",
       "type": "string",
-      "mode": "stored",
-      "description": "JSON string of parameters (denormalized for flexibility)",
-      "nullable": true
-    },
-    {
-      "name": "condition",
-      "type": "string",
-      "mode": "stored",
-      "description": "Condition expression for when to apply obligation",
-      "nullable": true
+      "mode": "enum",
+      "description": "When obligation must be executed",
+      "enum": ["before_access", "during_access", "after_access", "async"],
+      "default": "before_access"
     },
     {
       "name": "isMandatory",
       "type": "boolean",
       "mode": "stored",
-      "description": "Whether the obligation is mandatory",
+      "description": "Whether obligation must succeed for access to proceed",
       "default": true
+    },
+    {
+      "name": "parameters",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON parameters for obligation execution",
+      "example": "{\"log_level\":\"detailed\",\"include_data\":true,\"retention_days\":2555}"
+    },
+    {
+      "name": "conditions",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON conditions for when obligation applies",
+      "nullable": true,
+      "example": "{\"resource_classification\":\"sensitive\",\"access_location\":\"external\"}"
+    },
+    {
+      "name": "target",
+      "type": "string",
+      "mode": "stored",
+      "description": "System or service that fulfills obligation",
+      "example": "audit_service"
+    },
+    {
+      "name": "timeout",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Maximum milliseconds for obligation completion",
+      "default": 5000
+    },
+    {
+      "name": "retryPolicy",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON retry configuration if obligation fails",
+      "example": "{\"max_retries\":3,\"backoff\":\"exponential\",\"initial_delay\":1000}"
+    },
+    {
+      "name": "fallbackObligation",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "Alternative obligation if this one fails",
+      "nullable": true
+    },
+    {
+      "name": "compensatingAction",
+      "type": "string",
+      "mode": "stored",
+      "description": "Action to take if obligation cannot be fulfilled",
+      "nullable": true
     },
     {
       "name": "priority",
       "type": "integer",
       "mode": "stored",
-      "description": "Execution priority",
+      "description": "Execution order when multiple obligations exist",
       "default": 0
+    },
+    {
+      "name": "chainedObligations",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON array of obligations triggered by this one",
+      "nullable": true
+    },
+    {
+      "name": "fulfillmentTracking",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether to track obligation completion",
+      "default": true
+    },
+    {
+      "name": "complianceMapping",
+      "type": "string",
+      "mode": "stored",
+      "description": "Regulatory requirements this addresses",
+      "nullable": true,
+      "example": "{\"gdpr\":\"Article 33\",\"hipaa\":\"164.312(b)\"}"
+    },
+    {
+      "name": "validationRules",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON rules to verify obligation was fulfilled",
+      "nullable": true
+    },
+    {
+      "name": "isActive",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this obligation is currently enforced",
+      "default": true
     },
     {
       "name": "createdAt",
       "type": "DateTime",
       "mode": "stored",
-      "description": "Creation timestamp",
+      "description": "When obligation was defined",
       "required": true
-    }
-  ],
-  "indexes": [
-    {
-      "fields": ["policySet", "obligationId"],
-      "unique": true
     },
     {
-      "fields": ["policySet", "triggerOn"],
-      "name": "idx_policy_trigger"
+      "name": "metadata",
+      "type": "object",
+      "mode": "stored",
+      "description": "Additional obligation configuration"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "PolicyObligation",
+      "obligationId": "obl_audit_001",
+      "policyId": "pol_sensitive_data",
+      "obligationCode": "OBL_AUDIT_SENSITIVE",
+      "name": "Sensitive Data Access Audit",
+      "description": "Create detailed audit log for all sensitive data access including full context and data accessed",
+      "obligationType": "audit",
+      "triggerEvent": "on_permit",
+      "executionTime": "after_access",
+      "isMandatory": true,
+      "parameters": "{\"log_level\":\"detailed\",\"include_query\":true,\"include_results_summary\":true,\"pii_masking\":false,\"retention_days\":2555}",
+      "conditions": "{\"data_classification\":[\"sensitive\",\"confidential\"],\"user_role\":{\"$ne\":\"auditor\"}}",
+      "target": "audit_service",
+      "timeout": 3000,
+      "retryPolicy": "{\"max_retries\":3,\"backoff\":\"exponential\",\"initial_delay\":500}",
+      "priority": 100,
+      "fulfillmentTracking": true,
+      "complianceMapping": "{\"sox\":\"Section 404\",\"gdpr\":\"Article 30\"}",
+      "validationRules": "{\"required_fields\":[\"user_id\",\"resource_id\",\"timestamp\",\"operation\"],\"max_delay_seconds\":5}",
+      "isActive": true,
+      "createdAt": "2024-01-01T00:00:00Z",
+      "metadata": {
+        "alert_security_team": true,
+        "real_time_monitoring": true
+      }
+    },
+    {
+      "@type": "PolicyObligation",
+      "obligationId": "obl_encrypt_002",
+      "policyId": "pol_data_export",
+      "obligationCode": "OBL_ENCRYPT_EXPORT",
+      "name": "Export Data Encryption",
+      "description": "Apply AES-256 encryption to all data exports before transmission",
+      "obligationType": "encryption",
+      "triggerEvent": "on_permit",
+      "executionTime": "before_access",
+      "isMandatory": true,
+      "parameters": "{\"algorithm\":\"AES-256-GCM\",\"key_source\":\"kms\",\"include_integrity_check\":true}",
+      "target": "encryption_service",
+      "timeout": 10000,
+      "retryPolicy": "{\"max_retries\":1,\"immediate_retry\":true}",
+      "fallbackObligation": "obl_deny_export",
+      "compensatingAction": "deny_access_with_error",
+      "priority": 200,
+      "chainedObligations": "[\"obl_notify_dpo\",\"obl_log_export\"]",
+      "fulfillmentTracking": true,
+      "isActive": true,
+      "createdAt": "2024-01-01T00:00:00Z",
+      "metadata": {
+        "encryption_required_by": ["gdpr", "company_policy"],
+        "key_rotation_days": 90
+      }
     }
   ]
 }

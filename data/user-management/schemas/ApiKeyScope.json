@@ -2,28 +2,28 @@
   "@type": "Schema",
   "@context": "https://rocketschema.org/context",
   "name": "ApiKeyScope",
-  "description": "OAuth-style scopes for API keys (normalized from ApiKey)",
+  "description": "Defines the specific permissions and access boundaries for API keys using OAuth-style scope patterns. Scopes are a way to limit what an API key can do in your system, following the principle of least privilege - each key should only have the minimum permissions needed for its task. This entity breaks down scopes into resource and action pairs, like 'users:read' or 'orders:write', making it clear what operations are allowed on which resources. This granular control is essential for security when providing API access to third-party developers, automated scripts, or microservices. Each scope can include additional constraints in JSON format, such as limiting access to specific record IDs, IP ranges, or time windows. The system can combine multiple scopes to create precise permission sets - for example, an e-commerce integration might have 'products:read', 'inventory:write', and 'orders:create' but not 'users:delete'. Scopes make it easy to audit what each API key can access and quickly revoke specific permissions without regenerating the entire key. This pattern is widely used in modern APIs like GitHub, Google, and Stripe to provide secure, controlled access.",
   "properties": [
     {
       "name": "apiKeyId",
       "type": "uuid",
       "mode": "stored",
-      "description": "Reference to API key",
+      "description": "The API key this scope belongs to",
       "required": true
     },
     {
       "name": "scope",
       "type": "string",
       "mode": "stored",
-      "description": "Scope identifier",
+      "description": "Full scope string in resource:action format",
       "required": true,
-      "example": "read:users"
+      "example": "users:read"
     },
     {
       "name": "resource",
       "type": "string",
       "mode": "stored",
-      "description": "Resource part of scope",
+      "description": "The resource or entity this scope applies to",
       "required": true,
       "example": "users"
     },
@@ -31,7 +31,7 @@
       "name": "action",
       "type": "string",
       "mode": "stored",
-      "description": "Action part of scope",
+      "description": "The allowed action on the resource",
       "required": true,
       "example": "read"
     },
@@ -39,32 +39,90 @@
       "name": "constraints",
       "type": "string",
       "mode": "stored",
-      "description": "Additional constraints (JSON)",
+      "description": "Additional limitations in JSON format (filters, conditions)",
+      "nullable": true,
+      "example": "{\"organization_id\": \"org_123\", \"max_results\": 100}"
+    },
+    {
+      "name": "description",
+      "type": "string",
+      "mode": "stored",
+      "description": "Human-readable explanation of what this scope allows",
+      "example": "Read access to user profiles within the organization"
+    },
+    {
+      "name": "isActive",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this scope is currently enforced",
+      "default": true
+    },
+    {
+      "name": "expiresAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When this scope expires and is no longer valid",
       "nullable": true
     },
     {
       "name": "grantedAt",
       "type": "DateTime",
       "mode": "stored",
-      "description": "When scope was granted",
+      "description": "When this scope was added to the API key",
       "required": true
     },
     {
       "name": "grantedBy",
       "type": "User",
       "mode": "stored",
-      "description": "Who granted the scope",
+      "description": "User who granted this scope",
       "nullable": true
-    }
-  ],
-  "indexes": [
-    {
-      "fields": ["apiKeyId", "scope"],
-      "unique": true
     },
     {
-      "fields": ["apiKeyId", "resource", "action"],
-      "name": "idx_key_resource_action"
+      "name": "lastUsedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Last time this scope was checked during an API call",
+      "nullable": true
+    },
+    {
+      "name": "usageCount",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Number of times this scope has been used",
+      "default": 0
+    }
+  ],
+  "examples": [
+    {
+      "@type": "ApiKeyScope",
+      "apiKeyId": "key_550e8400",
+      "scope": "orders:write",
+      "resource": "orders",
+      "action": "write",
+      "constraints": "{\"status\": [\"pending\", \"processing\"], \"max_amount\": 10000}",
+      "description": "Create and update orders up to $10,000 in pending or processing status",
+      "isActive": true,
+      "expiresAt": null,
+      "grantedAt": "2024-01-15T10:00:00Z",
+      "grantedBy": "admin_123",
+      "lastUsedAt": "2024-03-15T14:30:00Z",
+      "usageCount": 1847
+    },
+    {
+      "@type": "ApiKeyScope",
+      "apiKeyId": "key_analytics_789",
+      "scope": "analytics:read",
+      "resource": "analytics",
+      "action": "read",
+      "constraints": "{\"date_range\": \"last_90_days\", \"metrics\": [\"revenue\", \"users\", \"conversion\"]}",
+      "description": "Read-only access to revenue, user, and conversion analytics for the last 90 days",
+      "isActive": true,
+      "expiresAt": "2024-12-31T23:59:59Z",
+      "grantedAt": "2024-03-01T08:00:00Z",
+      "grantedBy": "manager_456",
+      "lastUsedAt": "2024-03-15T09:00:00Z",
+      "usageCount": 523
     }
   ]
 }
