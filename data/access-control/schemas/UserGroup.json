@@ -41,7 +41,14 @@
       "type": "string",
       "mode": "enum",
       "description": "Classification of the group",
-      "enum": ["organization", "department", "team", "project", "committee", "custom"],
+      "enum": [
+        "organization",
+        "department",
+        "team",
+        "project",
+        "committee",
+        "custom"
+      ],
       "required": true,
       "example": "team"
     },
@@ -57,7 +64,11 @@
       "type": "string",
       "mode": "enum",
       "description": "How members are added to this group",
-      "enum": ["static", "dynamic", "hybrid"],
+      "enum": [
+        "static",
+        "dynamic",
+        "hybrid"
+      ],
       "default": "static"
     },
     {
@@ -147,26 +158,6 @@
       "example": "[\"engineering\",\"backend\",\"api\"]"
     },
     {
-      "name": "createdAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "When this group was created",
-      "required": true
-    },
-    {
-      "name": "createdBy",
-      "type": "User",
-      "mode": "stored",
-      "description": "User who created this group",
-      "nullable": true
-    },
-    {
-      "name": "updatedAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "Last modification timestamp"
-    },
-    {
       "name": "archivedAt",
       "type": "DateTime",
       "mode": "stored",
@@ -202,8 +193,6 @@
       "delegatedOwners": "[\"user_backend_lead\",\"user_principal_eng\"]",
       "settings": "{\"slack_channel\":\"#backend-team\",\"github_team\":\"backend-engineers\"}",
       "tags": "[\"engineering\",\"backend\",\"api\",\"infrastructure\"]",
-      "createdAt": "2024-01-01T00:00:00Z",
-      "createdBy": "user_cto",
       "metadata": {
         "costCenter": "ENG001",
         "budget": "team_backend"
@@ -226,7 +215,6 @@
       "owner": "user_project_manager",
       "settings": "{\"jira_project\":\"PHX\",\"confluence_space\":\"PHOENIX\"}",
       "tags": "[\"project\",\"q2_2024\",\"strategic\"]",
-      "createdAt": "2024-03-01T00:00:00Z",
       "metadata": {
         "projectCode": "PHX-2024",
         "deadline": "2024-06-30"

@@ -57,7 +57,16 @@
       "type": "string",
       "mode": "enum",
       "description": "Category of permission",
-      "enum": ["read", "write", "delete", "manage", "share", "workflow", "admin", "system"],
+      "enum": [
+        "read",
+        "write",
+        "delete",
+        "manage",
+        "share",
+        "workflow",
+        "admin",
+        "system"
+      ],
       "required": true
     },
     {
@@ -65,7 +74,12 @@
       "type": "string",
       "mode": "enum",
       "description": "Risk assessment of granting this permission",
-      "enum": ["low", "medium", "high", "critical"],
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
       "default": "medium"
     },
     {
@@ -73,7 +87,13 @@
       "type": "string",
       "mode": "enum",
       "description": "Scope of the permission",
-      "enum": ["own", "department", "organization", "global", "delegated"],
+      "enum": [
+        "own",
+        "department",
+        "organization",
+        "global",
+        "delegated"
+      ],
       "default": "own"
     },
     {
@@ -154,7 +174,12 @@
       "type": "string",
       "mode": "enum",
       "description": "Required audit level when permission is used",
-      "enum": ["none", "basic", "detailed", "full"],
+      "enum": [
+        "none",
+        "basic",
+        "detailed",
+        "full"
+      ],
       "default": "basic"
     },
     {
@@ -229,13 +254,6 @@
       "default": false
     },
     {
-      "name": "createdAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "When this permission was defined",
-      "required": true
-    },
-    {
       "name": "metadata",
       "type": "object",
       "mode": "stored",
@@ -272,7 +290,6 @@
       "timeRestrictions": "{\"allowed_hours\":\"09:00-18:00\",\"allowed_days\":[\"mon\",\"tue\",\"wed\",\"thu\",\"fri\"]}",
       "isActive": true,
       "isSystem": true,
-      "createdAt": "2024-01-01T00:00:00Z",
       "metadata": {
         "workflow_step": "publish",
         "notification_required": true
@@ -307,7 +324,6 @@
       "quotaPeriod": "month",
       "isActive": true,
       "isSystem": true,
-      "createdAt": "2024-01-01T00:00:00Z",
       "metadata": {
         "compliance_check": "required",
         "data_classification": "sensitive"

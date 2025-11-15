@@ -40,7 +40,13 @@
       "type": "string",
       "mode": "enum",
       "description": "Type of filtering",
-      "enum": ["row_level", "column_level", "cell_level", "aggregate", "dynamic"],
+      "enum": [
+        "row_level",
+        "column_level",
+        "cell_level",
+        "aggregate",
+        "dynamic"
+      ],
       "required": true
     },
     {
@@ -48,7 +54,12 @@
       "type": "string",
       "mode": "enum",
       "description": "How the filter operates",
-      "enum": ["include", "exclude", "mask", "transform"],
+      "enum": [
+        "include",
+        "exclude",
+        "mask",
+        "transform"
+      ],
       "default": "include"
     },
     {
@@ -94,7 +105,12 @@
       "type": "string",
       "mode": "enum",
       "description": "How to combine with other filters",
-      "enum": ["and", "or", "override", "merge"],
+      "enum": [
+        "and",
+        "or",
+        "override",
+        "merge"
+      ],
       "default": "and"
     },
     {
@@ -155,7 +171,12 @@
       "type": "string",
       "mode": "enum",
       "description": "Expected performance impact",
-      "enum": ["minimal", "low", "medium", "high"],
+      "enum": [
+        "minimal",
+        "low",
+        "medium",
+        "high"
+      ],
       "default": "low"
     },
     {
@@ -194,19 +215,6 @@
       "default": false
     },
     {
-      "name": "createdBy",
-      "type": "User",
-      "mode": "stored",
-      "description": "Who created this filter"
-    },
-    {
-      "name": "createdAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "When filter was created",
-      "required": true
-    },
-    {
       "name": "metadata",
       "type": "object",
       "mode": "stored",
@@ -238,10 +246,12 @@
       "auditBypass": true,
       "isActive": true,
       "testMode": false,
-      "createdAt": "2024-01-01T00:00:00Z",
       "metadata": {
         "filter_version": "2.0",
-        "indexed_columns": ["department_id", "visibility"]
+        "indexed_columns": [
+          "department_id",
+          "visibility"
+        ]
       }
     },
     {
@@ -268,7 +278,6 @@
       "auditBypass": true,
       "isActive": true,
       "testMode": false,
-      "createdAt": "2024-01-15T00:00:00Z",
       "metadata": {
         "gdpr_compliant": true,
         "masking_algorithm": "deterministic"

@@ -17,7 +17,13 @@
       "type": "string",
       "mode": "enum",
       "description": "Type of entity this condition is linked to",
-      "enum": ["permission", "role", "policy", "group", "resource"],
+      "enum": [
+        "permission",
+        "role",
+        "policy",
+        "group",
+        "resource"
+      ],
       "required": true
     },
     {
@@ -39,7 +45,13 @@
       "type": "string",
       "mode": "enum",
       "description": "Nature of the link",
-      "enum": ["required", "optional", "enhancing", "restricting", "alternative"],
+      "enum": [
+        "required",
+        "optional",
+        "enhancing",
+        "restricting",
+        "alternative"
+      ],
       "default": "required"
     },
     {
@@ -54,7 +66,13 @@
       "type": "string",
       "mode": "enum",
       "description": "How to combine with other conditions",
-      "enum": ["AND", "OR", "XOR", "NOT", "CUSTOM"],
+      "enum": [
+        "AND",
+        "OR",
+        "XOR",
+        "NOT",
+        "CUSTOM"
+      ],
       "default": "AND"
     },
     {
@@ -181,19 +199,6 @@
       "default": true
     },
     {
-      "name": "createdBy",
-      "type": "User",
-      "mode": "stored",
-      "description": "Who created this link"
-    },
-    {
-      "name": "createdAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "When link was created",
-      "required": true
-    },
-    {
       "name": "metadata",
       "type": "object",
       "mode": "stored",
@@ -222,7 +227,6 @@
       "avgEvaluationTime": 12.5,
       "lastEvaluatedAt": "2024-03-15T14:30:00Z",
       "isActive": true,
-      "createdAt": "2024-01-01T00:00:00Z",
       "metadata": {
         "business_justification": "Prevent accidental deletions outside monitored hours",
         "compliance_requirement": "SOX-404"
@@ -251,7 +255,6 @@
       "failureCount": 136,
       "avgEvaluationTime": 25.3,
       "isActive": true,
-      "createdAt": "2024-01-01T00:00:00Z",
       "metadata": {
         "annual_review_required": true,
         "auto_adjust_for_inflation": true

@@ -47,7 +47,16 @@
       "type": "string",
       "mode": "enum",
       "description": "Category of obligation",
-      "enum": ["audit", "notification", "encryption", "masking", "approval", "consent", "retention", "deletion"],
+      "enum": [
+        "audit",
+        "notification",
+        "encryption",
+        "masking",
+        "approval",
+        "consent",
+        "retention",
+        "deletion"
+      ],
       "required": true
     },
     {
@@ -55,7 +64,13 @@
       "type": "string",
       "mode": "enum",
       "description": "When this obligation is triggered",
-      "enum": ["on_permit", "on_deny", "on_error", "always", "conditional"],
+      "enum": [
+        "on_permit",
+        "on_deny",
+        "on_error",
+        "always",
+        "conditional"
+      ],
       "default": "on_permit"
     },
     {
@@ -63,7 +78,12 @@
       "type": "string",
       "mode": "enum",
       "description": "When obligation must be executed",
-      "enum": ["before_access", "during_access", "after_access", "async"],
+      "enum": [
+        "before_access",
+        "during_access",
+        "after_access",
+        "async"
+      ],
       "default": "before_access"
     },
     {
@@ -167,13 +187,6 @@
       "default": true
     },
     {
-      "name": "createdAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "When obligation was defined",
-      "required": true
-    },
-    {
       "name": "metadata",
       "type": "object",
       "mode": "stored",
@@ -202,7 +215,6 @@
       "complianceMapping": "{\"sox\":\"Section 404\",\"gdpr\":\"Article 30\"}",
       "validationRules": "{\"required_fields\":[\"user_id\",\"resource_id\",\"timestamp\",\"operation\"],\"max_delay_seconds\":5}",
       "isActive": true,
-      "createdAt": "2024-01-01T00:00:00Z",
       "metadata": {
         "alert_security_team": true,
         "real_time_monitoring": true
@@ -229,9 +241,11 @@
       "chainedObligations": "[\"obl_notify_dpo\",\"obl_log_export\"]",
       "fulfillmentTracking": true,
       "isActive": true,
-      "createdAt": "2024-01-01T00:00:00Z",
       "metadata": {
-        "encryption_required_by": ["gdpr", "company_policy"],
+        "encryption_required_by": [
+          "gdpr",
+          "company_policy"
+        ],
         "key_rotation_days": 90
       }
     }

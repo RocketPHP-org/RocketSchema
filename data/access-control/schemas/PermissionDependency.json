@@ -31,7 +31,14 @@
       "type": "string",
       "mode": "enum",
       "description": "Nature of the dependency",
-      "enum": ["prerequisite", "corequisite", "recommended", "conflicting", "alternative", "hierarchical"],
+      "enum": [
+        "prerequisite",
+        "corequisite",
+        "recommended",
+        "conflicting",
+        "alternative",
+        "hierarchical"
+      ],
       "required": true
     },
     {
@@ -39,7 +46,12 @@
       "type": "string",
       "mode": "enum",
       "description": "How strong the dependency is",
-      "enum": ["required", "strongly_recommended", "recommended", "optional"],
+      "enum": [
+        "required",
+        "strongly_recommended",
+        "recommended",
+        "optional"
+      ],
       "default": "required"
     },
     {
@@ -47,7 +59,11 @@
       "type": "string",
       "mode": "enum",
       "description": "Direction of dependency",
-      "enum": ["depends_on", "required_by", "bidirectional"],
+      "enum": [
+        "depends_on",
+        "required_by",
+        "bidirectional"
+      ],
       "default": "depends_on"
     },
     {
@@ -79,7 +95,12 @@
       "type": "string",
       "mode": "enum",
       "description": "How dependency propagates",
-      "enum": ["none", "grant", "revoke", "both"],
+      "enum": [
+        "none",
+        "grant",
+        "revoke",
+        "both"
+      ],
       "default": "none"
     },
     {
@@ -101,7 +122,11 @@
       "type": "string",
       "mode": "enum",
       "description": "How dependency chains work",
-      "enum": ["direct_only", "transitive", "transitive_limited"],
+      "enum": [
+        "direct_only",
+        "transitive",
+        "transitive_limited"
+      ],
       "default": "direct_only"
     },
     {
@@ -117,7 +142,12 @@
       "type": "string",
       "mode": "enum",
       "description": "How to handle conflicts",
-      "enum": ["block", "warn", "override", "escalate"],
+      "enum": [
+        "block",
+        "warn",
+        "override",
+        "escalate"
+      ],
       "default": "block"
     },
     {
@@ -183,21 +213,12 @@
       "type": "string",
       "mode": "enum",
       "description": "How strictly to enforce",
-      "enum": ["strict", "warning", "logging_only"],
+      "enum": [
+        "strict",
+        "warning",
+        "logging_only"
+      ],
       "default": "strict"
-    },
-    {
-      "name": "createdBy",
-      "type": "User",
-      "mode": "stored",
-      "description": "Who defined this dependency"
-    },
-    {
-      "name": "createdAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "When dependency was created",
-      "required": true
     },
     {
       "name": "metadata",
@@ -227,7 +248,6 @@
       "isCircular": false,
       "isActive": true,
       "enforcementLevel": "strict",
-      "createdAt": "2024-01-01T00:00:00Z",
       "metadata": {
         "documented_requirement": true,
         "security_policy": "least_privilege"
@@ -254,7 +274,6 @@
       "isCircular": false,
       "isActive": true,
       "enforcementLevel": "strict",
-      "createdAt": "2024-01-01T00:00:00Z",
       "metadata": {
         "compliance_requirement": "SOX",
         "audit_flag": true

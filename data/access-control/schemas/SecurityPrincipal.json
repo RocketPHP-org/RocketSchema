@@ -17,7 +17,15 @@
       "type": "string",
       "mode": "enum",
       "description": "Category of security principal",
-      "enum": ["user", "service", "application", "device", "system", "external", "federated"],
+      "enum": [
+        "user",
+        "service",
+        "application",
+        "device",
+        "system",
+        "external",
+        "federated"
+      ],
       "required": true
     },
     {
@@ -49,7 +57,16 @@
       "type": "string",
       "mode": "enum",
       "description": "How this principal authenticates",
-      "enum": ["password", "certificate", "api_key", "oauth", "saml", "kerberos", "biometric", "hardware_token"],
+      "enum": [
+        "password",
+        "certificate",
+        "api_key",
+        "oauth",
+        "saml",
+        "kerberos",
+        "biometric",
+        "hardware_token"
+      ],
       "required": true
     },
     {
@@ -153,7 +170,14 @@
       "type": "string",
       "mode": "enum",
       "description": "Current status of the principal",
-      "enum": ["active", "inactive", "suspended", "locked", "expired", "pending_approval"],
+      "enum": [
+        "active",
+        "inactive",
+        "suspended",
+        "locked",
+        "expired",
+        "pending_approval"
+      ],
       "default": "pending_approval"
     },
     {
@@ -235,20 +259,6 @@
       "nullable": true
     },
     {
-      "name": "createdAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "When principal was created",
-      "required": true
-    },
-    {
-      "name": "createdBy",
-      "type": "User",
-      "mode": "stored",
-      "description": "Who created this principal",
-      "nullable": true
-    },
-    {
       "name": "metadata",
       "type": "object",
       "mode": "stored",
@@ -286,7 +296,6 @@
       "isSystem": false,
       "canImpersonate": false,
       "tags": "[\"production\",\"critical\",\"data_processor\",\"gdpr_scope\"]",
-      "createdAt": "2024-01-01T00:00:00Z",
       "metadata": {
         "kubernetes_namespace": "data-services",
         "service_account": "data-pipeline-sa"
@@ -320,7 +329,6 @@
       "isSystem": false,
       "canImpersonate": false,
       "tags": "[\"partner\",\"external\",\"limited_access\",\"inventory_only\"]",
-      "createdAt": "2024-02-01T00:00:00Z",
       "metadata": {
         "contract_id": "CONTRACT_2024_001",
         "data_sharing_agreement": "DSA_2024_TC"

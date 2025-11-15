@@ -40,7 +40,15 @@
       "type": "string",
       "mode": "enum",
       "description": "Type of restriction applied",
-      "enum": ["hide", "mask", "redact", "transform", "readonly", "writeonly", "encrypt"],
+      "enum": [
+        "hide",
+        "mask",
+        "redact",
+        "transform",
+        "readonly",
+        "writeonly",
+        "encrypt"
+      ],
       "required": true
     },
     {
@@ -48,7 +56,11 @@
       "type": "string",
       "mode": "enum",
       "description": "Severity of restriction",
-      "enum": ["none", "partial", "full"],
+      "enum": [
+        "none",
+        "partial",
+        "full"
+      ],
       "default": "full"
     },
     {
@@ -202,19 +214,6 @@
       "nullable": true
     },
     {
-      "name": "createdBy",
-      "type": "User",
-      "mode": "stored",
-      "description": "Who created this restriction"
-    },
-    {
-      "name": "createdAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "When restriction was created",
-      "required": true
-    },
-    {
       "name": "metadata",
       "type": "object",
       "mode": "stored",
@@ -245,7 +244,6 @@
       "notifyOnAccess": false,
       "encryptionRequired": true,
       "isActive": true,
-      "createdAt": "2024-01-01T00:00:00Z",
       "metadata": {
         "salary_bands_visible": true,
         "show_percentile": true
@@ -275,7 +273,6 @@
       "retentionPolicy": "{\"delete_after\":\"7_years\",\"archive_after\":\"1_year\"}",
       "isActive": true,
       "effectiveFrom": "2024-01-01T00:00:00Z",
-      "createdAt": "2024-01-01T00:00:00Z",
       "metadata": {
         "pii_category": "government_id",
         "requires_legal_basis": true

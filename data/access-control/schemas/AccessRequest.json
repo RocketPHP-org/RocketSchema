@@ -17,7 +17,16 @@
       "type": "string",
       "mode": "enum",
       "description": "Category of access being requested",
-      "enum": ["role", "permission", "resource", "group", "elevation", "emergency", "temporary", "permanent"],
+      "enum": [
+        "role",
+        "permission",
+        "resource",
+        "group",
+        "elevation",
+        "emergency",
+        "temporary",
+        "permanent"
+      ],
       "required": true
     },
     {
@@ -55,7 +64,15 @@
       "type": "string",
       "mode": "enum",
       "description": "Business driver for request",
-      "enum": ["project", "operational", "support", "audit", "compliance", "emergency", "training"],
+      "enum": [
+        "project",
+        "operational",
+        "support",
+        "audit",
+        "compliance",
+        "emergency",
+        "training"
+      ],
       "required": true
     },
     {
@@ -63,7 +80,13 @@
       "type": "string",
       "mode": "enum",
       "description": "Urgency level of the request",
-      "enum": ["low", "medium", "high", "critical", "emergency"],
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical",
+        "emergency"
+      ],
       "default": "medium"
     },
     {
@@ -92,7 +115,17 @@
       "type": "string",
       "mode": "enum",
       "description": "Current status of the request",
-      "enum": ["draft", "submitted", "under_review", "approved", "denied", "provisioned", "expired", "revoked", "cancelled"],
+      "enum": [
+        "draft",
+        "submitted",
+        "under_review",
+        "approved",
+        "denied",
+        "provisioned",
+        "expired",
+        "revoked",
+        "cancelled"
+      ],
       "default": "draft",
       "required": true
     },
@@ -262,19 +295,6 @@
       "nullable": true
     },
     {
-      "name": "createdAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "When request was created",
-      "required": true
-    },
-    {
-      "name": "updatedAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "Last modification time"
-    },
-    {
       "name": "metadata",
       "type": "object",
       "mode": "stored",
@@ -309,7 +329,6 @@
       "attestations": "[{\"policy\":\"production_access_policy\",\"agreed\":true,\"timestamp\":\"2024-03-15T13:00:00Z\"},{\"training\":\"database_security\",\"completed\":true,\"completedDate\":\"2024-03-01T00:00:00Z\"}]",
       "conditions": "{\"readonly_first_24h\":true,\"audit_all_queries\":true,\"no_data_export\":true}",
       "renewalAllowed": true,
-      "createdAt": "2024-03-15T12:30:00Z",
       "metadata": {
         "ticket": "INC-2024-4521",
         "on_call": true
@@ -339,7 +358,6 @@
       "actualEndDate": "2024-03-15T06:00:00Z",
       "attestations": "[{\"policy\":\"emergency_access_policy\",\"agreed\":true},{\"acknowledgment\":\"post_review_required\",\"agreed\":true}]",
       "conditions": "{\"full_audit\":true,\"video_recording\":true,\"post_incident_review\":\"required\"}",
-      "createdAt": "2024-03-15T02:00:00Z",
       "metadata": {
         "incident_id": "SEC-2024-CRITICAL-001",
         "authorized_by": "CISO_on_call"

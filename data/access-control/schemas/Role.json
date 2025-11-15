@@ -148,26 +148,6 @@
       "default": true
     },
     {
-      "name": "createdAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "When this role was created",
-      "required": true
-    },
-    {
-      "name": "createdBy",
-      "type": "User",
-      "mode": "stored",
-      "description": "User who created this role",
-      "nullable": true
-    },
-    {
-      "name": "updatedAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "Last modification timestamp"
-    },
-    {
       "name": "metadata",
       "type": "string",
       "mode": "stored",
@@ -197,8 +177,6 @@
       "allowedTimeWindows": "[{\"days\":[\"mon\",\"tue\",\"wed\",\"thu\",\"fri\"],\"start\":\"07:00\",\"end\":\"19:00\",\"timezone\":\"America/New_York\"}]",
       "tags": "[\"finance\",\"management\",\"sensitive\",\"sox_compliance\"]",
       "isActive": true,
-      "createdAt": "2024-01-01T00:00:00Z",
-      "createdBy": "admin_789",
       "metadata": "{\"approval_chain\":[\"dept_head\",\"cfo\"],\"training_required\":\"finance_security_101\"}"
     },
     {
@@ -220,7 +198,6 @@
       "expirationDays": 30,
       "tags": "[\"public\",\"readonly\",\"guest\"]",
       "isActive": true,
-      "createdAt": "2024-01-01T00:00:00Z",
       "metadata": "{\"rate_limit\":\"100_per_hour\",\"features_disabled\":[\"export\",\"api_access\"]}"
     }
   ]

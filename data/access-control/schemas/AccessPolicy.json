@@ -42,7 +42,13 @@
       "type": "string",
       "mode": "enum",
       "description": "Type of access policy",
-      "enum": ["preventive", "permissive", "detective", "corrective", "mandatory"],
+      "enum": [
+        "preventive",
+        "permissive",
+        "detective",
+        "corrective",
+        "mandatory"
+      ],
       "required": true,
       "example": "preventive"
     },
@@ -51,7 +57,13 @@
       "type": "string",
       "mode": "enum",
       "description": "Scope where this policy applies",
-      "enum": ["global", "organization", "department", "resource_type", "custom"],
+      "enum": [
+        "global",
+        "organization",
+        "department",
+        "resource_type",
+        "custom"
+      ],
       "default": "global"
     },
     {
@@ -67,7 +79,14 @@
       "type": "string",
       "mode": "enum",
       "description": "What happens when policy conditions are met",
-      "enum": ["allow", "deny", "require_mfa", "require_approval", "audit", "notify"],
+      "enum": [
+        "allow",
+        "deny",
+        "require_mfa",
+        "require_approval",
+        "audit",
+        "notify"
+      ],
       "required": true,
       "example": "deny"
     },
@@ -124,7 +143,12 @@
       "type": "string",
       "mode": "enum",
       "description": "How to handle conflicts with other policies",
-      "enum": ["deny_overrides", "allow_overrides", "priority_based", "most_restrictive"],
+      "enum": [
+        "deny_overrides",
+        "allow_overrides",
+        "priority_based",
+        "most_restrictive"
+      ],
       "default": "deny_overrides"
     },
     {
@@ -192,20 +216,6 @@
       "nullable": true
     },
     {
-      "name": "createdBy",
-      "type": "User",
-      "mode": "stored",
-      "description": "Policy author",
-      "required": true
-    },
-    {
-      "name": "createdAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "When policy was created",
-      "required": true
-    },
-    {
       "name": "metadata",
       "type": "object",
       "mode": "stored",
@@ -236,9 +246,16 @@
       "complianceFramework": "GDPR Article 44-49",
       "approvedBy": "compliance_officer",
       "approvedAt": "2024-01-01T00:00:00Z",
-      "createdAt": "2023-12-01T10:00:00Z",
       "metadata": {
-        "eu_countries": ["DE","FR","IT","ES","NL","BE","PL"],
+        "eu_countries": [
+          "DE",
+          "FR",
+          "IT",
+          "ES",
+          "NL",
+          "BE",
+          "PL"
+        ],
         "audit_requirement": "quarterly_review"
       }
     },
@@ -267,8 +284,6 @@
       "complianceFramework": "SOX Section 404",
       "approvedBy": "cfo",
       "approvedAt": "2024-01-01T00:00:00Z",
-      "createdBy": "security_architect",
-      "createdAt": "2023-12-15T14:00:00Z",
       "metadata": {
         "thresholds": {
           "low": 1000,

@@ -40,7 +40,14 @@
       "type": "string",
       "mode": "enum",
       "description": "Data type of the attribute value",
-      "enum": ["string", "number", "boolean", "date", "json", "array"],
+      "enum": [
+        "string",
+        "number",
+        "boolean",
+        "date",
+        "json",
+        "array"
+      ],
       "required": true
     },
     {
@@ -48,7 +55,15 @@
       "type": "string",
       "mode": "enum",
       "description": "Category of attribute",
-      "enum": ["security", "compliance", "operational", "lifecycle", "quality", "behavioral", "custom"],
+      "enum": [
+        "security",
+        "compliance",
+        "operational",
+        "lifecycle",
+        "quality",
+        "behavioral",
+        "custom"
+      ],
       "required": true
     },
     {
@@ -138,7 +153,12 @@
       "type": "string",
       "mode": "enum",
       "description": "Who can see this attribute",
-      "enum": ["public", "admin", "system", "hidden"],
+      "enum": [
+        "public",
+        "admin",
+        "system",
+        "hidden"
+      ],
       "default": "admin"
     },
     {
@@ -198,25 +218,6 @@
       "default": true
     },
     {
-      "name": "createdBy",
-      "type": "User",
-      "mode": "stored",
-      "description": "Who created this attribute"
-    },
-    {
-      "name": "createdAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "When attribute was created",
-      "required": true
-    },
-    {
-      "name": "updatedAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "Last update timestamp"
-    },
-    {
       "name": "metadata",
       "type": "object",
       "mode": "stored",
@@ -247,7 +248,6 @@
       "tags": "[\"dangerous\",\"audit_required\",\"approval_needed\"]",
       "auditChanges": true,
       "isActive": true,
-      "createdAt": "2024-01-01T00:00:00Z",
       "metadata": {
         "compliance_impact": "high",
         "require_justification": true
@@ -275,7 +275,6 @@
       "priority": 50,
       "auditChanges": true,
       "isActive": true,
-      "createdAt": "2024-01-01T00:00:00Z",
       "metadata": {
         "reset_period": "monthly",
         "quota_type": "rolling",

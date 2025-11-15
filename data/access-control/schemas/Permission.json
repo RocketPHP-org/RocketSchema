@@ -173,13 +173,6 @@
       "nullable": true
     },
     {
-      "name": "createdAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "When this permission was defined",
-      "required": true
-    },
-    {
       "name": "metadata",
       "type": "string",
       "mode": "stored",
@@ -208,7 +201,6 @@
       "tags": "[\"dangerous\",\"gdpr\",\"audit\",\"compliance\"]",
       "version": 2,
       "isActive": true,
-      "createdAt": "2024-01-01T00:00:00Z",
       "metadata": "{\"audit_retention_days\":2555,\"requires_legal_review\":true}"
     },
     {
@@ -230,8 +222,7 @@
       "deniedFields": "[\"salary\",\"performance_rating\",\"ssn\"]",
       "tags": "[\"analytics\",\"read_only\"]",
       "version": 1,
-      "isActive": true,
-      "createdAt": "2024-01-15T10:00:00Z"
+      "isActive": true
     }
   ]
 }

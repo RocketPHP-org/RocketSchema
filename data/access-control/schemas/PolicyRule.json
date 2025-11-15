@@ -47,7 +47,13 @@
       "type": "string",
       "mode": "enum",
       "description": "Type of rule evaluation",
-      "enum": ["condition", "action", "obligation", "advice", "target"],
+      "enum": [
+        "condition",
+        "action",
+        "obligation",
+        "advice",
+        "target"
+      ],
       "required": true
     },
     {
@@ -55,7 +61,13 @@
       "type": "string",
       "mode": "enum",
       "description": "How the rule is evaluated",
-      "enum": ["simple", "complex", "script", "external", "machine_learning"],
+      "enum": [
+        "simple",
+        "complex",
+        "script",
+        "external",
+        "machine_learning"
+      ],
       "default": "simple"
     },
     {
@@ -70,7 +82,18 @@
       "type": "string",
       "mode": "enum",
       "description": "Comparison operator",
-      "enum": ["equals", "not_equals", "greater_than", "less_than", "in", "not_in", "contains", "regex", "between", "exists"],
+      "enum": [
+        "equals",
+        "not_equals",
+        "greater_than",
+        "less_than",
+        "in",
+        "not_in",
+        "contains",
+        "regex",
+        "between",
+        "exists"
+      ],
       "example": "equals"
     },
     {
@@ -108,7 +131,13 @@
       "type": "string",
       "mode": "enum",
       "description": "How to combine with previous rule",
-      "enum": ["AND", "OR", "AND_NOT", "OR_NOT", "XOR"],
+      "enum": [
+        "AND",
+        "OR",
+        "AND_NOT",
+        "OR_NOT",
+        "XOR"
+      ],
       "nullable": true
     },
     {
@@ -123,7 +152,13 @@
       "type": "string",
       "mode": "enum",
       "description": "Action when rule matches",
-      "enum": ["permit", "deny", "continue", "skip_remaining", "goto_rule"],
+      "enum": [
+        "permit",
+        "deny",
+        "continue",
+        "skip_remaining",
+        "goto_rule"
+      ],
       "default": "continue"
     },
     {
@@ -131,7 +166,13 @@
       "type": "string",
       "mode": "enum",
       "description": "Action when rule doesn't match",
-      "enum": ["permit", "deny", "continue", "skip_remaining", "goto_rule"],
+      "enum": [
+        "permit",
+        "deny",
+        "continue",
+        "skip_remaining",
+        "goto_rule"
+      ],
       "default": "continue"
     },
     {
@@ -168,7 +209,12 @@
       "type": "string",
       "mode": "enum",
       "description": "Expected performance impact",
-      "enum": ["negligible", "low", "medium", "high"],
+      "enum": [
+        "negligible",
+        "low",
+        "medium",
+        "high"
+      ],
       "default": "low"
     },
     {
@@ -176,7 +222,12 @@
       "type": "string",
       "mode": "enum",
       "description": "What to do if rule evaluation fails",
-      "enum": ["deny", "permit", "skip", "use_default"],
+      "enum": [
+        "deny",
+        "permit",
+        "skip",
+        "use_default"
+      ],
       "default": "deny"
     },
     {
@@ -206,19 +257,6 @@
       "mode": "stored",
       "description": "Rule version number",
       "default": 1
-    },
-    {
-      "name": "createdAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "When rule was created",
-      "required": true
-    },
-    {
-      "name": "createdBy",
-      "type": "User",
-      "mode": "stored",
-      "description": "Who created this rule"
     },
     {
       "name": "metadata",
@@ -252,7 +290,6 @@
       "errorMessage": "Access denied: Contractors cannot access customer PII without explicit authorization",
       "statistics": "{\"evaluations\":15234,\"matches\":89,\"avg_time_ms\":12}",
       "version": 2,
-      "createdAt": "2024-01-15T10:00:00Z",
       "metadata": {
         "compliance_ref": "privacy_policy_3.2",
         "risk_score": 8
@@ -280,7 +317,6 @@
       "timeout": 50,
       "errorMessage": "This operation is only allowed during business hours (Mon-Fri 9AM-5PM) unless emergency access is granted",
       "version": 1,
-      "createdAt": "2024-02-01T09:00:00Z",
       "metadata": {
         "timezone": "America/New_York",
         "holidays_api": "https://api.company.com/holidays"
