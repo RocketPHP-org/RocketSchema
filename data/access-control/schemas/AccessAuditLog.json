@@ -119,7 +119,8 @@
       "mode": "stored",
       "description": "Calculated risk level of this access (0-100)",
       "min": 0,
-      "max": 100
+      "max": 100,
+      "nullable": true
     },
     {
       "name": "riskFactors",
@@ -172,7 +173,8 @@
       "name": "responseTime",
       "type": "integer",
       "mode": "stored",
-      "description": "Milliseconds taken to make decision"
+      "description": "Milliseconds taken to make decision",
+      "nullable": true
     },
     {
       "name": "dataAccessed",

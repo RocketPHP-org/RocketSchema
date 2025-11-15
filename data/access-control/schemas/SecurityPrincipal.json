@@ -235,7 +235,8 @@
       "mode": "stored",
       "description": "Current risk assessment score",
       "min": 0,
-      "max": 100
+      "max": 100,
+      "nullable": true
     },
     {
       "name": "isSystem",

@@ -158,13 +158,6 @@
       "example": "[\"engineering\",\"backend\",\"api\"]"
     },
     {
-      "name": "archivedAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "When this group was archived",
-      "nullable": true
-    },
-    {
       "name": "metadata",
       "type": "object",
       "mode": "stored",

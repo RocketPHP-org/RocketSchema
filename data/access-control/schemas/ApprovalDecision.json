@@ -171,7 +171,8 @@
       "mode": "stored",
       "description": "Approver's confidence in decision (0-1)",
       "min": 0,
-      "max": 1
+      "max": 1,
+      "nullable": true
     },
     {
       "name": "consultedParties",
@@ -252,7 +253,6 @@
       "consultedParties": "[\"security_team\",\"senior_architect\"]",
       "followUpActions": "[{\"action\":\"security_training\",\"due_date\":\"2024-03-20\"},{\"action\":\"access_review\",\"frequency\":\"daily\"}]",
       "isActive": true,
-      "createdAt": "2024-03-15T14:30:00Z",
       "metadata": {
         "ticket": "OPS-2024-1234",
         "approval_chain": "complete"
@@ -274,7 +274,6 @@
       "evidenceProvided": "{\"similar_requests_denied\":3,\"policy_reference\":\"MIN_PRIVILEGE_POLICY\"}",
       "notificationsSent": "[{\"recipient\":\"requester\",\"type\":\"email\"},{\"recipient\":\"manager\",\"type\":\"notification\"}]",
       "isActive": true,
-      "createdAt": "2024-03-15T10:00:00Z",
       "metadata": {
         "alternative_suggested": true,
         "can_appeal": true

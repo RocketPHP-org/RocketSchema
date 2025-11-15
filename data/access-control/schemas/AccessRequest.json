@@ -142,7 +142,8 @@
       "mode": "stored",
       "description": "Calculated risk score of granting access",
       "min": 0,
-      "max": 100
+      "max": 100,
+      "nullable": true
     },
     {
       "name": "riskFactors",
