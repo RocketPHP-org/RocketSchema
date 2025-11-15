@@ -1,0 +1,136 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "PermissionAttribute",
+  "description": "Attributes for ABAC (Attribute-Based Access Control) evaluation",
+  "properties": [
+    {
+      "name": "permission",
+      "type": "Permission",
+      "mode": "stored",
+      "description": "Permission this attribute belongs to",
+      "required": true
+    },
+    {
+      "name": "attributeType",
+      "type": "string",
+      "mode": "enum",
+      "description": "Type of attribute",
+      "enum": ["subject", "resource", "action", "environment", "context"],
+      "required": true,
+      "example": "subject"
+    },
+    {
+      "name": "attributeName",
+      "type": "string",
+      "mode": "stored",
+      "description": "Name of the attribute",
+      "required": true,
+      "example": "department"
+    },
+    {
+      "name": "attributePath",
+      "type": "string",
+      "mode": "stored",
+      "description": "Path to attribute in the entity (dot notation)",
+      "example": "user.profile.department.id"
+    },
+    {
+      "name": "dataType",
+      "type": "string",
+      "mode": "enum",
+      "description": "Data type of the attribute",
+      "enum": ["string", "number", "boolean", "date", "array", "object"],
+      "required": true,
+      "example": "string"
+    },
+    {
+      "name": "operator",
+      "type": "string",
+      "mode": "enum",
+      "description": "Comparison operator",
+      "enum": ["equals", "not_equals", "contains", "not_contains", "in", "not_in", "greater_than", "less_than", "greater_or_equal", "less_or_equal", "matches_regex", "between", "is_null", "is_not_null", "starts_with", "ends_with"],
+      "required": true,
+      "example": "equals"
+    },
+    {
+      "name": "value",
+      "type": "object",
+      "mode": "stored",
+      "description": "Value to compare against (can be static or dynamic reference)",
+      "required": true
+    },
+    {
+      "name": "isDynamic",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether the value is a dynamic reference to another attribute",
+      "default": false
+    },
+    {
+      "name": "dynamicValuePath",
+      "type": "string",
+      "mode": "stored",
+      "description": "Path to dynamic value if isDynamic is true",
+      "example": "context.requestor.departmentId"
+    },
+    {
+      "name": "isRequired",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this attribute must be present for evaluation",
+      "default": true
+    },
+    {
+      "name": "caseInsensitive",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether string comparisons should be case-insensitive",
+      "default": false
+    },
+    {
+      "name": "metadata",
+      "type": "object",
+      "mode": "stored",
+      "description": "Additional metadata"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "PermissionAttribute",
+      "attributeType": "subject",
+      "attributeName": "department",
+      "attributePath": "user.departmentId",
+      "dataType": "string",
+      "operator": "equals",
+      "value": "sales",
+      "isDynamic": false,
+      "isRequired": true
+    },
+    {
+      "@type": "PermissionAttribute",
+      "attributeType": "resource",
+      "attributeName": "owner",
+      "attributePath": "document.ownerId",
+      "dataType": "string",
+      "operator": "equals",
+      "isDynamic": true,
+      "dynamicValuePath": "context.requestor.id",
+      "isRequired": true
+    },
+    {
+      "@type": "PermissionAttribute",
+      "attributeType": "environment",
+      "attributeName": "timeOfDay",
+      "attributePath": "context.currentTime",
+      "dataType": "date",
+      "operator": "between",
+      "value": {
+        "start": "09:00:00",
+        "end": "18:00:00"
+      },
+      "isDynamic": false,
+      "isRequired": true
+    }
+  ]
+}

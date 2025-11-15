@@ -1,0 +1,150 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "PermissionCondition",
+  "description": "Complex conditions for ABAC permission evaluation using logical operators",
+  "properties": [
+    {
+      "name": "permission",
+      "type": "Permission",
+      "mode": "stored",
+      "description": "Permission this condition belongs to",
+      "required": true
+    },
+    {
+      "name": "conditionType",
+      "type": "string",
+      "mode": "enum",
+      "description": "Type of condition",
+      "enum": ["simple", "composite", "expression", "temporal", "geographical", "risk_based"],
+      "required": true,
+      "example": "composite"
+    },
+    {
+      "name": "logicalOperator",
+      "type": "string",
+      "mode": "enum",
+      "description": "Logical operator for composite conditions",
+      "enum": ["AND", "OR", "NOT", "XOR"],
+      "example": "AND"
+    },
+    {
+      "name": "attributes",
+      "type": "PermissionAttribute[]",
+      "mode": "stored",
+      "description": "Attributes for simple conditions"
+    },
+    {
+      "name": "childConditions",
+      "type": "PermissionCondition[]",
+      "mode": "stored",
+      "description": "Nested conditions for composite conditions"
+    },
+    {
+      "name": "expression",
+      "type": "string",
+      "mode": "stored",
+      "description": "Custom expression for complex conditions (CEL or similar)",
+      "example": "user.age >= 18 && user.country in ['US', 'CA', 'UK']"
+    },
+    {
+      "name": "temporalConstraint",
+      "type": "object",
+      "mode": "stored",
+      "description": "Time-based constraints",
+      "example": {
+        "type": "recurring",
+        "daysOfWeek": ["monday", "tuesday", "wednesday", "thursday", "friday"],
+        "timeRange": {
+          "start": "09:00",
+          "end": "18:00"
+        },
+        "timezone": "America/New_York"
+      }
+    },
+    {
+      "name": "geographicalConstraint",
+      "type": "object",
+      "mode": "stored",
+      "description": "Location-based constraints",
+      "example": {
+        "type": "country",
+        "allowedCountries": ["US", "CA"],
+        "deniedCountries": ["CN", "RU"]
+      }
+    },
+    {
+      "name": "riskConstraint",
+      "type": "object",
+      "mode": "stored",
+      "description": "Risk-based access control constraints",
+      "example": {
+        "maxRiskScore": 50,
+        "requiredTrustLevel": "high",
+        "requireMFA": true
+      }
+    },
+    {
+      "name": "priority",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Evaluation priority",
+      "default": 0,
+      "min": 0
+    },
+    {
+      "name": "isActive",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this condition is active",
+      "default": true
+    },
+    {
+      "name": "failureMessage",
+      "type": "string",
+      "mode": "stored",
+      "description": "Custom message when condition fails",
+      "example": "Access denied: Outside of working hours"
+    },
+    {
+      "name": "metadata",
+      "type": "object",
+      "mode": "stored",
+      "description": "Additional metadata"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "PermissionCondition",
+      "conditionType": "composite",
+      "logicalOperator": "AND",
+      "priority": 1,
+      "isActive": true,
+      "failureMessage": "Access denied: Multiple conditions not met"
+    },
+    {
+      "@type": "PermissionCondition",
+      "conditionType": "temporal",
+      "temporalConstraint": {
+        "type": "recurring",
+        "daysOfWeek": ["monday", "tuesday", "wednesday", "thursday", "friday"],
+        "timeRange": {
+          "start": "09:00",
+          "end": "18:00"
+        },
+        "timezone": "America/New_York"
+      },
+      "priority": 2,
+      "isActive": true,
+      "failureMessage": "Access denied: Outside business hours"
+    },
+    {
+      "@type": "PermissionCondition",
+      "conditionType": "expression",
+      "expression": "user.employmentStatus == 'active' && user.clearanceLevel >= resource.requiredClearance && (user.department == resource.department || user.hasRole('admin'))",
+      "priority": 3,
+      "isActive": true,
+      "failureMessage": "Access denied: Insufficient clearance or wrong department"
+    }
+  ]
+}

@@ -1,0 +1,233 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "AccessRequest",
+  "description": "Request for access to resources with approval workflow support",
+  "properties": [
+    {
+      "name": "requestId",
+      "type": "string",
+      "mode": "stored",
+      "description": "Unique request identifier",
+      "required": true,
+      "unique": true
+    },
+    {
+      "name": "requestor",
+      "type": "User",
+      "mode": "stored",
+      "description": "User requesting access",
+      "required": true
+    },
+    {
+      "name": "requestType",
+      "type": "string",
+      "mode": "enum",
+      "description": "Type of access request",
+      "enum": ["permission", "role", "resource", "data", "exception", "emergency"],
+      "required": true,
+      "example": "permission"
+    },
+    {
+      "name": "requestedPermissions",
+      "type": "Permission[]",
+      "mode": "stored",
+      "description": "Permissions being requested"
+    },
+    {
+      "name": "requestedRoles",
+      "type": "Role[]",
+      "mode": "stored",
+      "description": "Roles being requested"
+    },
+    {
+      "name": "resourceIdentifier",
+      "type": "string",
+      "mode": "stored",
+      "description": "Identifier of the resource being requested",
+      "example": "document:12345"
+    },
+    {
+      "name": "resourceType",
+      "type": "string",
+      "mode": "stored",
+      "description": "Type of resource",
+      "example": "document"
+    },
+    {
+      "name": "reason",
+      "type": "string",
+      "mode": "stored",
+      "description": "Reason for the access request",
+      "required": true
+    },
+    {
+      "name": "businessJustification",
+      "type": "string",
+      "mode": "stored",
+      "description": "Business justification for the request"
+    },
+    {
+      "name": "duration",
+      "type": "object",
+      "mode": "stored",
+      "description": "Requested access duration",
+      "example": {
+        "type": "temporary",
+        "hours": 8,
+        "startTime": "2024-03-15T09:00:00Z",
+        "endTime": "2024-03-15T17:00:00Z"
+      }
+    },
+    {
+      "name": "urgency",
+      "type": "string",
+      "mode": "enum",
+      "description": "Request urgency level",
+      "enum": ["low", "normal", "high", "critical"],
+      "default": "normal",
+      "example": "high"
+    },
+    {
+      "name": "status",
+      "type": "string",
+      "mode": "enum",
+      "description": "Current status of the request",
+      "enum": ["pending", "approved", "rejected", "expired", "revoked", "partially_approved"],
+      "default": "pending",
+      "required": true
+    },
+    {
+      "name": "approvalRequired",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether approval is required",
+      "default": true
+    },
+    {
+      "name": "approvers",
+      "type": "User[]",
+      "mode": "stored",
+      "description": "Required approvers for this request"
+    },
+    {
+      "name": "approvalDecisions",
+      "type": "object[]",
+      "mode": "stored",
+      "description": "Approval decisions made",
+      "example": [
+        {
+          "approver": "user:manager123",
+          "decision": "approved",
+          "timestamp": "2024-03-15T10:00:00Z",
+          "comment": "Approved for project needs"
+        }
+      ]
+    },
+    {
+      "name": "autoApprovalCriteria",
+      "type": "object",
+      "mode": "stored",
+      "description": "Criteria for automatic approval",
+      "example": {
+        "maxDuration": 24,
+        "allowedRoles": ["employee"],
+        "riskScore": 30
+      }
+    },
+    {
+      "name": "riskScore",
+      "type": "number",
+      "mode": "stored",
+      "description": "Calculated risk score for this request",
+      "min": 0,
+      "max": 100
+    },
+    {
+      "name": "riskFactors",
+      "type": "string[]",
+      "mode": "stored",
+      "description": "Identified risk factors",
+      "example": ["sensitive_data", "external_user", "unusual_time"]
+    },
+    {
+      "name": "grantedPermissions",
+      "type": "Permission[]",
+      "mode": "stored",
+      "description": "Actually granted permissions (may differ from requested)"
+    },
+    {
+      "name": "conditions",
+      "type": "object",
+      "mode": "stored",
+      "description": "Conditions attached to the grant",
+      "example": {
+        "mfaRequired": true,
+        "ipRestriction": "10.0.0.0/8",
+        "auditLevel": "detailed"
+      }
+    },
+    {
+      "name": "submittedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When the request was submitted",
+      "required": true
+    },
+    {
+      "name": "processedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When the request was processed"
+    },
+    {
+      "name": "expiresAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When the granted access expires"
+    },
+    {
+      "name": "revokedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When the access was revoked"
+    },
+    {
+      "name": "revokedBy",
+      "type": "User",
+      "mode": "stored",
+      "description": "Who revoked the access"
+    },
+    {
+      "name": "revokedReason",
+      "type": "string",
+      "mode": "stored",
+      "description": "Reason for revocation"
+    },
+    {
+      "name": "metadata",
+      "type": "object",
+      "mode": "stored",
+      "description": "Additional metadata"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "AccessRequest",
+      "requestId": "req_abc123",
+      "requestType": "permission",
+      "reason": "Need to access financial reports for quarterly review",
+      "businessJustification": "Q1 financial audit preparation",
+      "duration": {
+        "type": "temporary",
+        "days": 7
+      },
+      "urgency": "high",
+      "status": "pending",
+      "approvalRequired": true,
+      "riskScore": 45,
+      "riskFactors": ["sensitive_data", "temporary_access"],
+      "submittedAt": "2024-03-15T09:00:00Z"
+    }
+  ]
+}

@@ -1,0 +1,193 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "FieldRestriction",
+  "description": "Field-level access control for fine-grained data security",
+  "properties": [
+    {
+      "name": "permission",
+      "type": "Permission",
+      "mode": "stored",
+      "description": "Permission this restriction belongs to",
+      "required": true
+    },
+    {
+      "name": "entityType",
+      "type": "string",
+      "mode": "stored",
+      "description": "Entity type this restriction applies to",
+      "required": true,
+      "example": "User"
+    },
+    {
+      "name": "fieldPath",
+      "type": "string",
+      "mode": "stored",
+      "description": "Path to the field (dot notation for nested fields)",
+      "required": true,
+      "example": "profile.salary"
+    },
+    {
+      "name": "accessType",
+      "type": "string",
+      "mode": "enum",
+      "description": "Type of access allowed",
+      "enum": ["none", "read", "write", "read_masked", "write_validated"],
+      "required": true,
+      "example": "read_masked"
+    },
+    {
+      "name": "conditions",
+      "type": "object[]",
+      "mode": "stored",
+      "description": "Conditions for field access",
+      "example": [
+        {
+          "type": "ownership",
+          "expression": "resource.ownerId == user.id"
+        },
+        {
+          "type": "role",
+          "requiredRoles": ["hr_manager", "payroll_admin"]
+        }
+      ]
+    },
+    {
+      "name": "maskingRule",
+      "type": "object",
+      "mode": "stored",
+      "description": "How to mask the field value",
+      "example": {
+        "type": "partial",
+        "showFirst": 0,
+        "showLast": 4,
+        "maskChar": "*"
+      }
+    },
+    {
+      "name": "validationRule",
+      "type": "object",
+      "mode": "stored",
+      "description": "Validation rules for write access",
+      "example": {
+        "type": "range",
+        "min": 0,
+        "max": 1000000,
+        "pattern": "^[0-9]+$"
+      }
+    },
+    {
+      "name": "transformRule",
+      "type": "object",
+      "mode": "stored",
+      "description": "Transformation to apply to field value",
+      "example": {
+        "type": "encryption",
+        "algorithm": "AES-256",
+        "keyReference": "field_key_001"
+      }
+    },
+    {
+      "name": "auditLevel",
+      "type": "string",
+      "mode": "enum",
+      "description": "Level of auditing for this field",
+      "enum": ["none", "access", "modification", "all"],
+      "default": "access",
+      "example": "all"
+    },
+    {
+      "name": "sensitivityLevel",
+      "type": "string",
+      "mode": "enum",
+      "description": "Data sensitivity classification",
+      "enum": ["public", "internal", "confidential", "restricted", "top_secret"],
+      "default": "internal",
+      "example": "confidential"
+    },
+    {
+      "name": "retentionPolicy",
+      "type": "object",
+      "mode": "stored",
+      "description": "Data retention rules for this field",
+      "example": {
+        "retentionDays": 365,
+        "deleteAfter": true,
+        "archiveFirst": true
+      }
+    },
+    {
+      "name": "priority",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Priority for conflict resolution",
+      "default": 0,
+      "min": 0
+    },
+    {
+      "name": "isActive",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this restriction is active",
+      "default": true
+    },
+    {
+      "name": "metadata",
+      "type": "object",
+      "mode": "stored",
+      "description": "Additional metadata"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "FieldRestriction",
+      "entityType": "Employee",
+      "fieldPath": "salary",
+      "accessType": "read_masked",
+      "conditions": [
+        {
+          "type": "role",
+          "requiredRoles": ["hr_manager", "payroll_admin"]
+        }
+      ],
+      "maskingRule": {
+        "type": "range",
+        "showRange": true,
+        "ranges": [
+          { "min": 0, "max": 50000, "display": "$0-50k" },
+          { "min": 50001, "max": 100000, "display": "$50k-100k" },
+          { "min": 100001, "max": null, "display": "$100k+" }
+        ]
+      },
+      "sensitivityLevel": "confidential",
+      "auditLevel": "all",
+      "priority": 100,
+      "isActive": true
+    },
+    {
+      "@type": "FieldRestriction",
+      "entityType": "User",
+      "fieldPath": "profile.ssn",
+      "accessType": "none",
+      "conditions": [
+        {
+          "type": "ownership",
+          "expression": "resource.id == user.id"
+        },
+        {
+          "type": "permission",
+          "requiredPermissions": ["user.pii.read"]
+        }
+      ],
+      "sensitivityLevel": "restricted",
+      "auditLevel": "all",
+      "retentionPolicy": {
+        "retentionDays": 2555,
+        "deleteAfter": true,
+        "archiveFirst": true
+      },
+      "priority": 200,
+      "isActive": true
+    }
+  ]
+}

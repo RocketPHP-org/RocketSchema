@@ -1,16 +1,32 @@
 [
   {
+    "name": "access-control",
+    "label": "Access Control",
+    "description": "Complete access control system with RBAC, ABAC, permissions, policies, audit, and fine-grained security - roles, permissions, policies, delegation, and data-level security",
+    "tags": [
+      "access-control",
+      "authorization",
+      "rbac",
+      "abac",
+      "permissions",
+      "policies",
+      "security",
+      "audit"
+    ],
+    "icon": "lock",
+    "order": 2
+  },
+  {
     "name": "user-management",
     "label": "User Management",
-    "description": "Complete user authentication, authorization, and identity management - users, roles, permissions, sessions, API keys, 2FA, and access control",
+    "description": "User authentication and identity management - users, sessions, 2FA, password policies, notifications, and OAuth integration",
     "tags": [
       "authentication",
       "authorization",
       "identity",
-      "access-control",
-      "security",
-      "rbac",
-      "iam"
+      "sessions",
+      "2fa",
+      "oauth"
     ],
     "icon": "shield",
     "order": 1
@@ -26,7 +42,7 @@
       "helpers"
     ],
     "icon": "wrench",
-    "order": 2
+    "order": 3
   },
   {
     "name": "reference-data",
@@ -39,7 +55,7 @@
       "enums"
     ],
     "icon": "database",
-    "order": 3
+    "order": 4
   },
   {
     "name": "core-entities",
@@ -52,7 +68,7 @@
       "organizations"
     ],
     "icon": "users",
-    "order": 4
+    "order": 5
   },
   {
     "name": "transverse",
@@ -66,7 +82,7 @@
       "integrations"
     ],
     "icon": "git-branch",
-    "order": 5
+    "order": 6
   },
   {
     "name": "crm",
@@ -81,7 +97,7 @@
       "gdpr"
     ],
     "icon": "user-heart",
-    "order": 6
+    "order": 7
   },
   {
     "name": "e-commerce",
@@ -95,7 +111,7 @@
       "products"
     ],
     "icon": "shopping-cart",
-    "order": 7
+    "order": 8
   },
   {
     "name": "financial",
@@ -108,7 +124,7 @@
       "payments"
     ],
     "icon": "dollar-sign",
-    "order": 8
+    "order": 9
   },
   {
     "name": "tax",
@@ -123,7 +139,7 @@
       "fiscal"
     ],
     "icon": "receipt",
-    "order": 9
+    "order": 10
   },
   {
     "name": "human-resources",
@@ -137,7 +153,7 @@
       "performance"
     ],
     "icon": "user-check",
-    "order": 10
+    "order": 11
   },
   {
     "name": "patient-management",
@@ -150,7 +166,7 @@
       "contacts"
     ],
     "icon": "user-round",
-    "order": 11
+    "order": 12
   },
   {
     "name": "clinical-care",
@@ -164,7 +180,7 @@
       "encounters"
     ],
     "icon": "stethoscope",
-    "order": 12
+    "order": 13
   },
   {
     "name": "medical-providers",
@@ -178,7 +194,7 @@
       "clinics"
     ],
     "icon": "hospital",
-    "order": 13
+    "order": 14
   },
   {
     "name": "pharmacy",
@@ -191,7 +207,7 @@
       "drugs"
     ],
     "icon": "pill",
-    "order": 14
+    "order": 15
   },
   {
     "name": "medical-records",
@@ -205,7 +221,7 @@
       "lab-tests"
     ],
     "icon": "file-text",
-    "order": 15
+    "order": 16
   },
   {
     "name": "nursing-care",
@@ -219,7 +235,7 @@
       "care-team"
     ],
     "icon": "heart-handshake",
-    "order": 16
+    "order": 17
   },
   {
     "name": "healthcare-admin",
@@ -232,7 +248,7 @@
       "scheduling"
     ],
     "icon": "calendar-check",
-    "order": 17
+    "order": 18
   },
   {
     "name": "fleet",
@@ -245,7 +261,7 @@
       "logistics"
     ],
     "icon": "truck",
-    "order": 18
+    "order": 19
   },
   {
     "name": "knowledge",
@@ -258,6 +274,6 @@
       "content"
     ],
     "icon": "book-open",
-    "order": 19
+    "order": 20
   }
 ]

@@ -1,0 +1,226 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "PolicySet",
+  "description": "A collection of permissions and rules that work together for complex access control scenarios",
+  "properties": [
+    {
+      "name": "code",
+      "type": "string",
+      "mode": "stored",
+      "description": "Unique policy set identifier",
+      "required": true,
+      "unique": true,
+      "example": "financial_data_access"
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "mode": "stored",
+      "description": "Human-readable name",
+      "required": true,
+      "example": "Financial Data Access Policy"
+    },
+    {
+      "name": "description",
+      "type": "string",
+      "mode": "stored",
+      "description": "Detailed description of the policy set",
+      "example": "Controls access to sensitive financial data based on role, department, and data classification"
+    },
+    {
+      "name": "type",
+      "type": "string",
+      "mode": "enum",
+      "description": "Type of policy set",
+      "enum": ["access_control", "data_governance", "compliance", "security", "custom"],
+      "default": "access_control",
+      "example": "compliance"
+    },
+    {
+      "name": "permissions",
+      "type": "Permission[]",
+      "mode": "stored",
+      "description": "Permissions included in this policy set"
+    },
+    {
+      "name": "combiningAlgorithm",
+      "type": "string",
+      "mode": "enum",
+      "description": "Algorithm for combining multiple permissions",
+      "enum": ["first_applicable", "deny_overrides", "permit_overrides", "deny_unless_permit", "permit_unless_deny", "custom"],
+      "default": "deny_overrides",
+      "example": "deny_overrides"
+    },
+    {
+      "name": "customAlgorithm",
+      "type": "string",
+      "mode": "stored",
+      "description": "Custom combining algorithm expression",
+      "example": "if any(deny) then deny else if any(permit) then permit else deny"
+    },
+    {
+      "name": "target",
+      "type": "object",
+      "mode": "stored",
+      "description": "Target specification for when this policy set applies",
+      "example": {
+        "subjects": ["role:financial_analyst", "department:finance"],
+        "resources": ["type:financial_report", "classification:confidential"],
+        "actions": ["read", "export"],
+        "environments": ["network:internal", "time:business_hours"]
+      }
+    },
+    {
+      "name": "obligations",
+      "type": "object[]",
+      "mode": "stored",
+      "description": "Actions that must be performed when policy is applied",
+      "example": [
+        {
+          "type": "audit",
+          "action": "log_access",
+          "details": "Log all access to financial data"
+        },
+        {
+          "type": "notification",
+          "action": "notify_manager",
+          "condition": "resource.value > 1000000"
+        }
+      ]
+    },
+    {
+      "name": "advice",
+      "type": "object[]",
+      "mode": "stored",
+      "description": "Recommended actions (non-mandatory)",
+      "example": [
+        {
+          "type": "security",
+          "recommendation": "enable_mfa",
+          "reason": "Accessing sensitive financial data"
+        }
+      ]
+    },
+    {
+      "name": "conflictResolution",
+      "type": "object",
+      "mode": "stored",
+      "description": "Rules for resolving conflicts between permissions",
+      "example": {
+        "strategy": "priority_based",
+        "defaultDecision": "deny"
+      }
+    },
+    {
+      "name": "parentPolicySet",
+      "type": "PolicySet",
+      "mode": "stored",
+      "description": "Parent policy set for inheritance"
+    },
+    {
+      "name": "inheritanceMode",
+      "type": "string",
+      "mode": "enum",
+      "description": "How to inherit from parent",
+      "enum": ["override", "merge", "append", "none"],
+      "default": "merge"
+    },
+    {
+      "name": "priority",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Priority for evaluation order",
+      "default": 0,
+      "min": 0
+    },
+    {
+      "name": "version",
+      "type": "string",
+      "mode": "stored",
+      "description": "Version of the policy set",
+      "example": "1.2.0"
+    },
+    {
+      "name": "isActive",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this policy set is active",
+      "default": true
+    },
+    {
+      "name": "validFrom",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Start of validity period"
+    },
+    {
+      "name": "validUntil",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "End of validity period"
+    },
+    {
+      "name": "createdAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Creation timestamp",
+      "required": true
+    },
+    {
+      "name": "createdBy",
+      "type": "User",
+      "mode": "stored",
+      "description": "User who created this policy set"
+    },
+    {
+      "name": "approvedBy",
+      "type": "User",
+      "mode": "stored",
+      "description": "User who approved this policy set"
+    },
+    {
+      "name": "approvedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Approval timestamp"
+    },
+    {
+      "name": "metadata",
+      "type": "object",
+      "mode": "stored",
+      "description": "Additional metadata"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "PolicySet",
+      "code": "gdpr_compliance",
+      "name": "GDPR Compliance Policy Set",
+      "description": "Ensures GDPR compliance for EU citizen data access",
+      "type": "compliance",
+      "combiningAlgorithm": "deny_overrides",
+      "target": {
+        "subjects": ["all"],
+        "resources": ["type:personal_data", "geography:eu"],
+        "actions": ["read", "write", "delete", "export"]
+      },
+      "obligations": [
+        {
+          "type": "audit",
+          "action": "log_gdpr_access",
+          "details": "Detailed logging for GDPR compliance"
+        },
+        {
+          "type": "consent",
+          "action": "verify_consent",
+          "required": true
+        }
+      ],
+      "priority": 100,
+      "version": "2.0.0",
+      "isActive": true,
+      "createdAt": "2024-01-01T00:00:00Z"
+    }
+  ]
+}

@@ -2,7 +2,7 @@
   "@type": "Schema",
   "@context": "https://rocketschema.org/context",
   "name": "Permission",
-  "description": "A granular permission that can be assigned to roles for access control",
+  "description": "A granular permission with ABAC (Attribute-Based Access Control) support for fine-grained access control",
   "properties": [
     {
       "name": "code",
@@ -45,13 +45,53 @@
       "example": "create"
     },
     {
+      "name": "effect",
+      "type": "string",
+      "mode": "enum",
+      "description": "Whether this permission allows or denies access",
+      "enum": ["allow", "deny"],
+      "default": "allow",
+      "example": "allow"
+    },
+    {
+      "name": "attributes",
+      "type": "PermissionAttribute[]",
+      "mode": "stored",
+      "description": "Attributes for ABAC evaluation"
+    },
+    {
+      "name": "conditions",
+      "type": "PermissionCondition[]",
+      "mode": "stored",
+      "description": "Conditions that must be met for permission to apply"
+    },
+    {
       "name": "scope",
       "type": "string",
       "mode": "enum",
       "description": "Scope of the permission",
-      "enum": ["global", "organization", "team", "self"],
+      "enum": ["global", "organization", "department", "team", "project", "self", "custom"],
       "default": "organization",
       "example": "organization"
+    },
+    {
+      "name": "scopeExpression",
+      "type": "string",
+      "mode": "stored",
+      "description": "Custom scope expression for complex scoping rules",
+      "example": "organization.id == user.organizationId && department.region == 'EU'"
+    },
+    {
+      "name": "dataFilters",
+      "type": "DataFilter[]",
+      "mode": "stored",
+      "description": "Filters to apply to data access"
+    },
+    {
+      "name": "fieldRestrictions",
+      "type": "FieldRestriction[]",
+      "mode": "stored",
+      "description": "Field-level access restrictions"
     },
     {
       "name": "category",
@@ -59,6 +99,14 @@
       "mode": "stored",
       "description": "Category for grouping permissions",
       "example": "User Management"
+    },
+    {
+      "name": "priority",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Priority for conflict resolution (higher = higher priority)",
+      "default": 0,
+      "min": 0
     },
     {
       "name": "isSystem",
@@ -74,17 +122,23 @@
       "description": "Other permissions required for this permission to be effective"
     },
     {
-      "name": "conditions",
-      "type": "object",
-      "mode": "stored",
-      "description": "Additional conditions or constraints for the permission"
-    },
-    {
       "name": "isActive",
       "type": "boolean",
       "mode": "stored",
       "description": "Whether the permission is active",
       "default": true
+    },
+    {
+      "name": "validFrom",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Start of validity period"
+    },
+    {
+      "name": "validUntil",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "End of validity period"
     },
     {
       "name": "createdAt",
@@ -103,27 +157,32 @@
   "examples": [
     {
       "@type": "Permission",
-      "code": "user.create",
-      "name": "Create User",
-      "description": "Allows creating new user accounts",
-      "resource": "user",
-      "action": "create",
-      "scope": "organization",
-      "category": "User Management",
-      "isSystem": true,
+      "code": "document.read.own_department",
+      "name": "Read Own Department Documents",
+      "description": "Allows reading documents from user's own department only",
+      "resource": "document",
+      "action": "read",
+      "effect": "allow",
+      "scope": "custom",
+      "scopeExpression": "resource.departmentId == user.departmentId",
+      "category": "Document Management",
+      "priority": 10,
+      "isSystem": false,
       "isActive": true,
       "createdAt": "2024-01-01T00:00:00Z"
     },
     {
       "@type": "Permission",
-      "code": "user.read",
-      "name": "View User",
-      "description": "Allows viewing user information",
+      "code": "user.update.working_hours",
+      "name": "Update User During Working Hours",
+      "description": "Allows updating users only during working hours",
       "resource": "user",
-      "action": "read",
+      "action": "update",
+      "effect": "allow",
       "scope": "organization",
       "category": "User Management",
-      "isSystem": true,
+      "priority": 5,
+      "isSystem": false,
       "isActive": true,
       "createdAt": "2024-01-01T00:00:00Z"
     }

@@ -1,0 +1,122 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "SecurityPrincipal",
+  "description": "Abstract representation of any entity that can be granted permissions (users, services, applications)",
+  "properties": [
+    {
+      "name": "principalId",
+      "type": "string",
+      "mode": "stored",
+      "description": "Unique principal identifier",
+      "required": true,
+      "unique": true
+    },
+    {
+      "name": "principalType",
+      "type": "string",
+      "mode": "enum",
+      "description": "Type of security principal",
+      "enum": ["user", "service", "application", "device", "api_key", "anonymous", "system"],
+      "required": true,
+      "example": "user"
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "mode": "stored",
+      "description": "Principal name",
+      "required": true,
+      "example": "john.doe"
+    },
+    {
+      "name": "displayName",
+      "type": "string",
+      "mode": "stored",
+      "description": "Display name",
+      "example": "John Doe"
+    },
+    {
+      "name": "entityReference",
+      "type": "object",
+      "mode": "stored",
+      "description": "Reference to the actual entity",
+      "example": {
+        "entityType": "User",
+        "entityId": "user_123"
+      }
+    },
+    {
+      "name": "attributes",
+      "type": "object",
+      "mode": "stored",
+      "description": "Principal attributes for ABAC evaluation",
+      "example": {
+        "department": "engineering",
+        "clearanceLevel": 3,
+        "location": "US"
+      }
+    },
+    {
+      "name": "roles",
+      "type": "Role[]",
+      "mode": "stored",
+      "description": "Assigned roles"
+    },
+    {
+      "name": "directPermissions",
+      "type": "Permission[]",
+      "mode": "stored",
+      "description": "Directly assigned permissions"
+    },
+    {
+      "name": "groups",
+      "type": "UserGroup[]",
+      "mode": "stored",
+      "description": "Groups membership"
+    },
+    {
+      "name": "trustedBy",
+      "type": "SecurityPrincipal[]",
+      "mode": "stored",
+      "description": "Principals that trust this principal"
+    },
+    {
+      "name": "trusts",
+      "type": "SecurityPrincipal[]",
+      "mode": "stored",
+      "description": "Principals this principal trusts"
+    },
+    {
+      "name": "isActive",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether the principal is active",
+      "default": true
+    },
+    {
+      "name": "activatedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Activation timestamp"
+    },
+    {
+      "name": "deactivatedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Deactivation timestamp"
+    },
+    {
+      "name": "lastActivityAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Last activity timestamp"
+    },
+    {
+      "name": "metadata",
+      "type": "object",
+      "mode": "stored",
+      "description": "Additional metadata"
+    }
+  ]
+}

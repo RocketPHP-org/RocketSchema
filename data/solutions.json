@@ -7,6 +7,7 @@
     "color": "purple",
     "domains": [
       "user-management",
+      "access-control",
       "support-types",
       "reference-data",
       "core-entities",
@@ -14,8 +15,8 @@
       "crm"
     ],
     "features": [
-      "Advanced User Authentication",
-      "Role-Based Access Control",
+      "User Authentication & SSO",
+      "Advanced Access Control (RBAC/ABAC)",
       "Customer Management",
       "Marketing Consent (GDPR)",
       "Customer Segmentation",
@@ -39,6 +40,7 @@
     "color": "blue",
     "domains": [
       "user-management",
+      "access-control",
       "support-types",
       "reference-data",
       "core-entities",
@@ -56,6 +58,7 @@
       "Inventory Management",
       "Customer Accounts",
       "User Authentication & 2FA",
+      "Fine-grained Access Control",
       "Reviews & Ratings",
       "Shipping & Fulfillment"
     ],
@@ -75,6 +78,7 @@
     "color": "green",
     "domains": [
       "user-management",
+      "access-control",
       "support-types",
       "reference-data",
       "core-entities",
@@ -93,6 +97,7 @@
       "Fleet Management",
       "Customer Relations",
       "User & Access Management",
+      "Policy-based Authorization",
       "Supplier Management",
       "Document Management"
     ],
@@ -112,6 +117,7 @@
     "color": "red",
     "domains": [
       "user-management",
+      "access-control",
       "support-types",
       "reference-data",
       "core-entities",
@@ -133,6 +139,7 @@
       "Lab Results",
       "Medical Billing",
       "Secure User Authentication",
+      "Role-based Access Control",
       "HIPAA Compliance"
     ],
     "useCases": [
@@ -151,6 +158,7 @@
     "color": "orange",
     "domains": [
       "user-management",
+      "access-control",
       "support-types",
       "reference-data",
       "core-entities",
@@ -161,7 +169,8 @@
     ],
     "features": [
       "Employee Records",
-      "User Access Control",
+      "Identity Management",
+      "Access Control Policies",
       "Recruitment & ATS",
       "Payroll Processing",
       "Performance Management",
@@ -185,6 +194,7 @@
     "color": "yellow",
     "domains": [
       "user-management",
+      "access-control",
       "support-types",
       "reference-data",
       "core-entities",
@@ -199,6 +209,7 @@
       "Fuel Management",
       "Driver Management",
       "User Authentication",
+      "Resource-based Permissions",
       "Accident Reporting",
       "Fleet Analytics",
       "Cost Management"
@@ -219,6 +230,7 @@
     "color": "indigo",
     "domains": [
       "user-management",
+      "access-control",
       "support-types",
       "reference-data",
       "core-entities",
@@ -230,7 +242,8 @@
       "Article Management",
       "Version Control",
       "Search & Discovery",
-      "Advanced Permissions & ACL",
+      "Advanced ABAC Permissions",
+      "Document Access Control",
       "Categories & Tags",
       "Comments & Collaboration"
     ],
@@ -250,6 +263,7 @@
     "color": "cyan",
     "domains": [
       "user-management",
+      "access-control",
       "support-types",
       "reference-data",
       "core-entities",
@@ -260,9 +274,11 @@
     ],
     "features": [
       "Advanced User Management",
+      "RBAC/ABAC Authorization",
       "Organization/Tenants",
       "Multi-Factor Authentication",
       "API Key Management",
+      "Policy-based Access Control",
       "Subscription Billing",
       "Audit Logging",
       "External Integrations",

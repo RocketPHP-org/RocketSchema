@@ -1,0 +1,153 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "AccessAuditLog",
+  "description": "Comprehensive audit log for all access control decisions and activities",
+  "properties": [
+    {
+      "name": "auditId",
+      "type": "string",
+      "mode": "stored",
+      "description": "Unique audit entry identifier",
+      "required": true,
+      "unique": true
+    },
+    {
+      "name": "timestamp",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When the access event occurred",
+      "required": true
+    },
+    {
+      "name": "eventType",
+      "type": "string",
+      "mode": "enum",
+      "description": "Type of access event",
+      "enum": ["access_granted", "access_denied", "permission_changed", "role_assigned", "role_revoked", "policy_evaluated", "delegation_used", "resource_accessed", "data_exported"],
+      "required": true,
+      "example": "access_granted"
+    },
+    {
+      "name": "subject",
+      "type": "object",
+      "mode": "stored",
+      "description": "Subject of the access attempt",
+      "required": true,
+      "example": {
+        "type": "user",
+        "id": "user_123",
+        "name": "john.doe@example.com",
+        "roles": ["employee", "analyst"]
+      }
+    },
+    {
+      "name": "resource",
+      "type": "object",
+      "mode": "stored",
+      "description": "Resource being accessed",
+      "example": {
+        "type": "document",
+        "id": "doc_456",
+        "path": "/finance/reports/q1.pdf",
+        "classification": "confidential"
+      }
+    },
+    {
+      "name": "action",
+      "type": "string",
+      "mode": "stored",
+      "description": "Action attempted",
+      "required": true,
+      "example": "read"
+    },
+    {
+      "name": "decision",
+      "type": "string",
+      "mode": "enum",
+      "description": "Access decision",
+      "enum": ["allow", "deny", "partial", "conditional"],
+      "required": true,
+      "example": "allow"
+    },
+    {
+      "name": "evaluatedPolicies",
+      "type": "string[]",
+      "mode": "stored",
+      "description": "Policies evaluated for this decision",
+      "example": ["policy_data_access", "policy_time_restriction"]
+    },
+    {
+      "name": "matchedRules",
+      "type": "string[]",
+      "mode": "stored",
+      "description": "Rules that matched",
+      "example": ["rule_dept_access", "rule_clearance_level"]
+    },
+    {
+      "name": "denialReason",
+      "type": "string",
+      "mode": "stored",
+      "description": "Reason for denial if access was denied",
+      "example": "Insufficient clearance level"
+    },
+    {
+      "name": "context",
+      "type": "object",
+      "mode": "stored",
+      "description": "Additional context information",
+      "example": {
+        "ipAddress": "192.168.1.100",
+        "userAgent": "Mozilla/5.0...",
+        "sessionId": "sess_789",
+        "location": {
+          "country": "US",
+          "city": "New York"
+        }
+      }
+    },
+    {
+      "name": "riskScore",
+      "type": "number",
+      "mode": "stored",
+      "description": "Calculated risk score",
+      "min": 0,
+      "max": 100
+    },
+    {
+      "name": "dataAccessed",
+      "type": "object",
+      "mode": "stored",
+      "description": "Details of data accessed",
+      "example": {
+        "fields": ["name", "email", "department"],
+        "recordCount": 150,
+        "sensitive": true
+      }
+    },
+    {
+      "name": "obligations",
+      "type": "string[]",
+      "mode": "stored",
+      "description": "Obligations fulfilled",
+      "example": ["encrypt", "watermark", "notify_owner"]
+    },
+    {
+      "name": "performanceMetrics",
+      "type": "object",
+      "mode": "stored",
+      "description": "Performance metrics for the evaluation",
+      "example": {
+        "evaluationTime": 45,
+        "policiesEvaluated": 5,
+        "rulesEvaluated": 12
+      }
+    },
+    {
+      "name": "metadata",
+      "type": "object",
+      "mode": "stored",
+      "description": "Additional metadata"
+    }
+  ]
+}

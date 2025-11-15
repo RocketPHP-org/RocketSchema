@@ -1,0 +1,181 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "DataFilter",
+  "description": "Data-level filters for row-level and cell-level security in ABAC",
+  "properties": [
+    {
+      "name": "permission",
+      "type": "Permission",
+      "mode": "stored",
+      "description": "Permission this filter belongs to",
+      "required": true
+    },
+    {
+      "name": "filterName",
+      "type": "string",
+      "mode": "stored",
+      "description": "Name of the filter",
+      "required": true,
+      "example": "department_filter"
+    },
+    {
+      "name": "filterType",
+      "type": "string",
+      "mode": "enum",
+      "description": "Type of data filter",
+      "enum": ["row", "column", "cell", "aggregate", "temporal"],
+      "required": true,
+      "example": "row"
+    },
+    {
+      "name": "entityType",
+      "type": "string",
+      "mode": "stored",
+      "description": "Entity type this filter applies to",
+      "required": true,
+      "example": "Document"
+    },
+    {
+      "name": "filterExpression",
+      "type": "string",
+      "mode": "stored",
+      "description": "Filter expression in query language",
+      "required": true,
+      "example": "departmentId = :userDepartmentId OR visibility = 'public'"
+    },
+    {
+      "name": "parameters",
+      "type": "object",
+      "mode": "stored",
+      "description": "Parameters for the filter expression",
+      "example": {
+        "userDepartmentId": "${user.departmentId}"
+      }
+    },
+    {
+      "name": "allowedFields",
+      "type": "string[]",
+      "mode": "stored",
+      "description": "Fields allowed to be accessed (for column filters)",
+      "example": ["id", "name", "description", "publicData"]
+    },
+    {
+      "name": "deniedFields",
+      "type": "string[]",
+      "mode": "stored",
+      "description": "Fields explicitly denied (for column filters)",
+      "example": ["salary", "ssn", "privateNotes"]
+    },
+    {
+      "name": "maskingRules",
+      "type": "object[]",
+      "mode": "stored",
+      "description": "Rules for data masking",
+      "example": [
+        {
+          "field": "email",
+          "maskingType": "partial",
+          "pattern": "****@${domain}"
+        },
+        {
+          "field": "phone",
+          "maskingType": "full",
+          "replacement": "***-***-****"
+        }
+      ]
+    },
+    {
+      "name": "aggregationRules",
+      "type": "object",
+      "mode": "stored",
+      "description": "Rules for aggregate queries",
+      "example": {
+        "minGroupSize": 5,
+        "allowedAggregations": ["count", "avg"],
+        "deniedAggregations": ["sum", "max", "min"]
+      }
+    },
+    {
+      "name": "temporalRules",
+      "type": "object",
+      "mode": "stored",
+      "description": "Time-based data access rules",
+      "example": {
+        "maxAge": "90 days",
+        "allowFuture": false,
+        "timeField": "createdAt"
+      }
+    },
+    {
+      "name": "joinRestrictions",
+      "type": "object[]",
+      "mode": "stored",
+      "description": "Restrictions on joining with other entities",
+      "example": [
+        {
+          "entity": "User",
+          "allowed": false,
+          "reason": "PII protection"
+        }
+      ]
+    },
+    {
+      "name": "priority",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Filter priority for conflict resolution",
+      "default": 0,
+      "min": 0
+    },
+    {
+      "name": "isActive",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this filter is active",
+      "default": true
+    },
+    {
+      "name": "metadata",
+      "type": "object",
+      "mode": "stored",
+      "description": "Additional metadata"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "DataFilter",
+      "filterName": "department_row_filter",
+      "filterType": "row",
+      "entityType": "Document",
+      "filterExpression": "departmentId = :userDepartmentId OR visibility = 'public'",
+      "parameters": {
+        "userDepartmentId": "${user.departmentId}"
+      },
+      "priority": 10,
+      "isActive": true
+    },
+    {
+      "@type": "DataFilter",
+      "filterName": "pii_column_filter",
+      "filterType": "column",
+      "entityType": "User",
+      "allowedFields": ["id", "name", "email", "department"],
+      "deniedFields": ["ssn", "salary", "medicalRecords", "performanceScore"],
+      "maskingRules": [
+        {
+          "field": "email",
+          "maskingType": "partial",
+          "pattern": "****@${domain}"
+        },
+        {
+          "field": "phone",
+          "maskingType": "full",
+          "replacement": "***-***-****"
+        }
+      ],
+      "priority": 20,
+      "isActive": true
+    }
+  ]
+}

@@ -1,0 +1,236 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "ResourcePermission",
+  "description": "Fine-grained permissions attached directly to resources for resource-centric access control",
+  "properties": [
+    {
+      "name": "resourceType",
+      "type": "string",
+      "mode": "stored",
+      "description": "Type of resource",
+      "required": true,
+      "example": "document"
+    },
+    {
+      "name": "resourceId",
+      "type": "string",
+      "mode": "stored",
+      "description": "Unique identifier of the resource",
+      "required": true,
+      "example": "doc_12345"
+    },
+    {
+      "name": "owner",
+      "type": "User",
+      "mode": "stored",
+      "description": "Owner of the resource",
+      "required": true
+    },
+    {
+      "name": "accessControlList",
+      "type": "object[]",
+      "mode": "stored",
+      "description": "Access control list entries",
+      "example": [
+        {
+          "principal": "user:john@example.com",
+          "permissions": ["read", "write"],
+          "granted": true,
+          "conditions": {
+            "timeRange": {
+              "start": "09:00",
+              "end": "18:00"
+            }
+          }
+        },
+        {
+          "principal": "group:finance",
+          "permissions": ["read"],
+          "granted": true
+        },
+        {
+          "principal": "role:external_auditor",
+          "permissions": ["read"],
+          "granted": true,
+          "validUntil": "2024-12-31T23:59:59Z"
+        }
+      ]
+    },
+    {
+      "name": "inheritFromParent",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether to inherit permissions from parent resource",
+      "default": true
+    },
+    {
+      "name": "parentResourceId",
+      "type": "string",
+      "mode": "stored",
+      "description": "Parent resource for permission inheritance",
+      "example": "folder_789"
+    },
+    {
+      "name": "propagateToChildren",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether permissions propagate to child resources",
+      "default": false
+    },
+    {
+      "name": "sharingSettings",
+      "type": "object",
+      "mode": "stored",
+      "description": "Resource sharing configuration",
+      "example": {
+        "allowExternalSharing": false,
+        "allowPublicAccess": false,
+        "requireMFA": true,
+        "maxShareDuration": 30,
+        "allowedDomains": ["example.com"],
+        "shareApprovalRequired": true
+      }
+    },
+    {
+      "name": "classification",
+      "type": "string",
+      "mode": "enum",
+      "description": "Data classification level",
+      "enum": ["public", "internal", "confidential", "restricted", "top_secret"],
+      "default": "internal"
+    },
+    {
+      "name": "tags",
+      "type": "string[]",
+      "mode": "stored",
+      "description": "Tags for attribute-based control",
+      "example": ["financial", "pii", "regulated"]
+    },
+    {
+      "name": "customAttributes",
+      "type": "object",
+      "mode": "stored",
+      "description": "Custom attributes for ABAC evaluation",
+      "example": {
+        "project": "alpha",
+        "costCenter": "CC-100",
+        "dataSubject": "eu_citizens"
+      }
+    },
+    {
+      "name": "auditSettings",
+      "type": "object",
+      "mode": "stored",
+      "description": "Audit configuration for this resource",
+      "example": {
+        "auditLevel": "full",
+        "logRetentionDays": 365,
+        "alertOnAccess": true,
+        "notifyOwner": true
+      }
+    },
+    {
+      "name": "encryptionSettings",
+      "type": "object",
+      "mode": "stored",
+      "description": "Encryption requirements",
+      "example": {
+        "encryptionRequired": true,
+        "algorithm": "AES256",
+        "keyRotationDays": 90
+      }
+    },
+    {
+      "name": "retentionPolicy",
+      "type": "object",
+      "mode": "stored",
+      "description": "Data retention rules",
+      "example": {
+        "retentionDays": 2555,
+        "legalHold": false,
+        "autoDelete": true,
+        "archiveBeforeDelete": true
+      }
+    },
+    {
+      "name": "lastPermissionUpdate",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Last time permissions were modified"
+    },
+    {
+      "name": "lastAccessReview",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Last access review date"
+    },
+    {
+      "name": "nextAccessReview",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Next scheduled access review"
+    },
+    {
+      "name": "createdAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Creation timestamp",
+      "required": true
+    },
+    {
+      "name": "metadata",
+      "type": "object",
+      "mode": "stored",
+      "description": "Additional metadata"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "ResourcePermission",
+      "resourceType": "document",
+      "resourceId": "doc_financial_report_2024",
+      "accessControlList": [
+        {
+          "principal": "user:cfo@example.com",
+          "permissions": ["read", "write", "delete", "share"],
+          "granted": true
+        },
+        {
+          "principal": "group:finance_team",
+          "permissions": ["read", "write"],
+          "granted": true,
+          "conditions": {
+            "ipRange": "10.0.0.0/8"
+          }
+        },
+        {
+          "principal": "role:auditor",
+          "permissions": ["read"],
+          "granted": true,
+          "validFrom": "2024-03-01T00:00:00Z",
+          "validUntil": "2024-03-31T23:59:59Z"
+        },
+        {
+          "principal": "user:*@external.com",
+          "permissions": ["all"],
+          "granted": false
+        }
+      ],
+      "inheritFromParent": false,
+      "classification": "confidential",
+      "tags": ["financial", "q1_2024", "board_review"],
+      "sharingSettings": {
+        "allowExternalSharing": false,
+        "requireMFA": true,
+        "shareApprovalRequired": true
+      },
+      "auditSettings": {
+        "auditLevel": "full",
+        "alertOnAccess": true,
+        "notifyOwner": true
+      },
+      "createdAt": "2024-01-01T00:00:00Z"
+    }
+  ]
+}

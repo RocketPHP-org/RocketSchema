@@ -1,0 +1,110 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "AccessPolicy",
+  "description": "Main access control policy that combines rules, conditions, and effects",
+  "properties": [
+    {
+      "name": "policyId",
+      "type": "string",
+      "mode": "stored",
+      "description": "Unique policy identifier",
+      "required": true,
+      "unique": true
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "mode": "stored",
+      "description": "Policy name",
+      "required": true,
+      "example": "Data Protection Policy"
+    },
+    {
+      "name": "description",
+      "type": "string",
+      "mode": "stored",
+      "description": "Policy description"
+    },
+    {
+      "name": "policyType",
+      "type": "string",
+      "mode": "enum",
+      "description": "Type of policy",
+      "enum": ["rbac", "abac", "pbac", "dac", "mac", "hybrid"],
+      "default": "abac",
+      "example": "abac"
+    },
+    {
+      "name": "effect",
+      "type": "string",
+      "mode": "enum",
+      "description": "Default effect of the policy",
+      "enum": ["allow", "deny"],
+      "default": "deny",
+      "example": "allow"
+    },
+    {
+      "name": "rules",
+      "type": "object[]",
+      "mode": "stored",
+      "description": "Policy rules",
+      "example": [
+        {
+          "ruleId": "rule_1",
+          "effect": "allow",
+          "subjects": ["role:admin"],
+          "resources": ["*"],
+          "actions": ["*"]
+        }
+      ]
+    },
+    {
+      "name": "target",
+      "type": "object",
+      "mode": "stored",
+      "description": "Policy target specification"
+    },
+    {
+      "name": "conditions",
+      "type": "PermissionCondition[]",
+      "mode": "stored",
+      "description": "Conditions for policy application"
+    },
+    {
+      "name": "priority",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Policy evaluation priority",
+      "default": 0,
+      "min": 0
+    },
+    {
+      "name": "isActive",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether the policy is active",
+      "default": true
+    },
+    {
+      "name": "version",
+      "type": "string",
+      "mode": "stored",
+      "description": "Policy version",
+      "example": "1.0.0"
+    },
+    {
+      "name": "createdAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Creation timestamp",
+      "required": true
+    },
+    {
+      "name": "metadata",
+      "type": "object",
+      "mode": "stored",
+      "description": "Additional metadata"
+    }
+  ]
+}
