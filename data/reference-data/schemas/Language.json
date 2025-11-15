@@ -7,6 +7,7 @@
     {
       "name": "code",
       "type": "string",
+      "mode": "stored",
       "description": "ISO 639-1 two-letter language code",
       "required": true,
       "format": "iso-language-code",
@@ -15,6 +16,7 @@
     {
       "name": "code3",
       "type": "string",
+      "mode": "stored",
       "description": "ISO 639-2/T three-letter language code",
       "format": "iso-language-code",
       "example": "eng"
@@ -22,6 +24,7 @@
     {
       "name": "name",
       "type": "string",
+      "mode": "stored",
       "description": "Language name in English",
       "required": true,
       "example": "English"
@@ -29,6 +32,7 @@
     {
       "name": "nativeName",
       "type": "string",
+      "mode": "stored",
       "description": "Language name in the language itself",
       "example": "English"
     }

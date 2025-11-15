@@ -1,0 +1,276 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "PrincipalTrust",
+  "description": "Quantifies and tracks the trustworthiness of security principals (users, services, devices) through continuous assessment of behavior, compliance, and risk indicators, enabling dynamic trust-based access control. This entity implements zero-trust principles where trust is never assumed but continuously earned and verified. Trust scores are calculated from multiple factors: authentication strength (password, MFA, biometrics), behavioral patterns (typical vs anomalous activity), compliance status (training completed, policies acknowledged), historical reliability (past violations, successful operations), and environmental context (device security, network location). Trust levels dynamically adjust based on positive signals (successful verifications, consistent behavior) and negative signals (failed attempts, policy violations, suspicious patterns). The entity enables trust-based authorization where higher trust unlocks more privileges, trust degradation where violations reduce access progressively, and trust recovery where good behavior restores standing. It supports trust federation where external trust assessments are incorporated, trust inheritance where new principals inherit baseline trust from their organization, and trust delegation where trusted principals can vouch for others. Trust scores influence various security decisions: required authentication strength, permission activation, audit intensity, and session duration. This continuous trust assessment is essential for adaptive security that responds to changing risk, insider threat detection through trust anomalies, and compliance with zero-trust architectures.",
+  "properties": [
+    {
+      "name": "trustId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "Unique identifier for this trust record",
+      "required": true,
+      "unique": true
+    },
+    {
+      "name": "principalId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "Security principal being assessed",
+      "required": true
+    },
+    {
+      "name": "principalType",
+      "type": "string",
+      "mode": "enum",
+      "description": "Type of principal",
+      "enum": ["user", "service", "device", "application", "network"],
+      "required": true
+    },
+    {
+      "name": "trustScore",
+      "type": "number",
+      "mode": "stored",
+      "description": "Current trust score (0-100)",
+      "min": 0,
+      "max": 100,
+      "required": true
+    },
+    {
+      "name": "trustLevel",
+      "type": "string",
+      "mode": "enum",
+      "description": "Categorized trust level",
+      "enum": ["untrusted", "low", "medium", "high", "verified"],
+      "required": true
+    },
+    {
+      "name": "scoreComponents",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON breakdown of score factors",
+      "required": true,
+      "example": "{\"authentication\":20,\"behavior\":25,\"compliance\":20,\"history\":20,\"context\":15}"
+    },
+    {
+      "name": "authenticationFactors",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON authentication trust signals",
+      "example": "{\"mfa_enabled\":true,\"password_strength\":\"strong\",\"biometric_enrolled\":true,\"last_password_change\":\"2024-01-01\"}"
+    },
+    {
+      "name": "behaviorMetrics",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON behavioral analysis",
+      "example": "{\"login_pattern\":\"consistent\",\"access_velocity\":\"normal\",\"resource_usage\":\"typical\",\"anomaly_score\":5}"
+    },
+    {
+      "name": "complianceStatus",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON compliance indicators",
+      "example": "{\"training_current\":true,\"policy_violations\":0,\"audit_findings\":\"none\",\"certifications\":[\"security_aware\"]}"
+    },
+    {
+      "name": "riskIndicators",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON risk factors affecting trust",
+      "nullable": true,
+      "example": "[\"new_device\",\"location_change\",\"after_hours_access\"]"
+    },
+    {
+      "name": "positiveSignals",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON recent trust-building events",
+      "nullable": true,
+      "example": "[{\"event\":\"successful_mfa\",\"timestamp\":\"2024-03-15T10:00:00Z\",\"impact\":+5}]"
+    },
+    {
+      "name": "negativeSignals",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON recent trust-reducing events",
+      "nullable": true,
+      "example": "[{\"event\":\"failed_login\",\"timestamp\":\"2024-03-15T09:00:00Z\",\"impact\":-10}]"
+    },
+    {
+      "name": "trustHistory",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON historical trust scores",
+      "nullable": true
+    },
+    {
+      "name": "trustTrend",
+      "type": "string",
+      "mode": "enum",
+      "description": "Direction of trust change",
+      "enum": ["increasing", "stable", "decreasing", "volatile"],
+      "default": "stable"
+    },
+    {
+      "name": "baseTrustScore",
+      "type": "number",
+      "mode": "stored",
+      "description": "Baseline trust before adjustments",
+      "default": 50
+    },
+    {
+      "name": "trustModifiers",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON temporary trust adjustments",
+      "nullable": true
+    },
+    {
+      "name": "trustDecayRate",
+      "type": "number",
+      "mode": "stored",
+      "description": "How fast trust decreases without activity",
+      "default": 0.01
+    },
+    {
+      "name": "trustRecoveryRate",
+      "type": "number",
+      "mode": "stored",
+      "description": "How fast trust can be rebuilt",
+      "default": 0.05
+    },
+    {
+      "name": "maxTrustScore",
+      "type": "number",
+      "mode": "stored",
+      "description": "Maximum achievable trust",
+      "default": 100
+    },
+    {
+      "name": "minTrustScore",
+      "type": "number",
+      "mode": "stored",
+      "description": "Minimum trust floor",
+      "default": 0
+    },
+    {
+      "name": "endorsements",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON trust endorsements from others",
+      "nullable": true
+    },
+    {
+      "name": "federatedTrust",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON external trust assessments",
+      "nullable": true
+    },
+    {
+      "name": "lastAssessmentAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Last trust evaluation",
+      "required": true
+    },
+    {
+      "name": "nextAssessmentAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Next scheduled evaluation",
+      "nullable": true
+    },
+    {
+      "name": "assessmentFrequency",
+      "type": "string",
+      "mode": "stored",
+      "description": "How often to reassess",
+      "default": "hourly"
+    },
+    {
+      "name": "trustAlerts",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON triggered trust alerts",
+      "nullable": true
+    },
+    {
+      "name": "requiresReview",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether manual review is needed",
+      "default": false
+    },
+    {
+      "name": "isActive",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether trust tracking is active",
+      "default": true
+    },
+    {
+      "name": "metadata",
+      "type": "object",
+      "mode": "stored",
+      "description": "Additional trust data"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "PrincipalTrust",
+      "trustId": "trust_user_001",
+      "principalId": "user_john_doe",
+      "principalType": "user",
+      "trustScore": 78,
+      "trustLevel": "high",
+      "scoreComponents": "{\"authentication\":18,\"behavior\":20,\"compliance\":15,\"history\":18,\"context\":7}",
+      "authenticationFactors": "{\"mfa_enabled\":true,\"mfa_type\":\"hardware_token\",\"password_age_days\":45,\"failed_attempts_30d\":1}",
+      "behaviorMetrics": "{\"login_consistency\":0.92,\"typical_hours\":true,\"resource_access_pattern\":\"normal\",\"data_volume\":\"average\"}",
+      "complianceStatus": "{\"training_completed\":true,\"last_training\":\"2024-02-01\",\"policy_acknowledgments\":12,\"violations_ytd\":0}",
+      "riskIndicators": "[\"occasional_vpn_use\",\"multiple_devices\"]",
+      "positiveSignals": "[{\"event\":\"completed_security_training\",\"timestamp\":\"2024-02-01T10:00:00Z\",\"impact\":10},{\"event\":\"reported_phishing\",\"timestamp\":\"2024-03-01T14:00:00Z\",\"impact\":5}]",
+      "negativeSignals": "[{\"event\":\"failed_mfa\",\"timestamp\":\"2024-03-10T08:00:00Z\",\"impact\":-5}]",
+      "trustTrend": "stable",
+      "baseTrustScore": 70,
+      "trustDecayRate": 0.005,
+      "trustRecoveryRate": 0.1,
+      "lastAssessmentAt": "2024-03-15T12:00:00Z",
+      "nextAssessmentAt": "2024-03-15T13:00:00Z",
+      "assessmentFrequency": "hourly",
+      "isActive": true,
+      "metadata": {
+        "employee_type": "full_time",
+        "tenure_years": 3
+      }
+    },
+    {
+      "@type": "PrincipalTrust",
+      "trustId": "trust_svc_002",
+      "principalType": "service",
+      "principalId": "svc_payment_processor",
+      "trustScore": 92,
+      "trustLevel": "verified",
+      "scoreComponents": "{\"authentication\":25,\"behavior\":23,\"compliance\":22,\"history\":22,\"context\":0}",
+      "authenticationFactors": "{\"certificate_based\":true,\"cert_expiry\":\"2025-01-01\",\"key_rotation\":\"monthly\",\"mutual_tls\":true}",
+      "behaviorMetrics": "{\"api_call_pattern\":\"consistent\",\"error_rate\":0.001,\"latency\":\"normal\",\"data_patterns\":\"expected\"}",
+      "complianceStatus": "{\"security_scans\":\"passed\",\"vulnerability_assessment\":\"clean\",\"last_audit\":\"2024-02-15\",\"pci_compliant\":true}",
+      "positiveSignals": "[{\"event\":\"successful_audit\",\"timestamp\":\"2024-02-15T00:00:00Z\",\"impact\":15}]",
+      "trustTrend": "increasing",
+      "baseTrustScore": 85,
+      "trustDecayRate": 0.001,
+      "trustRecoveryRate": 0.2,
+      "maxTrustScore": 95,
+      "federatedTrust": "{\"vendor_assessment\":90,\"third_party_audit\":88}",
+      "lastAssessmentAt": "2024-03-15T12:00:00Z",
+      "nextAssessmentAt": "2024-03-16T12:00:00Z",
+      "assessmentFrequency": "daily",
+      "isActive": true,
+      "metadata": {
+        "service_criticality": "high",
+        "sla_tier": "platinum"
+      }
+    }
+  ]
+}

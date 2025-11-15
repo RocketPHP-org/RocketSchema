@@ -1,0 +1,152 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "LoginHistory",
+  "description": "Comprehensive audit trail of all login attempts to the system. This entity records every single attempt to access an account, whether successful or failed, providing crucial security information for detecting unauthorized access attempts, brute force attacks, and unusual login patterns. It captures detailed information about each attempt including the IP address, device information, geographic location, and the reason for any failures. Security teams use this data to identify compromised accounts, detect attacks in progress, and help users understand who has accessed their account. It's also valuable for compliance requirements that mandate authentication auditing. Failed attempts can trigger security alerts or automatic account locks.",
+  "properties": [
+    {
+      "name": "user",
+      "type": "User",
+      "mode": "stored",
+      "description": "User account that was attempted to be accessed (null if username doesn't exist)"
+    },
+    {
+      "name": "username",
+      "type": "string",
+      "mode": "stored",
+      "description": "The username that was entered in the login attempt",
+      "required": true
+    },
+    {
+      "name": "timestamp",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Exact time when the login attempt occurred",
+      "required": true
+    },
+    {
+      "name": "success",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether the login attempt was successful",
+      "required": true
+    },
+    {
+      "name": "failureReason",
+      "type": "string",
+      "mode": "enum",
+      "description": "Specific reason why the login failed",
+      "enum": ["invalid_credentials", "account_locked", "account_suspended", "account_inactive", "mfa_required", "mfa_failed", "password_expired"],
+      "example": "invalid_credentials"
+    },
+    {
+      "name": "authMethod",
+      "type": "string",
+      "mode": "enum",
+      "description": "Authentication method used for this attempt",
+      "enum": ["password", "oauth", "saml", "ldap", "mfa", "biometric", "api_key"],
+      "default": "password",
+      "example": "password"
+    },
+    {
+      "name": "ipAddress",
+      "type": "string",
+      "mode": "stored",
+      "description": "IP address from which the login was attempted",
+      "example": "192.168.1.100"
+    },
+    {
+      "name": "userAgent",
+      "type": "string",
+      "mode": "stored",
+      "description": "Browser or application identification string"
+    },
+    {
+      "name": "deviceFingerprint",
+      "type": "string",
+      "mode": "stored",
+      "description": "Unique device identifier for tracking"
+    },
+    {
+      "name": "location",
+      "type": "object",
+      "mode": "stored",
+      "description": "Geographic location based on IP address"
+    },
+    {
+      "name": "riskScore",
+      "type": "number",
+      "mode": "stored",
+      "description": "Calculated risk level of this login attempt (0-100)",
+      "min": 0,
+      "max": 100
+    },
+    {
+      "name": "riskFactors",
+      "type": "string[]",
+      "mode": "stored",
+      "description": "Specific risk indicators detected",
+      "example": ["new_device", "unusual_location"]
+    },
+    {
+      "name": "sessionId",
+      "type": "string",
+      "mode": "stored",
+      "description": "Session ID created if login was successful"
+    },
+    {
+      "name": "metadata",
+      "type": "object",
+      "mode": "stored",
+      "description": "Additional context about the login attempt"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "LoginHistory",
+      "username": "john.doe",
+      "timestamp": "2024-03-15T10:00:00Z",
+      "success": true,
+      "authMethod": "password",
+      "ipAddress": "192.168.1.100",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/121.0",
+      "deviceFingerprint": "device_abc123",
+      "location": {
+        "country": "United States",
+        "city": "New York",
+        "coordinates": {
+          "lat": 40.7128,
+          "lon": -74.0060
+        }
+      },
+      "riskScore": 5,
+      "riskFactors": [],
+      "sessionId": "sess_xyz789",
+      "metadata": {
+        "loginPage": "/login",
+        "referrer": "/home"
+      }
+    },
+    {
+      "@type": "LoginHistory",
+      "username": "admin@company.com",
+      "timestamp": "2024-03-15T14:30:00Z",
+      "success": false,
+      "failureReason": "mfa_failed",
+      "authMethod": "password",
+      "ipAddress": "203.0.113.42",
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0) Mobile/15E148",
+      "location": {
+        "country": "China",
+        "city": "Beijing"
+      },
+      "riskScore": 85,
+      "riskFactors": ["unusual_location", "vpn_detected", "multiple_failed_attempts", "impossible_travel"],
+      "metadata": {
+        "vpnProvider": "NordVPN",
+        "attemptNumber": 3,
+        "timeSinceLastAttempt": 30
+      }
+    }
+  ]
+}

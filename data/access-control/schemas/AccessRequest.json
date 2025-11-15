@@ -1,0 +1,349 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "AccessRequest",
+  "description": "Manages formal requests for access to resources, roles, or permissions that require approval, implementing a complete workflow from request submission through review to final grant or denial. This entity handles scenarios where users need access beyond their current permissions - requesting a new role, access to sensitive data, temporary elevated privileges, or entry to restricted systems. Each request captures comprehensive justification including business need, duration required, specific resources needed, and risk acknowledgment. The approval workflow can be simple (single manager) or complex (multiple stakeholders, security review, legal sign-off), with configurable routing based on request type, risk level, and resource sensitivity. The entity tracks the complete lifecycle: draft, submitted, under review, approved/denied, provisioned, and expired. It supports emergency requests that bypass normal workflows with heavy auditing, time-boxed access that automatically expires, and conditional approvals with specific constraints. Requests can include attestations where requesters confirm understanding of policies, accept liability, or complete required training. The system handles delegation where managers can request on behalf of their teams, bulk requests for multiple users, and recurring requests for periodic access needs. This formal process is essential for compliance with regulations requiring documented access approval, maintaining zero-standing privileges, and providing evidence of proper authorization during audits.",
+  "properties": [
+    {
+      "name": "requestId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "Unique identifier for this access request",
+      "required": true,
+      "unique": true
+    },
+    {
+      "name": "requestType",
+      "type": "string",
+      "mode": "enum",
+      "description": "Category of access being requested",
+      "enum": ["role", "permission", "resource", "group", "elevation", "emergency", "temporary", "permanent"],
+      "required": true
+    },
+    {
+      "name": "requester",
+      "type": "User",
+      "mode": "stored",
+      "description": "User making the request",
+      "required": true
+    },
+    {
+      "name": "requestFor",
+      "type": "User",
+      "mode": "stored",
+      "description": "User who will receive the access (if different from requester)",
+      "nullable": true
+    },
+    {
+      "name": "requestedItems",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON array of requested access items",
+      "required": true,
+      "example": "[{\"type\":\"role\",\"id\":\"role_admin\",\"scope\":\"project_x\"},{\"type\":\"permission\",\"id\":\"database.write\"}]"
+    },
+    {
+      "name": "justification",
+      "type": "string",
+      "mode": "stored",
+      "description": "Business justification for the request",
+      "required": true,
+      "example": "Need admin access to configure new production deployment for Q2 product launch"
+    },
+    {
+      "name": "businessNeed",
+      "type": "string",
+      "mode": "enum",
+      "description": "Business driver for request",
+      "enum": ["project", "operational", "support", "audit", "compliance", "emergency", "training"],
+      "required": true
+    },
+    {
+      "name": "urgency",
+      "type": "string",
+      "mode": "enum",
+      "description": "Urgency level of the request",
+      "enum": ["low", "medium", "high", "critical", "emergency"],
+      "default": "medium"
+    },
+    {
+      "name": "requestedStartDate",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When access should begin",
+      "required": true
+    },
+    {
+      "name": "requestedEndDate",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When access should expire",
+      "nullable": true
+    },
+    {
+      "name": "duration",
+      "type": "string",
+      "mode": "stored",
+      "description": "Requested duration (e.g., '30 days', 'permanent')",
+      "example": "90 days"
+    },
+    {
+      "name": "status",
+      "type": "string",
+      "mode": "enum",
+      "description": "Current status of the request",
+      "enum": ["draft", "submitted", "under_review", "approved", "denied", "provisioned", "expired", "revoked", "cancelled"],
+      "default": "draft",
+      "required": true
+    },
+    {
+      "name": "submittedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When request was formally submitted",
+      "nullable": true
+    },
+    {
+      "name": "riskScore",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Calculated risk score of granting access",
+      "min": 0,
+      "max": 100
+    },
+    {
+      "name": "riskFactors",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON array of identified risks",
+      "nullable": true,
+      "example": "[\"sensitive_data\",\"production_access\",\"external_user\"]"
+    },
+    {
+      "name": "approvalRequired",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether approval is needed",
+      "default": true
+    },
+    {
+      "name": "approvalChain",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON array of required approvers in order",
+      "nullable": true,
+      "example": "[{\"role\":\"manager\",\"user\":\"user_123\"},{\"role\":\"security_team\"}]"
+    },
+    {
+      "name": "currentApprovalStep",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Current position in approval chain",
+      "default": 0
+    },
+    {
+      "name": "approvals",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON array of approval decisions",
+      "nullable": true
+    },
+    {
+      "name": "finalApprover",
+      "type": "User",
+      "mode": "stored",
+      "description": "Who gave final approval",
+      "nullable": true
+    },
+    {
+      "name": "approvedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When request was approved",
+      "nullable": true
+    },
+    {
+      "name": "deniedBy",
+      "type": "User",
+      "mode": "stored",
+      "description": "Who denied the request",
+      "nullable": true
+    },
+    {
+      "name": "deniedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When request was denied",
+      "nullable": true
+    },
+    {
+      "name": "denialReason",
+      "type": "string",
+      "mode": "stored",
+      "description": "Explanation for denial",
+      "nullable": true
+    },
+    {
+      "name": "provisionedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When access was actually granted",
+      "nullable": true
+    },
+    {
+      "name": "provisionedBy",
+      "type": "User",
+      "mode": "stored",
+      "description": "Who provisioned the access",
+      "nullable": true
+    },
+    {
+      "name": "actualStartDate",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When access actually started",
+      "nullable": true
+    },
+    {
+      "name": "actualEndDate",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When access actually ended",
+      "nullable": true
+    },
+    {
+      "name": "attestations",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON array of policy attestations",
+      "nullable": true,
+      "example": "[{\"policy\":\"acceptable_use\",\"agreed\":true},{\"training\":\"security_awareness\",\"completed\":true}]"
+    },
+    {
+      "name": "conditions",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON conditions attached to approval",
+      "nullable": true
+    },
+    {
+      "name": "isEmergency",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this is an emergency request",
+      "default": false
+    },
+    {
+      "name": "emergencyContact",
+      "type": "string",
+      "mode": "stored",
+      "description": "Contact for emergency requests",
+      "nullable": true
+    },
+    {
+      "name": "expiryNotificationSent",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether expiry warning was sent",
+      "default": false
+    },
+    {
+      "name": "renewalAllowed",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether request can be renewed",
+      "default": true
+    },
+    {
+      "name": "parentRequestId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "Original request if this is a renewal",
+      "nullable": true
+    },
+    {
+      "name": "createdAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When request was created",
+      "required": true
+    },
+    {
+      "name": "updatedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Last modification time"
+    },
+    {
+      "name": "metadata",
+      "type": "object",
+      "mode": "stored",
+      "description": "Additional request data"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "AccessRequest",
+      "requestId": "req_abc123",
+      "requestType": "role",
+      "justification": "Need production database access to investigate and resolve critical performance issues affecting customers",
+      "businessNeed": "operational",
+      "urgency": "high",
+      "requestedItems": "[{\"type\":\"role\",\"id\":\"role_dba\",\"scope\":\"production\"},{\"type\":\"permission\",\"id\":\"database.query_optimization\"}]",
+      "requestedStartDate": "2024-03-15T14:00:00Z",
+      "requestedEndDate": "2024-03-22T14:00:00Z",
+      "duration": "7 days",
+      "status": "approved",
+      "submittedAt": "2024-03-15T13:00:00Z",
+      "riskScore": 65,
+      "riskFactors": "[\"production_access\",\"database_admin\",\"temporary_elevation\"]",
+      "approvalRequired": true,
+      "approvalChain": "[{\"role\":\"manager\",\"user\":\"user_mgr_123\"},{\"role\":\"dba_team\"},{\"role\":\"security\"}]",
+      "currentApprovalStep": 3,
+      "approvals": "[{\"approver\":\"user_mgr_123\",\"decision\":\"approve\",\"timestamp\":\"2024-03-15T13:15:00Z\"},{\"approver\":\"user_dba_lead\",\"decision\":\"approve\",\"timestamp\":\"2024-03-15T13:30:00Z\",\"note\":\"Limited to read-only during first 24h\"},{\"approver\":\"user_security\",\"decision\":\"approve\",\"timestamp\":\"2024-03-15T13:45:00Z\"}]",
+      "finalApprover": "user_security",
+      "approvedAt": "2024-03-15T13:45:00Z",
+      "provisionedAt": "2024-03-15T14:00:00Z",
+      "provisionedBy": "system_auto_provisioner",
+      "actualStartDate": "2024-03-15T14:00:00Z",
+      "attestations": "[{\"policy\":\"production_access_policy\",\"agreed\":true,\"timestamp\":\"2024-03-15T13:00:00Z\"},{\"training\":\"database_security\",\"completed\":true,\"completedDate\":\"2024-03-01T00:00:00Z\"}]",
+      "conditions": "{\"readonly_first_24h\":true,\"audit_all_queries\":true,\"no_data_export\":true}",
+      "renewalAllowed": true,
+      "createdAt": "2024-03-15T12:30:00Z",
+      "metadata": {
+        "ticket": "INC-2024-4521",
+        "on_call": true
+      }
+    },
+    {
+      "@type": "AccessRequest",
+      "requestId": "req_emrg_789",
+      "requestType": "emergency",
+      "justification": "Critical security incident - need immediate access to investigate potential data breach",
+      "businessNeed": "emergency",
+      "urgency": "emergency",
+      "requestedItems": "[{\"type\":\"role\",\"id\":\"role_security_admin\"},{\"type\":\"permission\",\"id\":\"audit.full_access\"},{\"type\":\"permission\",\"id\":\"system.forensics\"}]",
+      "requestedStartDate": "2024-03-15T02:00:00Z",
+      "requestedEndDate": "2024-03-15T10:00:00Z",
+      "duration": "8 hours",
+      "status": "provisioned",
+      "submittedAt": "2024-03-15T02:00:00Z",
+      "riskScore": 95,
+      "riskFactors": "[\"emergency_access\",\"full_system_access\",\"off_hours\",\"bypassed_approval\"]",
+      "approvalRequired": false,
+      "isEmergency": true,
+      "emergencyContact": "+1-555-911-1234",
+      "provisionedAt": "2024-03-15T02:01:00Z",
+      "provisionedBy": "system_emergency_access",
+      "actualStartDate": "2024-03-15T02:01:00Z",
+      "actualEndDate": "2024-03-15T06:00:00Z",
+      "attestations": "[{\"policy\":\"emergency_access_policy\",\"agreed\":true},{\"acknowledgment\":\"post_review_required\",\"agreed\":true}]",
+      "conditions": "{\"full_audit\":true,\"video_recording\":true,\"post_incident_review\":\"required\"}",
+      "createdAt": "2024-03-15T02:00:00Z",
+      "metadata": {
+        "incident_id": "SEC-2024-CRITICAL-001",
+        "authorized_by": "CISO_on_call"
+      }
+    }
+  ]
+}

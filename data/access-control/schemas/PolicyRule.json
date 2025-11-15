@@ -1,0 +1,290 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "PolicyRule",
+  "description": "Represents individual rules within an access policy, providing granular conditions and actions that compose complex policy logic. While an AccessPolicy defines the overall security requirement, PolicyRules are the building blocks that implement specific checks and decisions. Each rule evaluates a specific condition (like 'user is contractor' or 'time is outside business hours') and specifies what should happen when that condition is met. Rules can be combined using boolean logic (AND, OR, NOT) to create sophisticated policies. For example, a policy preventing data exfiltration might have rules checking data volume, destination, time of day, and user history. Rules support various evaluation methods including simple comparisons, regex patterns, mathematical operations, and even external service calls for dynamic decisions. They can trigger multiple actions like logging, notifications, step-up authentication, or access denial. The entity includes rule versioning to track changes, testing capabilities to validate logic, and performance metrics to identify slow-evaluating rules. Rules can be shared across policies for consistency and can be temporarily disabled for troubleshooting. This granular approach allows security teams to build precise, maintainable policies that can adapt to evolving threats and compliance requirements without complete rewrites.",
+  "properties": [
+    {
+      "name": "ruleId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "Unique identifier for this rule",
+      "required": true,
+      "unique": true
+    },
+    {
+      "name": "policyId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "Parent policy this rule belongs to",
+      "required": true
+    },
+    {
+      "name": "ruleName",
+      "type": "string",
+      "mode": "stored",
+      "description": "Descriptive name for the rule",
+      "required": true,
+      "example": "Check Contractor Status"
+    },
+    {
+      "name": "description",
+      "type": "string",
+      "mode": "stored",
+      "description": "Explanation of what this rule checks",
+      "example": "Verifies if user is a contractor or external vendor"
+    },
+    {
+      "name": "ruleOrder",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Evaluation sequence within the policy",
+      "required": true,
+      "default": 0
+    },
+    {
+      "name": "ruleType",
+      "type": "string",
+      "mode": "enum",
+      "description": "Type of rule evaluation",
+      "enum": ["condition", "action", "obligation", "advice", "target"],
+      "required": true
+    },
+    {
+      "name": "evaluationMode",
+      "type": "string",
+      "mode": "enum",
+      "description": "How the rule is evaluated",
+      "enum": ["simple", "complex", "script", "external", "machine_learning"],
+      "default": "simple"
+    },
+    {
+      "name": "attribute",
+      "type": "string",
+      "mode": "stored",
+      "description": "Attribute being evaluated",
+      "example": "user.employment_type"
+    },
+    {
+      "name": "operator",
+      "type": "string",
+      "mode": "enum",
+      "description": "Comparison operator",
+      "enum": ["equals", "not_equals", "greater_than", "less_than", "in", "not_in", "contains", "regex", "between", "exists"],
+      "example": "equals"
+    },
+    {
+      "name": "value",
+      "type": "string",
+      "mode": "stored",
+      "description": "Value to compare against (can be JSON)",
+      "example": "contractor"
+    },
+    {
+      "name": "expression",
+      "type": "string",
+      "mode": "stored",
+      "description": "Complex expression for advanced rules",
+      "nullable": true,
+      "example": "(user.clearance_level >= 3 AND resource.classification == 'secret') OR user.role == 'auditor'"
+    },
+    {
+      "name": "script",
+      "type": "string",
+      "mode": "stored",
+      "description": "Script code for script-based evaluation",
+      "nullable": true
+    },
+    {
+      "name": "externalService",
+      "type": "string",
+      "mode": "stored",
+      "description": "External service URL for dynamic evaluation",
+      "nullable": true,
+      "example": "https://risk-api.company.com/evaluate"
+    },
+    {
+      "name": "combineOperator",
+      "type": "string",
+      "mode": "enum",
+      "description": "How to combine with previous rule",
+      "enum": ["AND", "OR", "AND_NOT", "OR_NOT", "XOR"],
+      "nullable": true
+    },
+    {
+      "name": "negateResult",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether to negate the rule result",
+      "default": false
+    },
+    {
+      "name": "onMatch",
+      "type": "string",
+      "mode": "enum",
+      "description": "Action when rule matches",
+      "enum": ["permit", "deny", "continue", "skip_remaining", "goto_rule"],
+      "default": "continue"
+    },
+    {
+      "name": "onNoMatch",
+      "type": "string",
+      "mode": "enum",
+      "description": "Action when rule doesn't match",
+      "enum": ["permit", "deny", "continue", "skip_remaining", "goto_rule"],
+      "default": "continue"
+    },
+    {
+      "name": "actions",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON array of actions to execute",
+      "nullable": true,
+      "example": "[{\"type\":\"log\",\"level\":\"warning\"},{\"type\":\"notify\",\"target\":\"security_team\"}]"
+    },
+    {
+      "name": "isEnabled",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this rule is active",
+      "default": true
+    },
+    {
+      "name": "isCacheable",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether rule results can be cached",
+      "default": true
+    },
+    {
+      "name": "cacheTimeout",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Seconds to cache rule results",
+      "default": 300
+    },
+    {
+      "name": "performanceImpact",
+      "type": "string",
+      "mode": "enum",
+      "description": "Expected performance impact",
+      "enum": ["negligible", "low", "medium", "high"],
+      "default": "low"
+    },
+    {
+      "name": "failureMode",
+      "type": "string",
+      "mode": "enum",
+      "description": "What to do if rule evaluation fails",
+      "enum": ["deny", "permit", "skip", "use_default"],
+      "default": "deny"
+    },
+    {
+      "name": "timeout",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Maximum milliseconds for rule evaluation",
+      "default": 1000
+    },
+    {
+      "name": "errorMessage",
+      "type": "string",
+      "mode": "stored",
+      "description": "Message to show when rule denies access",
+      "nullable": true
+    },
+    {
+      "name": "statistics",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON statistics about rule evaluation",
+      "nullable": true
+    },
+    {
+      "name": "version",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Rule version number",
+      "default": 1
+    },
+    {
+      "name": "createdAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When rule was created",
+      "required": true
+    },
+    {
+      "name": "createdBy",
+      "type": "User",
+      "mode": "stored",
+      "description": "Who created this rule"
+    },
+    {
+      "name": "metadata",
+      "type": "object",
+      "mode": "stored",
+      "description": "Additional rule configuration"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "PolicyRule",
+      "ruleId": "rule_contractor_check",
+      "policyId": "pol_data_access",
+      "ruleName": "Contractor PII Access Check",
+      "description": "Prevents contractors from accessing customer PII unless explicitly authorized",
+      "ruleOrder": 1,
+      "ruleType": "condition",
+      "evaluationMode": "complex",
+      "expression": "user.employment_type == 'contractor' AND resource.contains_pii == true AND user.pii_authorization != true",
+      "combineOperator": null,
+      "negateResult": false,
+      "onMatch": "deny",
+      "onNoMatch": "continue",
+      "actions": "[{\"type\":\"audit_log\",\"severity\":\"high\",\"message\":\"Contractor attempted PII access\"},{\"type\":\"alert\",\"target\":\"security_team\"}]",
+      "isEnabled": true,
+      "isCacheable": true,
+      "cacheTimeout": 600,
+      "performanceImpact": "low",
+      "failureMode": "deny",
+      "timeout": 100,
+      "errorMessage": "Access denied: Contractors cannot access customer PII without explicit authorization",
+      "statistics": "{\"evaluations\":15234,\"matches\":89,\"avg_time_ms\":12}",
+      "version": 2,
+      "createdAt": "2024-01-15T10:00:00Z",
+      "metadata": {
+        "compliance_ref": "privacy_policy_3.2",
+        "risk_score": 8
+      }
+    },
+    {
+      "@type": "PolicyRule",
+      "ruleId": "rule_time_window",
+      "policyId": "pol_maintenance_window",
+      "ruleName": "Business Hours Check",
+      "description": "Allows sensitive operations only during business hours unless emergency flag is set",
+      "ruleOrder": 2,
+      "ruleType": "condition",
+      "evaluationMode": "script",
+      "script": "const now = new Date(); const hour = now.getHours(); const isWeekday = now.getDay() >= 1 && now.getDay() <= 5; return (isWeekday && hour >= 9 && hour < 17) || context.emergency_override === true;",
+      "combineOperator": "AND",
+      "negateResult": false,
+      "onMatch": "permit",
+      "onNoMatch": "deny",
+      "actions": "[{\"type\":\"log\",\"message\":\"After-hours access attempt\"}]",
+      "isEnabled": true,
+      "isCacheable": false,
+      "performanceImpact": "negligible",
+      "failureMode": "deny",
+      "timeout": 50,
+      "errorMessage": "This operation is only allowed during business hours (Mon-Fri 9AM-5PM) unless emergency access is granted",
+      "version": 1,
+      "createdAt": "2024-02-01T09:00:00Z",
+      "metadata": {
+        "timezone": "America/New_York",
+        "holidays_api": "https://api.company.com/holidays"
+      }
+    }
+  ]
+}

@@ -1,0 +1,285 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "AccessControlTransaction",
+  "description": "Ensures atomic, consistent access control changes by grouping related permission modifications into transactional units that either completely succeed or completely fail. This entity addresses the critical challenge of maintaining authorization integrity when multiple interdependent changes must occur together - like rotating roles during organizational restructuring, migrating permissions between systems, or implementing new compliance policies. Each transaction encapsulates a series of access control operations (grant, revoke, modify) with ACID properties: Atomicity ensures all changes apply or none do, Consistency maintains valid permission states throughout, Isolation prevents concurrent transactions from interfering, and Durability ensures completed changes persist. Transactions support complex scenarios like swapping user roles (must revoke old before granting new), cascading permission updates (parent change affects all children), and compensating transactions (automatic rollback operations). The entity tracks transaction state through phases: planning (validating changes), execution (applying changes), verification (confirming success), and commitment (making permanent). It handles distributed transactions across multiple systems, two-phase commit protocols for coordination, and saga patterns for long-running operations. Transaction logs provide audit trails for compliance, enable point-in-time recovery for access control state, and support what-if analysis for proposed changes. This transactional approach is essential for maintaining security during bulk permission updates, preventing privilege escalation during transitions, and ensuring zero-downtime access control migrations.",
+  "properties": [
+    {
+      "name": "transactionId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "Unique identifier for this transaction",
+      "required": true,
+      "unique": true
+    },
+    {
+      "name": "transactionType",
+      "type": "string",
+      "mode": "enum",
+      "description": "Category of transaction",
+      "enum": ["role_rotation", "permission_migration", "bulk_update", "policy_deployment", "emergency_change", "rollback"],
+      "required": true
+    },
+    {
+      "name": "description",
+      "type": "string",
+      "mode": "stored",
+      "description": "Explanation of transaction purpose",
+      "required": true,
+      "example": "Quarterly role rotation for security compliance"
+    },
+    {
+      "name": "operations",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON array of operations in transaction",
+      "required": true,
+      "example": "[{\"op\":\"revoke\",\"target\":\"role_admin\",\"user\":\"user_001\"},{\"op\":\"grant\",\"target\":\"role_viewer\",\"user\":\"user_001\"}]"
+    },
+    {
+      "name": "state",
+      "type": "string",
+      "mode": "enum",
+      "description": "Current transaction state",
+      "enum": ["draft", "validating", "preparing", "executing", "verifying", "committing", "committed", "rolling_back", "rolled_back", "failed"],
+      "default": "draft",
+      "required": true
+    },
+    {
+      "name": "isolationLevel",
+      "type": "string",
+      "mode": "enum",
+      "description": "Transaction isolation level",
+      "enum": ["read_uncommitted", "read_committed", "repeatable_read", "serializable"],
+      "default": "serializable"
+    },
+    {
+      "name": "atomicityMode",
+      "type": "string",
+      "mode": "enum",
+      "description": "How atomicity is enforced",
+      "enum": ["all_or_nothing", "best_effort", "eventual_consistency"],
+      "default": "all_or_nothing"
+    },
+    {
+      "name": "validationResults",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON validation checks performed",
+      "nullable": true,
+      "example": "{\"permission_conflicts\":\"none\",\"policy_compliance\":\"passed\",\"dependency_check\":\"satisfied\"}"
+    },
+    {
+      "name": "executionPlan",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON detailed execution strategy",
+      "nullable": true
+    },
+    {
+      "name": "affectedEntities",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON entities impacted by transaction",
+      "example": "{\"users\":[\"user_001\",\"user_002\"],\"roles\":[\"role_admin\"],\"permissions\":[\"perm_delete\"]}"
+    },
+    {
+      "name": "dependencies",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON other transactions this depends on",
+      "nullable": true
+    },
+    {
+      "name": "conflictingTransactions",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON transactions that conflict",
+      "nullable": true
+    },
+    {
+      "name": "rollbackPlan",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON strategy for reverting changes",
+      "nullable": true
+    },
+    {
+      "name": "compensatingActions",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON actions to undo effects",
+      "nullable": true
+    },
+    {
+      "name": "checkpoints",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON savepoints during execution",
+      "nullable": true
+    },
+    {
+      "name": "initiatedBy",
+      "type": "User",
+      "mode": "stored",
+      "description": "Who started this transaction",
+      "required": true
+    },
+    {
+      "name": "approvedBy",
+      "type": "User",
+      "mode": "stored",
+      "description": "Who approved execution",
+      "nullable": true
+    },
+    {
+      "name": "startedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When transaction began executing",
+      "nullable": true
+    },
+    {
+      "name": "committedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When changes were committed",
+      "nullable": true
+    },
+    {
+      "name": "rolledBackAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When transaction was rolled back",
+      "nullable": true
+    },
+    {
+      "name": "timeout",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Maximum seconds for completion",
+      "default": 300
+    },
+    {
+      "name": "retryCount",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Number of retry attempts",
+      "default": 0
+    },
+    {
+      "name": "maxRetries",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Maximum retry attempts allowed",
+      "default": 3
+    },
+    {
+      "name": "errorDetails",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON error information if failed",
+      "nullable": true
+    },
+    {
+      "name": "partialResults",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON operations that succeeded before failure",
+      "nullable": true
+    },
+    {
+      "name": "verificationStatus",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON post-execution verification",
+      "nullable": true
+    },
+    {
+      "name": "auditLog",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON detailed transaction history",
+      "nullable": true
+    },
+    {
+      "name": "isDryRun",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this is a test run",
+      "default": false
+    },
+    {
+      "name": "isReversible",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether transaction can be undone",
+      "default": true
+    },
+    {
+      "name": "priority",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Execution priority",
+      "default": 0
+    },
+    {
+      "name": "metadata",
+      "type": "object",
+      "mode": "stored",
+      "description": "Additional transaction data"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "AccessControlTransaction",
+      "transactionId": "txn_role_rotation_001",
+      "transactionType": "role_rotation",
+      "description": "Quarterly security role rotation - Q1 2024 admin privilege reduction",
+      "operations": "[{\"seq\":1,\"op\":\"revoke\",\"type\":\"role\",\"target\":\"role_super_admin\",\"users\":[\"user_001\",\"user_002\"]},{\"seq\":2,\"op\":\"grant\",\"type\":\"role\",\"target\":\"role_admin\",\"users\":[\"user_001\",\"user_002\"]},{\"seq\":3,\"op\":\"grant\",\"type\":\"role\",\"target\":\"role_super_admin\",\"users\":[\"user_003\"]},{\"seq\":4,\"op\":\"audit\",\"type\":\"log\",\"message\":\"Q1 2024 role rotation completed\"}]",
+      "state": "committed",
+      "isolationLevel": "serializable",
+      "atomicityMode": "all_or_nothing",
+      "validationResults": "{\"conflict_check\":\"passed\",\"permission_continuity\":\"maintained\",\"compliance_check\":\"passed\"}",
+      "affectedEntities": "{\"users\":[\"user_001\",\"user_002\",\"user_003\"],\"roles\":[\"role_super_admin\",\"role_admin\"],\"permission_count\":47}",
+      "rollbackPlan": "{\"strategy\":\"reverse_operations\",\"checkpoint_based\":true,\"verification_required\":true}",
+      "initiatedBy": "user_security_admin",
+      "approvedBy": "user_ciso",
+      "startedAt": "2024-03-01T00:00:00Z",
+      "committedAt": "2024-03-01T00:05:23Z",
+      "timeout": 600,
+      "retryCount": 0,
+      "verificationStatus": "{\"all_operations\":\"successful\",\"permission_state\":\"consistent\",\"no_orphaned_permissions\":true}",
+      "isReversible": true,
+      "priority": 100,
+      "metadata": {
+        "compliance_requirement": "ISO_27001",
+        "change_ticket": "CHG-2024-001"
+      }
+    },
+    {
+      "@type": "AccessControlTransaction",
+      "transactionId": "txn_emergency_002",
+      "transactionType": "emergency_change",
+      "description": "Emergency revocation of compromised contractor access",
+      "operations": "[{\"seq\":1,\"op\":\"revoke\",\"type\":\"all_permissions\",\"user\":\"contractor_compromised\"},{\"seq\":2,\"op\":\"revoke\",\"type\":\"all_roles\",\"user\":\"contractor_compromised\"},{\"seq\":3,\"op\":\"disable\",\"type\":\"account\",\"user\":\"contractor_compromised\"},{\"seq\":4,\"op\":\"notify\",\"targets\":[\"security_team\",\"contractor_manager\"]}]",
+      "state": "committed",
+      "isolationLevel": "read_committed",
+      "atomicityMode": "all_or_nothing",
+      "validationResults": "{\"emergency_override\":true,\"skip_approval\":true}",
+      "affectedEntities": "{\"users\":[\"contractor_compromised\"],\"roles\":5,\"permissions\":23,\"sessions\":3}",
+      "initiatedBy": "user_soc_analyst",
+      "startedAt": "2024-03-15T15:30:00Z",
+      "committedAt": "2024-03-15T15:30:05Z",
+      "timeout": 30,
+      "retryCount": 0,
+      "verificationStatus": "{\"access_revoked\":true,\"sessions_terminated\":true,\"account_disabled\":true}",
+      "isReversible": true,
+      "priority": 999,
+      "metadata": {
+        "incident_id": "SEC-2024-156",
+        "threat_level": "critical"
+      }
+    }
+  ]
+}

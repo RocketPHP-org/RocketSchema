@@ -1,0 +1,223 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "RolePermission",
+  "description": "Maps permissions to roles, defining what actions each role is authorized to perform in the system. This junction table is the heart of RBAC, translating high-level roles into specific, actionable permissions. When a user is assigned the 'Editor' role, this entity defines that editors can 'create:articles', 'edit:articles', 'publish:articles' but not 'delete:articles'. The relationship can be additive (granting permissions) or subtractive (explicitly denying permissions even if inherited from parent roles). This allows fine-tuning of roles - for example, a 'Junior Admin' role might inherit from 'Admin' but have certain dangerous permissions explicitly removed. The entity tracks who granted each permission to the role and when, providing accountability for permission changes. It supports conditional permissions where the same role might have different permissions based on context (time of day, location, resource attributes). Permission changes to roles immediately affect all users with that role, making it efficient to manage access for large groups. The entity maintains history even after permissions are revoked from roles, essential for compliance audits asking 'What could this role do last quarter?'",
+  "properties": [
+    {
+      "name": "role",
+      "type": "Role",
+      "mode": "stored",
+      "description": "The role receiving this permission",
+      "required": true
+    },
+    {
+      "name": "permission",
+      "type": "Permission",
+      "mode": "stored",
+      "description": "The permission being granted or denied",
+      "required": true
+    },
+    {
+      "name": "grantType",
+      "type": "string",
+      "mode": "enum",
+      "description": "Whether this permission is granted or explicitly denied",
+      "enum": ["grant", "deny", "conditional"],
+      "default": "grant",
+      "required": true
+    },
+    {
+      "name": "grantedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When this permission was added to the role",
+      "required": true
+    },
+    {
+      "name": "grantedBy",
+      "type": "User",
+      "mode": "stored",
+      "description": "Administrator who added this permission",
+      "nullable": true
+    },
+    {
+      "name": "reason",
+      "type": "string",
+      "mode": "stored",
+      "description": "Explanation for adding this permission to the role",
+      "nullable": true,
+      "example": "Required for content management duties"
+    },
+    {
+      "name": "scope",
+      "type": "string",
+      "mode": "stored",
+      "description": "Context where this permission applies",
+      "nullable": true,
+      "example": "department:marketing"
+    },
+    {
+      "name": "conditions",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON conditions that must be met for permission to apply",
+      "nullable": true,
+      "example": "{\"resource_owner\":\"self\",\"resource_status\":\"draft\"}"
+    },
+    {
+      "name": "restrictions",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON restrictions limiting the permission",
+      "nullable": true,
+      "example": "{\"max_records\":100,\"allowed_fields\":[\"name\",\"email\"]}"
+    },
+    {
+      "name": "priority",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Resolution order when conflicts occur (higher wins)",
+      "default": 0
+    },
+    {
+      "name": "isInherited",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this permission comes from a parent role",
+      "default": false
+    },
+    {
+      "name": "inheritedFrom",
+      "type": "Role",
+      "mode": "stored",
+      "description": "Parent role this permission is inherited from",
+      "nullable": true
+    },
+    {
+      "name": "canDelegate",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether users with this role can delegate this permission",
+      "default": false
+    },
+    {
+      "name": "requiresMfa",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether 2FA is required when using this permission",
+      "default": false
+    },
+    {
+      "name": "requiresApproval",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether using this permission needs real-time approval",
+      "default": false
+    },
+    {
+      "name": "approvalConfig",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON configuration for approval workflow",
+      "nullable": true,
+      "example": "{\"approvers\":[\"manager\",\"security_team\"],\"timeout_hours\":24}"
+    },
+    {
+      "name": "validFrom",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When this permission becomes active for the role",
+      "nullable": true
+    },
+    {
+      "name": "validUntil",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When this permission expires for the role",
+      "nullable": true
+    },
+    {
+      "name": "isActive",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this permission grant is currently active",
+      "default": true
+    },
+    {
+      "name": "suspendedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When this permission was temporarily suspended",
+      "nullable": true
+    },
+    {
+      "name": "suspendedReason",
+      "type": "string",
+      "mode": "stored",
+      "description": "Why this permission was suspended",
+      "nullable": true
+    },
+    {
+      "name": "revokedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When this permission was removed from the role",
+      "nullable": true
+    },
+    {
+      "name": "revokedBy",
+      "type": "User",
+      "mode": "stored",
+      "description": "Who removed this permission",
+      "nullable": true
+    },
+    {
+      "name": "metadata",
+      "type": "object",
+      "mode": "stored",
+      "description": "Additional configuration data"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "RolePermission",
+      "grantType": "grant",
+      "grantedAt": "2024-01-15T10:00:00Z",
+      "grantedBy": "admin_123",
+      "reason": "Standard permission for content editors",
+      "scope": "global",
+      "conditions": "{\"content_type\":[\"article\",\"blog\",\"page\"],\"workflow_state\":[\"draft\",\"review\"]}",
+      "priority": 50,
+      "isInherited": false,
+      "canDelegate": false,
+      "requiresMfa": false,
+      "requiresApproval": false,
+      "isActive": true,
+      "metadata": {
+        "permission_group": "content_management",
+        "risk_assessed": true
+      }
+    },
+    {
+      "@type": "RolePermission",
+      "grantType": "deny",
+      "grantedAt": "2024-02-01T14:00:00Z",
+      "grantedBy": "security_admin",
+      "reason": "Restrict junior admins from user deletion to prevent accidents",
+      "scope": "global",
+      "priority": 100,
+      "isInherited": true,
+      "inheritedFrom": "role_admin",
+      "canDelegate": false,
+      "requiresMfa": true,
+      "requiresApproval": true,
+      "approvalConfig": "{\"approvers\":[\"senior_admin\",\"security_team\"],\"timeout_hours\":4,\"emergency_bypass\":false}",
+      "isActive": true,
+      "metadata": {
+        "override_reason": "security_policy",
+        "review_date": "2024-06-01"
+      }
+    }
+  ]
+}

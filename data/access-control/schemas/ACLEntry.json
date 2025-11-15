@@ -1,0 +1,291 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "ACLEntry",
+  "description": "Defines access control list entries that specify precise permissions for principals on specific resources, implementing discretionary access control (DAC) at the most granular level. ACL entries are the building blocks of resource-centric security, where each resource (file, folder, database, API endpoint) maintains a list of who can do what with it. Unlike role-based permissions that apply broadly, ACL entries provide fine-grained control for specific resource instances. Each entry defines a principal (user, group, or service), the resource they can access, and exactly what operations are allowed or denied. This is essential for implementing ownership models where resource creators control access, handling exceptions to broader policies, and managing shared resources with complex permission requirements. ACL entries support inheritance from parent resources (folders passing permissions to files), explicit deny rules that override allows, and conditional access based on resource state or context. They can specify different permissions for different aspects of a resource - for example, allowing read of metadata but not content, or permitting updates to certain fields only. The system evaluates ACL entries in a specific order, considering inheritance, explicit entries, and deny-before-allow rules. This granular control is crucial for compliance scenarios requiring proof of exactly who had access to specific data at specific times.",
+  "properties": [
+    {
+      "name": "aclId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "Unique identifier for this ACL entry",
+      "required": true,
+      "unique": true
+    },
+    {
+      "name": "resourceType",
+      "type": "string",
+      "mode": "stored",
+      "description": "Type of resource this ACL applies to",
+      "required": true,
+      "example": "document"
+    },
+    {
+      "name": "resourceId",
+      "type": "string",
+      "mode": "stored",
+      "description": "Specific resource identifier",
+      "required": true,
+      "example": "doc_financial_report_2024"
+    },
+    {
+      "name": "principalType",
+      "type": "string",
+      "mode": "enum",
+      "description": "Type of principal being granted access",
+      "enum": ["user", "group", "role", "service", "everyone", "authenticated", "anonymous"],
+      "required": true
+    },
+    {
+      "name": "principalId",
+      "type": "string",
+      "mode": "stored",
+      "description": "Identifier of the principal",
+      "required": true
+    },
+    {
+      "name": "permissions",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON array of granted permissions",
+      "required": true,
+      "example": "[\"read\",\"write\",\"delete\",\"share\"]"
+    },
+    {
+      "name": "grantType",
+      "type": "string",
+      "mode": "enum",
+      "description": "Whether permissions are granted or denied",
+      "enum": ["allow", "deny"],
+      "default": "allow",
+      "required": true
+    },
+    {
+      "name": "scope",
+      "type": "string",
+      "mode": "enum",
+      "description": "Scope of the ACL entry",
+      "enum": ["resource_only", "resource_and_children", "children_only", "recursive"],
+      "default": "resource_only"
+    },
+    {
+      "name": "inheritanceType",
+      "type": "string",
+      "mode": "enum",
+      "description": "How this ACL interacts with inherited permissions",
+      "enum": ["override", "merge", "block_inheritance"],
+      "default": "merge"
+    },
+    {
+      "name": "isInherited",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this ACL was inherited from parent",
+      "default": false
+    },
+    {
+      "name": "inheritedFrom",
+      "type": "string",
+      "mode": "stored",
+      "description": "Parent resource this was inherited from",
+      "nullable": true
+    },
+    {
+      "name": "priority",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Evaluation order (higher priority evaluated first)",
+      "default": 0
+    },
+    {
+      "name": "conditions",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON conditions for when ACL applies",
+      "nullable": true,
+      "example": "{\"resource_state\":\"published\",\"time_range\":\"business_hours\"}"
+    },
+    {
+      "name": "fieldRestrictions",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON specifying field-level permissions",
+      "nullable": true,
+      "example": "{\"allowed_fields\":[\"title\",\"summary\"],\"denied_fields\":[\"salary\",\"ssn\"]}"
+    },
+    {
+      "name": "maxAccessCount",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Maximum number of times resource can be accessed",
+      "nullable": true
+    },
+    {
+      "name": "currentAccessCount",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Current access count",
+      "default": 0
+    },
+    {
+      "name": "validFrom",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When this ACL becomes effective",
+      "nullable": true
+    },
+    {
+      "name": "validUntil",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When this ACL expires",
+      "nullable": true
+    },
+    {
+      "name": "grantedBy",
+      "type": "User",
+      "mode": "stored",
+      "description": "Who created this ACL entry",
+      "nullable": true
+    },
+    {
+      "name": "grantedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When ACL was granted",
+      "required": true
+    },
+    {
+      "name": "reason",
+      "type": "string",
+      "mode": "stored",
+      "description": "Explanation for this ACL entry",
+      "nullable": true
+    },
+    {
+      "name": "requiresMfa",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether MFA is required for access",
+      "default": false
+    },
+    {
+      "name": "requiresApproval",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether access requires runtime approval",
+      "default": false
+    },
+    {
+      "name": "approvalConfig",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON configuration for approval workflow",
+      "nullable": true
+    },
+    {
+      "name": "auditLevel",
+      "type": "string",
+      "mode": "enum",
+      "description": "Level of auditing for access via this ACL",
+      "enum": ["none", "basic", "detailed", "full"],
+      "default": "basic"
+    },
+    {
+      "name": "propagate",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether to propagate to child resources",
+      "default": true
+    },
+    {
+      "name": "isActive",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this ACL entry is active",
+      "default": true
+    },
+    {
+      "name": "lastUsedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Last time this ACL was used for access",
+      "nullable": true
+    },
+    {
+      "name": "usageCount",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Number of times this ACL has been used",
+      "default": 0
+    },
+    {
+      "name": "metadata",
+      "type": "object",
+      "mode": "stored",
+      "description": "Additional ACL configuration"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "ACLEntry",
+      "aclId": "acl_doc_001",
+      "resourceType": "document",
+      "resourceId": "doc_annual_report_2024",
+      "principalType": "group",
+      "principalId": "grp_finance_team",
+      "permissions": "[\"read\",\"write\",\"comment\",\"version\"]",
+      "grantType": "allow",
+      "scope": "resource_only",
+      "inheritanceType": "merge",
+      "isInherited": false,
+      "priority": 50,
+      "conditions": "{\"document_state\":[\"draft\",\"review\"],\"work_hours\":true}",
+      "fieldRestrictions": "{\"denied_fields\":[\"executive_summary\",\"confidential_notes\"]}",
+      "validFrom": "2024-01-01T00:00:00Z",
+      "validUntil": "2024-12-31T23:59:59Z",
+      "grantedBy": "user_cfo",
+      "grantedAt": "2024-01-01T00:00:00Z",
+      "reason": "Finance team needs edit access to prepare annual report",
+      "requiresMfa": true,
+      "requiresApproval": false,
+      "auditLevel": "detailed",
+      "propagate": false,
+      "isActive": true,
+      "lastUsedAt": "2024-03-15T10:30:00Z",
+      "usageCount": 156,
+      "metadata": {
+        "project": "annual_report_2024",
+        "sensitivity": "high"
+      }
+    },
+    {
+      "@type": "ACLEntry",
+      "aclId": "acl_folder_002",
+      "resourceType": "folder",
+      "resourceId": "folder_customer_data",
+      "principalType": "user",
+      "principalId": "user_contractor_123",
+      "permissions": "[\"read\",\"list\"]",
+      "grantType": "deny",
+      "scope": "recursive",
+      "inheritanceType": "override",
+      "isInherited": false,
+      "priority": 100,
+      "conditions": "{\"after_date\":\"2024-06-01\"}",
+      "maxAccessCount": 0,
+      "validFrom": "2024-06-01T00:00:00Z",
+      "grantedBy": "user_security_admin",
+      "grantedAt": "2024-05-15T00:00:00Z",
+      "reason": "Contractor engagement ends May 31, 2024 - preventive access removal",
+      "requiresMfa": true,
+      "auditLevel": "full",
+      "propagate": true,
+      "isActive": true,
+      "metadata": {
+        "contract_end": "2024-05-31",
+        "security_review": "required"
+      }
+    }
+  ]
+}

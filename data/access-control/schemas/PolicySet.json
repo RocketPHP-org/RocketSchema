@@ -1,0 +1,275 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "PolicySet",
+  "description": "Groups related access policies into cohesive sets that can be managed, deployed, and evaluated together, providing organizational structure for complex policy landscapes. Policy sets are containers that bundle policies sharing common purposes, compliance requirements, or organizational scope - like 'GDPR Compliance Policies' or 'Financial Data Protection'. This hierarchical organization allows policy administrators to manage hundreds of policies efficiently, deploy entire policy frameworks at once, and ensure comprehensive coverage without gaps or conflicts. Each set can contain other sets (nested hierarchy), individual policies, and rules, with sophisticated combination algorithms determining how multiple policies interact. The entity supports different policy combination methods: permit-overrides (any allow wins), deny-overrides (any deny wins), first-applicable (stop at first match), or consensus-based. Policy sets can be versioned as a unit, enabling rollback of entire policy frameworks if issues arise. They support staged deployment where sets are tested in non-production before enterprise-wide activation. The entity handles policy inheritance where child organizations inherit parent policy sets but can add local policies. This is essential for multi-tenant systems where base policies apply to all while allowing customization, regulatory compliance where entire frameworks must be adopted together, and enterprise governance where consistent policy application across divisions is required.",
+  "properties": [
+    {
+      "name": "policySetId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "Unique identifier for this policy set",
+      "required": true,
+      "unique": true
+    },
+    {
+      "name": "code",
+      "type": "string",
+      "mode": "stored",
+      "description": "Unique machine-readable identifier",
+      "required": true,
+      "unique": true,
+      "example": "PS_FINANCIAL_COMPLIANCE"
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "mode": "stored",
+      "description": "Human-readable name of the policy set",
+      "required": true,
+      "example": "Financial Services Compliance Policy Set"
+    },
+    {
+      "name": "description",
+      "type": "string",
+      "mode": "stored",
+      "description": "Detailed explanation of the policy set's purpose",
+      "required": true,
+      "example": "Comprehensive policies ensuring compliance with SOX, PCI-DSS, and internal financial controls"
+    },
+    {
+      "name": "category",
+      "type": "string",
+      "mode": "enum",
+      "description": "Category of policy set",
+      "enum": ["compliance", "security", "privacy", "operational", "custom"],
+      "required": true
+    },
+    {
+      "name": "scope",
+      "type": "string",
+      "mode": "stored",
+      "description": "Organizational scope where this set applies",
+      "example": "organization:finance_dept"
+    },
+    {
+      "name": "parentSetId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "Parent policy set in hierarchy",
+      "nullable": true
+    },
+    {
+      "name": "policies",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON array of policy IDs in this set",
+      "example": "[\"pol_001\",\"pol_002\",\"pol_003\"]"
+    },
+    {
+      "name": "childSets",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON array of child policy set IDs",
+      "nullable": true
+    },
+    {
+      "name": "combiningAlgorithm",
+      "type": "string",
+      "mode": "enum",
+      "description": "How to combine policy decisions",
+      "enum": ["permit_overrides", "deny_overrides", "first_applicable", "only_one_applicable", "consensus"],
+      "default": "deny_overrides"
+    },
+    {
+      "name": "priority",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Evaluation order when multiple sets apply",
+      "default": 0
+    },
+    {
+      "name": "target",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON criteria for when this set applies",
+      "example": "{\"resource_type\":[\"financial_data\",\"payment_info\"],\"user_department\":\"finance\"}"
+    },
+    {
+      "name": "obligations",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON array of required actions when set is evaluated",
+      "nullable": true
+    },
+    {
+      "name": "advice",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON array of optional recommendations",
+      "nullable": true
+    },
+    {
+      "name": "version",
+      "type": "string",
+      "mode": "stored",
+      "description": "Version identifier for the policy set",
+      "required": true,
+      "example": "2.1.0"
+    },
+    {
+      "name": "status",
+      "type": "string",
+      "mode": "enum",
+      "description": "Current status of the policy set",
+      "enum": ["draft", "testing", "active", "deprecated", "archived"],
+      "default": "draft"
+    },
+    {
+      "name": "effectiveFrom",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When this policy set becomes effective",
+      "nullable": true
+    },
+    {
+      "name": "effectiveUntil",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When this policy set expires",
+      "nullable": true
+    },
+    {
+      "name": "complianceFrameworks",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON array of compliance requirements addressed",
+      "example": "[\"SOX\",\"PCI-DSS\",\"GDPR\"]"
+    },
+    {
+      "name": "testResults",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON results from policy testing",
+      "nullable": true
+    },
+    {
+      "name": "deploymentStage",
+      "type": "string",
+      "mode": "enum",
+      "description": "Current deployment stage",
+      "enum": ["development", "testing", "staging", "production"],
+      "default": "development"
+    },
+    {
+      "name": "approvedBy",
+      "type": "User",
+      "mode": "stored",
+      "description": "Who approved this policy set",
+      "nullable": true
+    },
+    {
+      "name": "approvedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When the set was approved",
+      "nullable": true
+    },
+    {
+      "name": "lastReviewDate",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Last compliance review",
+      "nullable": true
+    },
+    {
+      "name": "nextReviewDate",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When next review is due",
+      "nullable": true
+    },
+    {
+      "name": "createdBy",
+      "type": "User",
+      "mode": "stored",
+      "description": "Policy set author",
+      "required": true
+    },
+    {
+      "name": "createdAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Creation timestamp",
+      "required": true
+    },
+    {
+      "name": "metadata",
+      "type": "object",
+      "mode": "stored",
+      "description": "Additional configuration"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "PolicySet",
+      "policySetId": "ps_financial_001",
+      "code": "PS_FINANCIAL_COMPLIANCE",
+      "name": "Financial Services Compliance Suite",
+      "description": "Complete policy framework for financial data protection, transaction security, and regulatory compliance",
+      "category": "compliance",
+      "scope": "department:finance",
+      "policies": "[\"pol_transaction_limits\",\"pol_dual_approval\",\"pol_audit_logging\",\"pol_data_encryption\"]",
+      "childSets": "[\"ps_sox_compliance\",\"ps_pci_compliance\"]",
+      "combiningAlgorithm": "deny_overrides",
+      "priority": 100,
+      "target": "{\"resource_classification\":[\"financial\",\"pii\"],\"transaction_value\":{\"$gt\":1000}}",
+      "obligations": "[{\"action\":\"audit_log\",\"level\":\"detailed\"},{\"action\":\"encrypt\",\"algorithm\":\"AES-256\"}]",
+      "version": "3.2.1",
+      "status": "active",
+      "effectiveFrom": "2024-01-01T00:00:00Z",
+      "complianceFrameworks": "[\"SOX\",\"PCI-DSS\",\"Basel III\"]",
+      "deploymentStage": "production",
+      "approvedBy": "compliance_officer",
+      "approvedAt": "2023-12-15T10:00:00Z",
+      "lastReviewDate": "2024-02-01T00:00:00Z",
+      "nextReviewDate": "2024-05-01T00:00:00Z",
+      "createdAt": "2023-11-01T00:00:00Z",
+      "metadata": {
+        "regulatory_citations": ["SOX-404", "PCI-DSS-3.2.1"],
+        "risk_rating": "critical"
+      }
+    },
+    {
+      "@type": "PolicySet",
+      "policySetId": "ps_gdpr_002",
+      "code": "PS_GDPR_PRIVACY",
+      "name": "GDPR Privacy Protection Framework",
+      "description": "EU data protection policies ensuring GDPR compliance for personal data processing",
+      "category": "privacy",
+      "scope": "global",
+      "parentSetId": "ps_master_privacy",
+      "policies": "[\"pol_consent_management\",\"pol_right_to_erasure\",\"pol_data_portability\",\"pol_breach_notification\"]",
+      "combiningAlgorithm": "deny_overrides",
+      "priority": 90,
+      "target": "{\"data_subjects\":[\"eu_resident\"],\"data_type\":\"personal_data\"}",
+      "obligations": "[{\"action\":\"obtain_consent\"},{\"action\":\"maintain_processing_records\"},{\"action\":\"enable_data_export\"}]",
+      "advice": "[{\"recommendation\":\"privacy_impact_assessment\"}]",
+      "version": "2.0.0",
+      "status": "active",
+      "effectiveFrom": "2018-05-25T00:00:00Z",
+      "complianceFrameworks": "[\"GDPR\",\"ePrivacy\"]",
+      "deploymentStage": "production",
+      "approvedBy": "dpo",
+      "approvedAt": "2018-05-01T00:00:00Z",
+      "lastReviewDate": "2024-01-15T00:00:00Z",
+      "nextReviewDate": "2024-07-15T00:00:00Z",
+      "createdBy": "privacy_team",
+      "createdAt": "2018-03-01T00:00:00Z",
+      "metadata": {
+        "gdpr_articles": ["6", "7", "15-22", "25", "32"],
+        "automated_enforcement": true
+      }
+    }
+  ]
+}

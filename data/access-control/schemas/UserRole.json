@@ -1,0 +1,238 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "UserRole",
+  "description": "Links users to their assigned roles, forming the core relationship in Role-Based Access Control (RBAC). This junction table manages which roles each user has, when they were granted, by whom, and when they expire. A single user can have multiple roles, and the same role can be assigned to many users, creating a many-to-many relationship. This entity goes beyond simple linking by tracking the complete lifecycle of role assignments including the reason for granting, approval chains, activation dates, and expiration. Temporary role assignments are common for contractors or for elevated privileges during emergencies. The entity supports role delegation, where a manager can grant their roles to subordinates temporarily. It also handles contextual roles - a user might be an 'Admin' for Project A but only a 'Viewer' for Project B. The system evaluates all active user roles to determine the complete set of permissions. Historical records are maintained even after roles expire or are revoked, providing an audit trail for compliance. This is critical for answering questions like 'Who had admin access last month?' during security investigations.",
+  "properties": [
+    {
+      "name": "user",
+      "type": "User",
+      "mode": "stored",
+      "description": "The user receiving this role assignment",
+      "required": true
+    },
+    {
+      "name": "role",
+      "type": "Role",
+      "mode": "stored",
+      "description": "The role being assigned to the user",
+      "required": true
+    },
+    {
+      "name": "assignmentId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "Unique identifier for this specific assignment",
+      "required": true,
+      "unique": true
+    },
+    {
+      "name": "assignedBy",
+      "type": "User",
+      "mode": "stored",
+      "description": "Administrator who granted this role",
+      "nullable": true
+    },
+    {
+      "name": "assignedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When the role was granted",
+      "required": true
+    },
+    {
+      "name": "assignmentReason",
+      "type": "string",
+      "mode": "stored",
+      "description": "Explanation for why this role was granted",
+      "nullable": true,
+      "example": "Promoted to team lead position"
+    },
+    {
+      "name": "activatedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When the role becomes active (can be future-dated)",
+      "required": true
+    },
+    {
+      "name": "expiresAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When this role assignment expires",
+      "nullable": true
+    },
+    {
+      "name": "scope",
+      "type": "string",
+      "mode": "stored",
+      "description": "Context where this role applies (project, department, etc.)",
+      "nullable": true,
+      "example": "project:proj_123"
+    },
+    {
+      "name": "isPrimary",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this is the user's primary role",
+      "default": false
+    },
+    {
+      "name": "isTemporary",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this is a temporary assignment",
+      "default": false
+    },
+    {
+      "name": "isDelegated",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this role was delegated from another user",
+      "default": false
+    },
+    {
+      "name": "delegatedFrom",
+      "type": "User",
+      "mode": "stored",
+      "description": "Original role holder who delegated this role",
+      "nullable": true
+    },
+    {
+      "name": "approvalStatus",
+      "type": "string",
+      "mode": "enum",
+      "description": "Approval state if role requires approval",
+      "enum": ["pending", "approved", "rejected", "expired"],
+      "nullable": true
+    },
+    {
+      "name": "approvedBy",
+      "type": "User",
+      "mode": "stored",
+      "description": "Manager who approved this role assignment",
+      "nullable": true
+    },
+    {
+      "name": "approvedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When the assignment was approved",
+      "nullable": true
+    },
+    {
+      "name": "approvalNotes",
+      "type": "string",
+      "mode": "stored",
+      "description": "Comments from the approval process",
+      "nullable": true
+    },
+    {
+      "name": "conditions",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON conditions that must be met for role to be active",
+      "nullable": true,
+      "example": "{\"location\":\"office\",\"time\":\"business_hours\"}"
+    },
+    {
+      "name": "isActive",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this role assignment is currently active",
+      "default": true
+    },
+    {
+      "name": "suspendedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When the role was temporarily suspended",
+      "nullable": true
+    },
+    {
+      "name": "suspendedReason",
+      "type": "string",
+      "mode": "stored",
+      "description": "Why the role was suspended",
+      "nullable": true
+    },
+    {
+      "name": "revokedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When the role was permanently revoked",
+      "nullable": true
+    },
+    {
+      "name": "revokedBy",
+      "type": "User",
+      "mode": "stored",
+      "description": "Who revoked this role assignment",
+      "nullable": true
+    },
+    {
+      "name": "revokedReason",
+      "type": "string",
+      "mode": "stored",
+      "description": "Reason for revoking the role",
+      "nullable": true
+    },
+    {
+      "name": "lastUsedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Last time permissions from this role were used",
+      "nullable": true
+    },
+    {
+      "name": "metadata",
+      "type": "object",
+      "mode": "stored",
+      "description": "Additional assignment-specific data"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "UserRole",
+      "assignmentId": "assign_abc123",
+      "assignedAt": "2024-03-01T10:00:00Z",
+      "assignmentReason": "Promoted to Engineering Manager",
+      "activatedAt": "2024-03-01T10:00:00Z",
+      "expiresAt": null,
+      "scope": "department:engineering",
+      "isPrimary": true,
+      "isTemporary": false,
+      "isDelegated": false,
+      "approvalStatus": "approved",
+      "approvedBy": "director_456",
+      "approvedAt": "2024-03-01T09:30:00Z",
+      "approvalNotes": "Approved per HR recommendation",
+      "isActive": true,
+      "lastUsedAt": "2024-03-15T14:30:00Z",
+      "metadata": {
+        "teamSize": 12,
+        "previousRole": "senior_engineer"
+      }
+    },
+    {
+      "@type": "UserRole",
+      "assignmentId": "assign_temp_789",
+      "assignedBy": "manager_123",
+      "assignedAt": "2024-03-10T08:00:00Z",
+      "assignmentReason": "Covering for admin during vacation",
+      "activatedAt": "2024-03-10T08:00:00Z",
+      "expiresAt": "2024-03-24T17:00:00Z",
+      "scope": "global",
+      "isPrimary": false,
+      "isTemporary": true,
+      "isDelegated": true,
+      "delegatedFrom": "admin_primary",
+      "conditions": "{\"max_operations_per_day\":50,\"restricted_actions\":[\"delete_users\",\"modify_billing\"]}",
+      "isActive": true,
+      "metadata": {
+        "coverageType": "vacation",
+        "originalRoleHolder": "admin_primary"
+      }
+    }
+  ]
+}

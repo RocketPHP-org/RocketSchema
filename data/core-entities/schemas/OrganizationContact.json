@@ -8,37 +8,45 @@
     {
       "name": "role",
       "type": "string",
+      "mode": "stored",
       "description": "Role or position of the contact person in the organization",
       "example": "Sales Manager"
     },
     {
       "name": "department",
       "type": "string",
+      "mode": "stored",
       "description": "Department or division within the organization",
       "example": "Sales"
     },
     {
       "name": "isPrimary",
       "type": "boolean",
+      "mode": "stored",
       "description": "Whether this is the primary contact for the organization",
       "example": true
     },
     {
       "name": "contactPurpose",
       "type": "string",
-      "description": "Purpose of contact (billing, technical, administrative, sales, support, emergency)",
+      "mode": "enum",
+      "description": "Purpose of contact",
+      "enum": ["billing", "technical", "administrative", "sales", "support", "emergency"],
       "example": "sales"
     },
     {
       "name": "availability",
       "type": "string",
+      "mode": "stored",
       "description": "Availability information or hours",
       "example": "Monday-Friday, 9AM-5PM EST"
     },
     {
       "name": "preferredContactMethod",
       "type": "string",
-      "description": "Preferred method of contact (email, phone, sms)",
+      "mode": "enum",
+      "description": "Preferred method of contact",
+      "enum": ["email", "phone", "sms"],
       "example": "email"
     }
   ],

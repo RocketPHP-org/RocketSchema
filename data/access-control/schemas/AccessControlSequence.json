@@ -1,0 +1,281 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "AccessControlSequence",
+  "description": "Orchestrates complex, multi-step authorization workflows where access decisions require sequential evaluation of multiple policies, conditions, and approvals in a specific order. This entity represents authorization chains that cannot be evaluated in parallel - each step depends on the outcome of previous steps, creating sophisticated decision trees. For example, accessing classified documents might require: first checking security clearance, then verifying need-to-know, then checking time-window restrictions, then obtaining supervisor approval, and finally logging the access attempt. Each step in the sequence can have different evaluation criteria, different fallback behaviors, and different side effects. The sequence supports branching logic where different paths are taken based on intermediate results, loops for retry scenarios, and rollback capabilities if later steps fail. It enables progressive authorization where initial steps grant partial access and subsequent steps unlock additional capabilities. The entity tracks sequence execution state, allowing long-running authorization processes that span multiple user sessions or require human intervention. Sequences can be templated for common scenarios (onboarding workflow, privileged access elevation), dynamically generated based on risk assessment, or manually configured for special cases. This sequential processing is essential for implementing complex compliance requirements, multi-party approval processes, and adaptive security protocols that adjust based on accumulating evidence of legitimacy or risk.",
+  "properties": [
+    {
+      "name": "sequenceId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "Unique identifier for this sequence",
+      "required": true,
+      "unique": true
+    },
+    {
+      "name": "sequenceName",
+      "type": "string",
+      "mode": "stored",
+      "description": "Human-readable name for the sequence",
+      "required": true,
+      "example": "Classified Document Access Flow"
+    },
+    {
+      "name": "description",
+      "type": "string",
+      "mode": "stored",
+      "description": "Explanation of the sequence purpose",
+      "example": "Multi-step verification process for accessing classified materials"
+    },
+    {
+      "name": "sequenceType",
+      "type": "string",
+      "mode": "enum",
+      "description": "Category of sequence",
+      "enum": ["authorization", "approval", "verification", "escalation", "remediation", "audit"],
+      "required": true
+    },
+    {
+      "name": "steps",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON array of sequence steps in order",
+      "required": true,
+      "example": "[{\"step\":1,\"type\":\"policy_check\",\"target\":\"clearance_policy\"},{\"step\":2,\"type\":\"approval\",\"target\":\"supervisor\"}]"
+    },
+    {
+      "name": "currentStep",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Currently executing step",
+      "default": 0
+    },
+    {
+      "name": "executionState",
+      "type": "string",
+      "mode": "enum",
+      "description": "Current state of sequence execution",
+      "enum": ["pending", "running", "paused", "completed", "failed", "rolled_back", "cancelled"],
+      "default": "pending"
+    },
+    {
+      "name": "flowControl",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON flow control logic",
+      "example": "{\"on_step_failure\":\"rollback\",\"on_timeout\":\"escalate\",\"allow_skip\":[3,4],\"retry_count\":2}"
+    },
+    {
+      "name": "branchingLogic",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON branching conditions between steps",
+      "nullable": true,
+      "example": "{\"step_2_outcome\":{\"approved\":\"goto_step_3\",\"denied\":\"end_sequence\",\"conditional\":\"goto_step_2a\"}}"
+    },
+    {
+      "name": "variables",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON variables passed between steps",
+      "nullable": true,
+      "example": "{\"risk_score\":0,\"approvals_collected\":[],\"conditions_met\":[]}"
+    },
+    {
+      "name": "stepResults",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON results from each completed step",
+      "nullable": true
+    },
+    {
+      "name": "timeConstraints",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON time limits for sequence and steps",
+      "nullable": true,
+      "example": "{\"total_timeout\":3600,\"step_timeouts\":{\"1\":60,\"2\":1800}}"
+    },
+    {
+      "name": "rollbackStrategy",
+      "type": "string",
+      "mode": "enum",
+      "description": "How to handle rollbacks",
+      "enum": ["none", "full", "partial", "compensating"],
+      "default": "none"
+    },
+    {
+      "name": "rollbackActions",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON actions to perform on rollback",
+      "nullable": true
+    },
+    {
+      "name": "parallelSteps",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON array of steps that can run in parallel",
+      "nullable": true,
+      "example": "[[2,3],[5,6,7]]"
+    },
+    {
+      "name": "requiredApprovals",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Minimum approvals needed to proceed",
+      "default": 0
+    },
+    {
+      "name": "collectedApprovals",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON array of approvals gathered",
+      "nullable": true
+    },
+    {
+      "name": "contextId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "Access context this sequence relates to",
+      "nullable": true
+    },
+    {
+      "name": "userId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "User this sequence is executing for",
+      "required": true
+    },
+    {
+      "name": "resourceId",
+      "type": "string",
+      "mode": "stored",
+      "description": "Resource being accessed",
+      "nullable": true
+    },
+    {
+      "name": "startedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When sequence execution began",
+      "nullable": true
+    },
+    {
+      "name": "completedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When sequence finished",
+      "nullable": true
+    },
+    {
+      "name": "pausedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When sequence was paused",
+      "nullable": true
+    },
+    {
+      "name": "expiresAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When sequence expires if not completed",
+      "nullable": true
+    },
+    {
+      "name": "finalOutcome",
+      "type": "string",
+      "mode": "enum",
+      "description": "Final result of sequence",
+      "enum": ["granted", "denied", "partial", "expired", "error"],
+      "nullable": true
+    },
+    {
+      "name": "auditTrail",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON detailed execution history",
+      "nullable": true
+    },
+    {
+      "name": "errorDetails",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON error information if failed",
+      "nullable": true
+    },
+    {
+      "name": "isTemplate",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this is a reusable template",
+      "default": false
+    },
+    {
+      "name": "templateId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "Template this was created from",
+      "nullable": true
+    },
+    {
+      "name": "metadata",
+      "type": "object",
+      "mode": "stored",
+      "description": "Additional sequence configuration"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "AccessControlSequence",
+      "sequenceId": "seq_classified_001",
+      "sequenceName": "Classified Document Access Workflow",
+      "description": "Multi-step verification and approval process for accessing classified documents",
+      "sequenceType": "authorization",
+      "steps": "[{\"step\":1,\"type\":\"policy_check\",\"target\":\"security_clearance_policy\",\"required\":true},{\"step\":2,\"type\":\"condition_check\",\"target\":\"need_to_know_verification\",\"required\":true},{\"step\":3,\"type\":\"approval\",\"target\":\"classification_authority\",\"timeout\":1800},{\"step\":4,\"type\":\"mfa_challenge\",\"target\":\"user\",\"required\":true},{\"step\":5,\"type\":\"audit_log\",\"target\":\"security_audit_system\",\"required\":true}]",
+      "currentStep": 3,
+      "executionState": "paused",
+      "flowControl": "{\"on_step_failure\":\"deny_and_alert\",\"on_timeout\":\"escalate_to_security\",\"max_duration\":3600,\"retry_enabled\":false}",
+      "branchingLogic": "{\"step_1\":{\"pass\":\"continue\",\"fail\":\"terminate\"},\"step_3\":{\"approved\":\"continue\",\"denied\":\"terminate\",\"escalated\":\"goto_step_3a\"}}",
+      "variables": "{\"clearance_level\":3,\"classification_level\":\"secret\",\"risk_score\":45}",
+      "stepResults": "[{\"step\":1,\"result\":\"pass\",\"details\":{\"clearance_valid\":true,\"level\":\"secret\"}},{\"step\":2,\"result\":\"pass\",\"details\":{\"need_to_know\":\"verified\",\"project\":\"PROJECT_ALPHA\"}}]",
+      "timeConstraints": "{\"total_timeout\":3600,\"step_timeouts\":{\"3\":1800,\"4\":300}}",
+      "rollbackStrategy": "full",
+      "requiredApprovals": 2,
+      "collectedApprovals": "[{\"approver\":\"security_officer_001\",\"timestamp\":\"2024-03-15T14:00:00Z\",\"decision\":\"approved\"}]",
+      "userId": "user_analyst_001",
+      "resourceId": "doc_classified_report_2024",
+      "startedAt": "2024-03-15T13:45:00Z",
+      "pausedAt": "2024-03-15T14:00:00Z",
+      "expiresAt": "2024-03-15T14:45:00Z",
+      "auditTrail": "[{\"timestamp\":\"2024-03-15T13:45:00Z\",\"event\":\"sequence_started\"},{\"timestamp\":\"2024-03-15T13:45:05Z\",\"event\":\"step_1_completed\",\"result\":\"pass\"}]",
+      "metadata": {
+        "classification": "secret",
+        "compliance_framework": "NIST_800-53"
+      }
+    },
+    {
+      "@type": "AccessControlSequence",
+      "sequenceId": "seq_emergency_002",
+      "sequenceName": "Emergency Access Escalation",
+      "description": "Rapid escalation sequence for emergency production access",
+      "sequenceType": "escalation",
+      "steps": "[{\"step\":1,\"type\":\"identity_verification\",\"target\":\"mfa_system\"},{\"step\":2,\"type\":\"automated_risk_check\",\"target\":\"risk_engine\"},{\"step\":3,\"type\":\"notification\",\"target\":\"on_call_team\"},{\"step\":4,\"type\":\"temporary_grant\",\"target\":\"permission_system\"}]",
+      "currentStep": 4,
+      "executionState": "completed",
+      "flowControl": "{\"on_step_failure\":\"continue_with_logging\",\"emergency_mode\":true,\"skip_optional\":true}",
+      "variables": "{\"incident_id\":\"INC-2024-789\",\"risk_accepted\":true,\"duration_minutes\":60}",
+      "stepResults": "[{\"step\":1,\"result\":\"pass\"},{\"step\":2,\"result\":\"warning\",\"risk_score\":78},{\"step\":3,\"result\":\"pass\"},{\"step\":4,\"result\":\"pass\",\"permissions_granted\":[\"prod_read\",\"logs_access\"]}]",
+      "rollbackStrategy": "compensating",
+      "rollbackActions": "[{\"action\":\"revoke_permissions\",\"delay\":3600},{\"action\":\"comprehensive_audit\"}]",
+      "userId": "user_sre_002",
+      "startedAt": "2024-03-15T02:00:00Z",
+      "completedAt": "2024-03-15T02:02:00Z",
+      "finalOutcome": "granted",
+      "metadata": {
+        "incident_priority": "P1",
+        "bypass_reason": "critical_outage"
+      }
+    }
+  ]
+}

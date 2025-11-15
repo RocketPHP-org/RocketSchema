@@ -7,13 +7,16 @@
     {
       "name": "system",
       "type": "string",
+      "mode": "enum",
       "description": "Type of contact point (phone, email, fax, url, sms, other)",
       "required": true,
+      "enum": ["phone", "email", "fax", "url", "sms", "other"],
       "example": "phone"
     },
     {
       "name": "value",
       "type": "string",
+      "mode": "stored",
       "description": "The actual contact point value (phone number, email address, etc.)",
       "required": true,
       "example": "+1-555-0100"
@@ -21,30 +24,36 @@
     {
       "name": "use",
       "type": "string",
+      "mode": "enum",
       "description": "Purpose of this contact point (work, home, mobile, main, billing, support, emergency)",
+      "enum": ["work", "home", "mobile", "main", "billing", "support", "emergency"],
       "example": "work"
     },
     {
       "name": "rank",
       "type": "number",
+      "mode": "stored",
       "description": "Order of preference (1 = highest priority)",
       "example": 1
     },
     {
       "name": "label",
       "type": "string",
+      "mode": "stored",
       "description": "Human-readable label for this contact point",
       "example": "Main Office"
     },
     {
       "name": "extension",
       "type": "string",
+      "mode": "stored",
       "description": "Phone extension number if applicable",
       "example": "1234"
     },
     {
       "name": "period",
       "type": "Period",
+      "mode": "stored",
       "description": "Time period when this contact point is valid"
     }
   ],

@@ -1,0 +1,163 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "UserSession",
+  "description": "Represents an active user session in the system. When a user logs in successfully, a session is created to track their activity and maintain their authenticated state. Sessions are the bridge between a user's login credentials and their ability to access protected resources. Each session has a unique token, tracks the device and location information, and has an expiration time for security. Multiple sessions can exist for the same user (like being logged in on phone and laptop simultaneously). Sessions are essential for features like 'remember me', activity tracking, and the ability to remotely log out devices. When a user logs out or their session expires, it gets marked as inactive.",
+  "properties": [
+    {
+      "name": "sessionId",
+      "type": "string",
+      "mode": "stored",
+      "description": "Unique identifier for this session",
+      "required": true,
+      "unique": true
+    },
+    {
+      "name": "user",
+      "type": "User",
+      "mode": "stored",
+      "description": "The user who owns this session",
+      "required": true
+    },
+    {
+      "name": "tokenHash",
+      "type": "string",
+      "mode": "stored",
+      "description": "Hashed version of the session token for security",
+      "private": true
+    },
+    {
+      "name": "refreshTokenHash",
+      "type": "string",
+      "mode": "stored",
+      "description": "Hashed refresh token used to get new access tokens",
+      "private": true
+    },
+    {
+      "name": "ipAddress",
+      "type": "string",
+      "mode": "stored",
+      "description": "IP address from which the session was created",
+      "example": "192.168.1.100"
+    },
+    {
+      "name": "userAgent",
+      "type": "string",
+      "mode": "stored",
+      "description": "Browser or application information",
+      "example": "Mozilla/5.0..."
+    },
+    {
+      "name": "deviceType",
+      "type": "string",
+      "mode": "enum",
+      "description": "Type of device used for this session",
+      "enum": ["desktop", "mobile", "tablet", "api", "unknown"],
+      "example": "desktop"
+    },
+    {
+      "name": "deviceInfo",
+      "type": "object",
+      "mode": "stored",
+      "description": "Additional device details like OS version, browser version",
+      "nullable": true
+    },
+    {
+      "name": "location",
+      "type": "object",
+      "mode": "stored",
+      "description": "Geographic location based on IP if available",
+      "nullable": true
+    },
+    {
+      "name": "createdAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When the session was created (login time)",
+      "required": true
+    },
+    {
+      "name": "lastActivityAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Last time this session was used",
+      "required": true
+    },
+    {
+      "name": "expiresAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When this session will automatically expire",
+      "required": true
+    },
+    {
+      "name": "isActive",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether the session is currently valid and usable",
+      "default": true
+    },
+    {
+      "name": "terminatedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When the session was ended (logout or forced termination)",
+      "nullable": true
+    },
+    {
+      "name": "terminationReason",
+      "type": "string",
+      "mode": "enum",
+      "description": "Why the session ended",
+      "enum": ["logout", "timeout", "revoked", "expired", "security"],
+      "example": "logout"
+    },
+    {
+      "name": "metadata",
+      "type": "object",
+      "mode": "stored",
+      "description": "Additional session data like feature flags or permissions cache"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "UserSession",
+      "sessionId": "sess_abc123xyz789",
+      "ipAddress": "192.168.1.100",
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
+      "deviceType": "desktop",
+      "deviceInfo": {
+        "os": "macOS",
+        "browser": "Chrome",
+        "version": "121.0"
+      },
+      "location": {
+        "country": "United States",
+        "city": "San Francisco",
+        "region": "California"
+      },
+      "createdAt": "2024-03-15T10:00:00Z",
+      "lastActivityAt": "2024-03-15T10:30:00Z",
+      "expiresAt": "2024-03-15T22:00:00Z",
+      "isActive": true
+    },
+    {
+      "@type": "UserSession",
+      "sessionId": "sess_mobile_456def",
+      "ipAddress": "172.58.12.34",
+      "userAgent": "MyApp/2.1.0 (iPhone; iOS 17.0)",
+      "deviceType": "mobile",
+      "deviceInfo": {
+        "os": "iOS",
+        "version": "17.0",
+        "model": "iPhone 14 Pro"
+      },
+      "createdAt": "2024-03-14T08:00:00Z",
+      "lastActivityAt": "2024-03-14T18:45:00Z",
+      "expiresAt": "2024-03-21T08:00:00Z",
+      "isActive": false,
+      "terminatedAt": "2024-03-14T19:00:00Z",
+      "terminationReason": "logout"
+    }
+  ]
+}

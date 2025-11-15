@@ -1,0 +1,198 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "TwoFactorAuth",
+  "description": "Manages two-factor authentication (2FA) methods for enhanced account security. This entity stores configuration for various 2FA methods like SMS codes, authenticator apps (Google Authenticator, Authy), email codes, or hardware keys. Each user can have multiple 2FA methods configured, with one marked as primary. When 2FA is enabled, users must provide both their password and a second factor to log in. This dramatically increases account security by requiring something the user knows (password) and something they have (phone, hardware key). The entity tracks verification status, failed attempts, and can temporarily lock 2FA after too many failures to prevent brute force attacks.",
+  "properties": [
+    {
+      "name": "twoFactorAuthId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "Unique identifier for this 2FA configuration",
+      "required": true,
+      "unique": true
+    },
+    {
+      "name": "userId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "The user who owns this 2FA method",
+      "required": true
+    },
+    {
+      "name": "method",
+      "type": "string",
+      "mode": "enum",
+      "description": "Type of 2FA method being used",
+      "enum": ["totp", "sms", "email", "authenticator", "hardware_key", "biometric", "backup_codes"],
+      "required": true,
+      "example": "totp"
+    },
+    {
+      "name": "isEnabled",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this 2FA method is currently active",
+      "default": false
+    },
+    {
+      "name": "isPrimary",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this is the default 2FA method",
+      "default": false
+    },
+    {
+      "name": "secretHash",
+      "type": "string",
+      "mode": "stored",
+      "description": "Encrypted secret key for TOTP generation",
+      "nullable": true,
+      "private": true
+    },
+    {
+      "name": "phoneNumber",
+      "type": "string",
+      "mode": "stored",
+      "description": "Phone number for SMS-based 2FA",
+      "nullable": true,
+      "format": "phone"
+    },
+    {
+      "name": "email",
+      "type": "string",
+      "mode": "stored",
+      "description": "Email address for email-based 2FA",
+      "nullable": true,
+      "format": "email"
+    },
+    {
+      "name": "deviceName",
+      "type": "string",
+      "mode": "stored",
+      "description": "Friendly name for hardware key or authenticator app",
+      "nullable": true
+    },
+    {
+      "name": "deviceSerial",
+      "type": "string",
+      "mode": "stored",
+      "description": "Serial number of hardware security key",
+      "nullable": true
+    },
+    {
+      "name": "algorithm",
+      "type": "string",
+      "mode": "enum",
+      "description": "Cryptographic algorithm for TOTP",
+      "enum": ["SHA1", "SHA256", "SHA512"],
+      "default": "SHA256"
+    },
+    {
+      "name": "digits",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Number of digits in the generated code",
+      "default": 6,
+      "min": 6,
+      "max": 8
+    },
+    {
+      "name": "period",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Time period in seconds for TOTP code rotation",
+      "default": 30
+    },
+    {
+      "name": "verifiedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When this 2FA method was verified and confirmed working",
+      "nullable": true
+    },
+    {
+      "name": "lastUsedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Last successful use of this 2FA method",
+      "nullable": true
+    },
+    {
+      "name": "failedAttempts",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Count of consecutive failed verification attempts",
+      "default": 0
+    },
+    {
+      "name": "lockedUntil",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Temporary lock after too many failed attempts",
+      "nullable": true
+    },
+    {
+      "name": "backupCodesGenerated",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Total number of backup codes created",
+      "default": 0
+    },
+    {
+      "name": "backupCodesRemaining",
+      "type": "integer",
+      "mode": "stored",
+      "description": "How many unused backup codes are left",
+      "default": 0
+    },
+    {
+      "name": "createdAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When this 2FA method was added",
+      "required": true
+    },
+    {
+      "name": "updatedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Last modification timestamp"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "TwoFactorAuth",
+      "twoFactorAuthId": "2fa_auth123",
+      "userId": "550e8400-e29b-41d4-a716-446655440000",
+      "method": "totp",
+      "isEnabled": true,
+      "isPrimary": true,
+      "deviceName": "Google Authenticator on iPhone",
+      "algorithm": "SHA256",
+      "digits": 6,
+      "period": 30,
+      "verifiedAt": "2024-01-15T10:00:00Z",
+      "lastUsedAt": "2024-03-15T14:30:00Z",
+      "failedAttempts": 0,
+      "backupCodesGenerated": 10,
+      "backupCodesRemaining": 8,
+      "createdAt": "2024-01-15T10:00:00Z"
+    },
+    {
+      "@type": "TwoFactorAuth",
+      "twoFactorAuthId": "2fa_sms456",
+      "userId": "6ba7b810-9dad-11d1-80b4-00c04fd430c8",
+      "method": "sms",
+      "isEnabled": true,
+      "isPrimary": false,
+      "phoneNumber": "+1-555-123-4567",
+      "verifiedAt": "2024-01-20T11:00:00Z",
+      "lastUsedAt": "2024-03-10T09:15:00Z",
+      "failedAttempts": 2,
+      "backupCodesGenerated": 0,
+      "backupCodesRemaining": 0,
+      "createdAt": "2024-01-20T11:00:00Z"
+    }
+  ]
+}

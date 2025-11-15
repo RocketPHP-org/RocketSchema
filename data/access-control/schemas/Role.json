@@ -1,0 +1,227 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "Role",
+  "description": "Defines a named collection of permissions that can be assigned to users or groups, implementing Role-Based Access Control (RBAC) in the system. Roles are the cornerstone of scalable permission management - instead of assigning individual permissions to thousands of users, you create roles like 'Editor', 'Manager', or 'Admin' and assign appropriate permissions to each role. Users then inherit all permissions from their assigned roles. This dramatically simplifies access management, especially in large organizations where many people have similar job functions. Roles can be hierarchical, where a 'Senior Manager' role might inherit all permissions from 'Manager' plus additional elevated privileges. System roles (like 'Super Admin') are built-in and protected from modification, while custom roles can be created to match specific organizational needs. Each role has a priority level to resolve conflicts when a user has multiple roles with contradicting permissions. Roles can be scoped to specific contexts - for example, someone might be an 'Admin' for one department but 'Viewer' for another. This entity makes it easy to implement least-privilege access, conduct access reviews, and maintain compliance with security policies by providing a clear, auditable structure for who can do what in the system.",
+  "properties": [
+    {
+      "name": "roleId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "Unique identifier for this role",
+      "required": true,
+      "unique": true
+    },
+    {
+      "name": "code",
+      "type": "string",
+      "mode": "stored",
+      "description": "Machine-readable identifier used in code and APIs",
+      "required": true,
+      "unique": true,
+      "example": "CONTENT_MANAGER"
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "mode": "stored",
+      "description": "Human-friendly display name",
+      "required": true,
+      "example": "Content Manager"
+    },
+    {
+      "name": "description",
+      "type": "string",
+      "mode": "stored",
+      "description": "Detailed explanation of the role's purpose and responsibilities",
+      "example": "Manages all content including creation, editing, publishing, and archival"
+    },
+    {
+      "name": "type",
+      "type": "string",
+      "mode": "enum",
+      "description": "Classification of the role",
+      "enum": ["system", "organization", "department", "project", "custom"],
+      "default": "custom",
+      "example": "organization"
+    },
+    {
+      "name": "scope",
+      "type": "string",
+      "mode": "stored",
+      "description": "Context where this role applies (global, org-specific, etc.)",
+      "nullable": true,
+      "example": "organization:org_123"
+    },
+    {
+      "name": "isSystem",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this is a built-in role that cannot be modified",
+      "default": false
+    },
+    {
+      "name": "isDefault",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether new users automatically receive this role",
+      "default": false
+    },
+    {
+      "name": "isAssignable",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this role can be assigned to users",
+      "default": true
+    },
+    {
+      "name": "requiresMfa",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether users need two-factor authentication for this role",
+      "default": false
+    },
+    {
+      "name": "requiresApproval",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether role assignment needs manager approval",
+      "default": false
+    },
+    {
+      "name": "maxAssignments",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Maximum number of users who can have this role (null for unlimited)",
+      "nullable": true
+    },
+    {
+      "name": "priority",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Resolution order when permission conflicts occur (higher wins)",
+      "default": 0
+    },
+    {
+      "name": "parentRoleId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "Parent role from which permissions are inherited",
+      "nullable": true
+    },
+    {
+      "name": "expirationDays",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Days until role assignment expires (null for permanent)",
+      "nullable": true
+    },
+    {
+      "name": "allowedIpRanges",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON array of IP ranges where this role is active",
+      "nullable": true,
+      "example": "[\"10.0.0.0/8\",\"192.168.1.0/24\"]"
+    },
+    {
+      "name": "allowedTimeWindows",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON array of time windows when role is active",
+      "nullable": true,
+      "example": "[{\"days\":[\"mon\",\"tue\",\"wed\",\"thu\",\"fri\"],\"start\":\"09:00\",\"end\":\"17:00\"}]"
+    },
+    {
+      "name": "tags",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON array of tags for categorization",
+      "nullable": true,
+      "example": "[\"finance\",\"sensitive\",\"compliance\"]"
+    },
+    {
+      "name": "isActive",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this role is currently active",
+      "default": true
+    },
+    {
+      "name": "createdAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When this role was created",
+      "required": true
+    },
+    {
+      "name": "createdBy",
+      "type": "User",
+      "mode": "stored",
+      "description": "User who created this role",
+      "nullable": true
+    },
+    {
+      "name": "updatedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Last modification timestamp"
+    },
+    {
+      "name": "metadata",
+      "type": "string",
+      "mode": "stored",
+      "description": "Additional configuration in JSON format",
+      "nullable": true
+    }
+  ],
+  "examples": [
+    {
+      "@type": "Role",
+      "roleId": "role_abc123",
+      "code": "FINANCE_MANAGER",
+      "name": "Finance Manager",
+      "description": "Full access to financial data, reports, and budgeting tools. Can approve expenses up to $50,000 and manage team members in finance department.",
+      "type": "department",
+      "scope": "department:finance",
+      "isSystem": false,
+      "isDefault": false,
+      "isAssignable": true,
+      "requiresMfa": true,
+      "requiresApproval": true,
+      "maxAssignments": 5,
+      "priority": 75,
+      "parentRoleId": "role_employee",
+      "expirationDays": 365,
+      "allowedIpRanges": "[\"10.0.0.0/8\",\"vpn.company.com\"]",
+      "allowedTimeWindows": "[{\"days\":[\"mon\",\"tue\",\"wed\",\"thu\",\"fri\"],\"start\":\"07:00\",\"end\":\"19:00\",\"timezone\":\"America/New_York\"}]",
+      "tags": "[\"finance\",\"management\",\"sensitive\",\"sox_compliance\"]",
+      "isActive": true,
+      "createdAt": "2024-01-01T00:00:00Z",
+      "createdBy": "admin_789",
+      "metadata": "{\"approval_chain\":[\"dept_head\",\"cfo\"],\"training_required\":\"finance_security_101\"}"
+    },
+    {
+      "@type": "Role",
+      "roleId": "role_def456",
+      "code": "GUEST_VIEWER",
+      "name": "Guest Viewer",
+      "description": "Read-only access to public content and basic application features. Cannot modify any data or access sensitive information.",
+      "type": "system",
+      "scope": "global",
+      "isSystem": true,
+      "isDefault": true,
+      "isAssignable": true,
+      "requiresMfa": false,
+      "requiresApproval": false,
+      "maxAssignments": null,
+      "priority": 10,
+      "parentRoleId": null,
+      "expirationDays": 30,
+      "tags": "[\"public\",\"readonly\",\"guest\"]",
+      "isActive": true,
+      "createdAt": "2024-01-01T00:00:00Z",
+      "metadata": "{\"rate_limit\":\"100_per_hour\",\"features_disabled\":[\"export\",\"api_access\"]}"
+    }
+  ]
+}

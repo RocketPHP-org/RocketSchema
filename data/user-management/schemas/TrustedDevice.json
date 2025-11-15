@@ -1,0 +1,226 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "TrustedDevice",
+  "description": "Manages devices that users have marked as trusted to bypass two-factor authentication requirements. When a user successfully logs in with 2FA from a device, they can choose to 'Remember this device' or 'Trust this device for 30 days', which creates a trusted device record. This significantly improves user experience by not requiring 2FA on every login from frequently-used devices like their personal laptop or phone, while still maintaining security on unknown devices. The system creates a unique fingerprint for each device using various characteristics like browser type, operating system, screen resolution, and installed plugins - making it difficult for attackers to impersonate a trusted device. Trust can be time-limited (expires after 30 days) or revoked manually by the user or automatically if suspicious activity is detected. Users can view and manage all their trusted devices from their security settings, seeing details like when each device was last used and from what location. This feature balances security with usability, similar to how banks remember your computer but still require extra verification from new devices.",
+  "properties": [
+    {
+      "name": "deviceId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "Unique identifier for this trusted device",
+      "required": true,
+      "unique": true
+    },
+    {
+      "name": "userId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "User who has trusted this device",
+      "required": true
+    },
+    {
+      "name": "deviceName",
+      "type": "string",
+      "mode": "stored",
+      "description": "User-friendly name for the device",
+      "required": true,
+      "example": "John's MacBook Pro"
+    },
+    {
+      "name": "deviceType",
+      "type": "string",
+      "mode": "enum",
+      "description": "Category of the trusted device",
+      "enum": ["desktop", "laptop", "mobile", "tablet", "browser", "api_client", "smart_tv", "wearable"],
+      "required": true
+    },
+    {
+      "name": "deviceFingerprint",
+      "type": "string",
+      "mode": "stored",
+      "description": "Unique fingerprint combining multiple device characteristics",
+      "required": true,
+      "private": true
+    },
+    {
+      "name": "userAgent",
+      "type": "string",
+      "mode": "stored",
+      "description": "Browser user agent string for device identification",
+      "nullable": true
+    },
+    {
+      "name": "operatingSystem",
+      "type": "string",
+      "mode": "stored",
+      "description": "Operating system name and version",
+      "nullable": true,
+      "example": "macOS 14.2"
+    },
+    {
+      "name": "browser",
+      "type": "string",
+      "mode": "stored",
+      "description": "Browser name and version",
+      "nullable": true,
+      "example": "Chrome 121.0.6167.184"
+    },
+    {
+      "name": "ipAddress",
+      "type": "string",
+      "mode": "stored",
+      "description": "Last known IP address of the device",
+      "nullable": true
+    },
+    {
+      "name": "location",
+      "type": "string",
+      "mode": "stored",
+      "description": "Approximate geographic location",
+      "nullable": true,
+      "example": "San Francisco, CA, USA"
+    },
+    {
+      "name": "trustedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When the device was first trusted",
+      "required": true
+    },
+    {
+      "name": "trustedUntil",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When the trust expires (null for permanent trust)",
+      "nullable": true
+    },
+    {
+      "name": "lastUsedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Most recent activity from this device",
+      "nullable": true
+    },
+    {
+      "name": "lastVerifiedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Last time the device passed trust verification",
+      "nullable": true
+    },
+    {
+      "name": "usageCount",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Number of times this device has been used for login",
+      "default": 0
+    },
+    {
+      "name": "isActive",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether the device is currently trusted",
+      "default": true
+    },
+    {
+      "name": "revokedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When trust was revoked for this device",
+      "nullable": true
+    },
+    {
+      "name": "revokedReason",
+      "type": "string",
+      "mode": "stored",
+      "description": "Why the device trust was revoked",
+      "nullable": true
+    },
+    {
+      "name": "riskScore",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Calculated risk level for this device (0-100)",
+      "min": 0,
+      "max": 100
+    },
+    {
+      "name": "metadata",
+      "type": "object",
+      "mode": "stored",
+      "description": "Additional device characteristics and flags"
+    },
+    {
+      "name": "createdAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When this record was created",
+      "required": true
+    },
+    {
+      "name": "updatedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Last modification of this record"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "TrustedDevice",
+      "deviceId": "dev_550e8400",
+      "userId": "user_123456",
+      "deviceName": "Sarah's Work Laptop",
+      "deviceType": "laptop",
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
+      "operatingSystem": "macOS 14.2",
+      "browser": "Chrome 121.0.6167.184",
+      "ipAddress": "192.168.1.100",
+      "location": "New York, NY, USA",
+      "trustedAt": "2024-01-15T10:00:00Z",
+      "trustedUntil": "2024-04-15T10:00:00Z",
+      "lastUsedAt": "2024-03-15T08:30:00Z",
+      "lastVerifiedAt": "2024-03-15T08:30:00Z",
+      "usageCount": 145,
+      "isActive": true,
+      "riskScore": 5,
+      "metadata": {
+        "screenResolution": "2560x1440",
+        "colorDepth": 24,
+        "timezone": "America/New_York",
+        "language": "en-US"
+      },
+      "createdAt": "2024-01-15T10:00:00Z",
+      "updatedAt": "2024-03-15T08:30:00Z"
+    },
+    {
+      "@type": "TrustedDevice",
+      "deviceId": "dev_mobile_789",
+      "userId": "user_456789",
+      "deviceName": "iPhone 14 Pro",
+      "deviceType": "mobile",
+      "userAgent": "MyApp/2.5.0 (iPhone; iOS 17.3)",
+      "operatingSystem": "iOS 17.3",
+      "browser": null,
+      "ipAddress": "172.58.12.34",
+      "location": "London, UK",
+      "trustedAt": "2024-02-01T14:00:00Z",
+      "trustedUntil": null,
+      "lastUsedAt": "2024-03-14T19:45:00Z",
+      "lastVerifiedAt": "2024-03-14T19:45:00Z",
+      "usageCount": 89,
+      "isActive": false,
+      "revokedAt": "2024-03-15T09:00:00Z",
+      "revokedReason": "User manually revoked after device was lost",
+      "riskScore": 0,
+      "metadata": {
+        "appVersion": "2.5.0",
+        "deviceModel": "iPhone15,2",
+        "biometricEnabled": true,
+        "jailbroken": false
+      },
+      "createdAt": "2024-02-01T14:00:00Z",
+      "updatedAt": "2024-03-15T09:00:00Z"
+    }
+  ]
+}

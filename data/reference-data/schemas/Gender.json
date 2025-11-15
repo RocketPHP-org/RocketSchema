@@ -7,13 +7,16 @@
     {
       "name": "code",
       "type": "string",
-      "description": "Gender code (M, F, O, U for Male, Female, Other, Unknown)",
+      "mode": "enum",
+      "description": "Gender code",
+      "enum": ["M", "F", "O", "U"],
       "required": true,
       "example": "F"
     },
     {
       "name": "label",
       "type": "string",
+      "mode": "stored",
       "description": "Human-readable label",
       "required": true,
       "example": "Female"
@@ -21,6 +24,7 @@
     {
       "name": "description",
       "type": "string",
+      "mode": "stored",
       "description": "Detailed description"
     }
   ],

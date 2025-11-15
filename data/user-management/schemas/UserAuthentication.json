@@ -1,0 +1,172 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "UserAuthentication",
+  "description": "Stores and manages all authentication credentials and security settings for a user account. This entity is the vault for sensitive authentication data, keeping passwords securely hashed and tracking login security metrics. It handles password management including expiration policies, change requirements, and history to prevent reuse. The entity monitors failed login attempts to detect and prevent brute force attacks by automatically locking accounts after suspicious activity. It maintains the last successful login details for security auditing and tracks overall account activity. By separating authentication data from the main User entity, the system ensures that sensitive credentials can be protected with stricter access controls and encryption. This is critical for maintaining account security and meeting compliance requirements for credential storage.",
+  "properties": [
+    {
+      "name": "userId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "Links to the user account this authentication belongs to",
+      "required": true,
+      "unique": true
+    },
+    {
+      "name": "passwordHash",
+      "type": "string",
+      "mode": "stored",
+      "description": "Password stored using one-way cryptographic hashing - original password cannot be recovered",
+      "required": true,
+      "private": true
+    },
+    {
+      "name": "passwordSalt",
+      "type": "string",
+      "mode": "stored",
+      "description": "Random data added to password before hashing for extra security",
+      "private": true
+    },
+    {
+      "name": "passwordAlgorithm",
+      "type": "string",
+      "mode": "enum",
+      "description": "The cryptographic algorithm used to hash the password",
+      "enum": ["bcrypt", "argon2id", "scrypt", "pbkdf2"],
+      "default": "argon2id"
+    },
+    {
+      "name": "passwordLastChangedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When the password was last updated",
+      "required": true
+    },
+    {
+      "name": "passwordExpiresAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When the current password will expire and must be changed",
+      "nullable": true
+    },
+    {
+      "name": "mustChangePassword",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Forces user to change password on next login",
+      "default": false
+    },
+    {
+      "name": "passwordHistory",
+      "type": "integer",
+      "mode": "stored",
+      "description": "How many previous passwords to remember to prevent reuse",
+      "default": 5
+    },
+    {
+      "name": "failedLoginAttempts",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Counter of consecutive failed login attempts",
+      "default": 0
+    },
+    {
+      "name": "failedLoginResetAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When the failed attempts counter was last reset",
+      "nullable": true
+    },
+    {
+      "name": "lockedUntil",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Account locked until this time due to security concerns",
+      "nullable": true
+    },
+    {
+      "name": "lastLoginAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Timestamp of the most recent successful login",
+      "nullable": true
+    },
+    {
+      "name": "lastLoginIp",
+      "type": "string",
+      "mode": "stored",
+      "description": "IP address from the most recent successful login",
+      "nullable": true
+    },
+    {
+      "name": "lastActivityAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Last time the user performed any authenticated action",
+      "nullable": true
+    },
+    {
+      "name": "passwordPolicy",
+      "type": "PasswordPolicy",
+      "mode": "stored",
+      "description": "Reference to the password rules this account must follow",
+      "nullable": true
+    },
+    {
+      "name": "version",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Version number to handle concurrent updates safely",
+      "default": 1
+    },
+    {
+      "name": "createdAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When this authentication record was created",
+      "required": true
+    },
+    {
+      "name": "updatedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Last time any authentication data was modified"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "UserAuthentication",
+      "userId": "550e8400-e29b-41d4-a716-446655440000",
+      "passwordAlgorithm": "argon2id",
+      "passwordLastChangedAt": "2024-02-01T10:00:00Z",
+      "passwordExpiresAt": "2024-05-01T10:00:00Z",
+      "mustChangePassword": false,
+      "passwordHistory": 5,
+      "failedLoginAttempts": 0,
+      "lastLoginAt": "2024-03-15T08:30:00Z",
+      "lastLoginIp": "192.168.1.50",
+      "lastActivityAt": "2024-03-15T16:45:00Z",
+      "version": 3,
+      "createdAt": "2024-01-01T00:00:00Z",
+      "updatedAt": "2024-03-15T08:30:00Z"
+    },
+    {
+      "@type": "UserAuthentication",
+      "userId": "6ba7b810-9dad-11d1-80b4-00c04fd430c8",
+      "passwordAlgorithm": "bcrypt",
+      "passwordLastChangedAt": "2023-12-15T00:00:00Z",
+      "passwordExpiresAt": "2024-03-15T00:00:00Z",
+      "mustChangePassword": true,
+      "passwordHistory": 10,
+      "failedLoginAttempts": 3,
+      "failedLoginResetAt": "2024-03-15T14:00:00Z",
+      "lockedUntil": "2024-03-15T14:30:00Z",
+      "lastLoginAt": "2024-03-14T09:00:00Z",
+      "lastLoginIp": "203.0.113.99",
+      "lastActivityAt": "2024-03-14T17:30:00Z",
+      "version": 1,
+      "createdAt": "2023-12-15T00:00:00Z",
+      "updatedAt": "2024-03-15T14:00:00Z"
+    }
+  ]
+}

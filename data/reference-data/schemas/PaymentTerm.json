@@ -7,6 +7,7 @@
     {
       "name": "code",
       "type": "string",
+      "mode": "stored",
       "description": "Payment term code (NET_30, NET_60, COD, ADVANCE, etc.)",
       "required": true,
       "example": "NET_30"
@@ -14,6 +15,7 @@
     {
       "name": "label",
       "type": "string",
+      "mode": "stored",
       "description": "Human-readable label",
       "required": true,
       "example": "Net 30 days"
@@ -21,11 +23,13 @@
     {
       "name": "description",
       "type": "string",
+      "mode": "stored",
       "description": "Detailed description of the payment terms"
     },
     {
       "name": "daysUntilDue",
       "type": "number",
+      "mode": "stored",
       "description": "Number of days until payment is due (0 for immediate, null for custom)",
       "example": 30
     }

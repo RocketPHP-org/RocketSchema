@@ -1,0 +1,330 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "SecurityPrincipal",
+  "description": "Represents any entity that can be authenticated and authorized in the system, providing a unified abstraction for users, service accounts, API clients, and automated systems. A security principal is anything that can have permissions and make requests - it could be a human user, a microservice, an IoT device, a scheduled job, or an external system. This abstraction allows the access control system to treat all these entities consistently while maintaining their unique characteristics. Each principal has credentials for authentication (passwords, certificates, keys), attributes for authorization decisions (clearance level, department, trust score), and a security context that defines their capabilities. Service principals enable machine-to-machine authentication without user involvement, essential for automated workflows and microservices. System principals represent internal components that need controlled access to resources. External principals handle third-party integrations with limited, scoped access. The entity tracks the principal's lifecycle from creation through various trust states to eventual deactivation. It maintains security posture information like last security review, compliance status, and risk assessments. This unified approach simplifies access control policies - a single policy can apply to users, services, and systems without separate implementations. It's fundamental for zero-trust architectures where every request must be authenticated and authorized regardless of source.",
+  "properties": [
+    {
+      "name": "principalId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "Unique identifier for this security principal",
+      "required": true,
+      "unique": true
+    },
+    {
+      "name": "principalType",
+      "type": "string",
+      "mode": "enum",
+      "description": "Category of security principal",
+      "enum": ["user", "service", "application", "device", "system", "external", "federated"],
+      "required": true
+    },
+    {
+      "name": "principalName",
+      "type": "string",
+      "mode": "stored",
+      "description": "Unique name identifier across all principals",
+      "required": true,
+      "unique": true,
+      "example": "svc_payment_processor"
+    },
+    {
+      "name": "displayName",
+      "type": "string",
+      "mode": "stored",
+      "description": "Human-friendly name for display",
+      "required": true,
+      "example": "Payment Processing Service"
+    },
+    {
+      "name": "description",
+      "type": "string",
+      "mode": "stored",
+      "description": "Purpose and function of this principal",
+      "example": "Automated service for processing customer payments and refunds"
+    },
+    {
+      "name": "authenticationMethod",
+      "type": "string",
+      "mode": "enum",
+      "description": "How this principal authenticates",
+      "enum": ["password", "certificate", "api_key", "oauth", "saml", "kerberos", "biometric", "hardware_token"],
+      "required": true
+    },
+    {
+      "name": "credentialHash",
+      "type": "string",
+      "mode": "stored",
+      "description": "Hashed credential for authentication",
+      "private": true,
+      "nullable": true
+    },
+    {
+      "name": "certificateThumbprint",
+      "type": "string",
+      "mode": "stored",
+      "description": "Certificate identifier for cert-based auth",
+      "nullable": true
+    },
+    {
+      "name": "publicKey",
+      "type": "string",
+      "mode": "stored",
+      "description": "Public key for asymmetric authentication",
+      "nullable": true
+    },
+    {
+      "name": "realm",
+      "type": "string",
+      "mode": "stored",
+      "description": "Authentication realm or domain",
+      "example": "corporate.example.com"
+    },
+    {
+      "name": "trustLevel",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Trust score from 0 (untrusted) to 100 (fully trusted)",
+      "min": 0,
+      "max": 100,
+      "default": 50
+    },
+    {
+      "name": "clearanceLevel",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Security clearance level",
+      "min": 0,
+      "max": 10,
+      "default": 0
+    },
+    {
+      "name": "owner",
+      "type": "User",
+      "mode": "stored",
+      "description": "User responsible for this principal",
+      "nullable": true
+    },
+    {
+      "name": "organization",
+      "type": "string",
+      "mode": "stored",
+      "description": "Organization this principal belongs to",
+      "nullable": true
+    },
+    {
+      "name": "department",
+      "type": "string",
+      "mode": "stored",
+      "description": "Department or team",
+      "nullable": true
+    },
+    {
+      "name": "attributes",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON attributes for policy evaluation",
+      "example": "{\"location\":\"us-east-1\",\"environment\":\"production\",\"data_classification\":\"sensitive\"}"
+    },
+    {
+      "name": "allowedIpRanges",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON array of permitted IP ranges",
+      "nullable": true
+    },
+    {
+      "name": "allowedTimeWindows",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON array of time-based access windows",
+      "nullable": true
+    },
+    {
+      "name": "maxConcurrentSessions",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Maximum simultaneous active sessions",
+      "default": 1
+    },
+    {
+      "name": "status",
+      "type": "string",
+      "mode": "enum",
+      "description": "Current status of the principal",
+      "enum": ["active", "inactive", "suspended", "locked", "expired", "pending_approval"],
+      "default": "pending_approval"
+    },
+    {
+      "name": "activatedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When principal became active",
+      "nullable": true
+    },
+    {
+      "name": "expiresAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When principal access expires",
+      "nullable": true
+    },
+    {
+      "name": "lastAuthenticationAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Last successful authentication",
+      "nullable": true
+    },
+    {
+      "name": "lastActivityAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Last recorded activity",
+      "nullable": true
+    },
+    {
+      "name": "lastSecurityReview",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Last security assessment date",
+      "nullable": true
+    },
+    {
+      "name": "nextReviewDate",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When next security review is due",
+      "nullable": true
+    },
+    {
+      "name": "complianceStatus",
+      "type": "string",
+      "mode": "stored",
+      "description": "Compliance assessment status",
+      "nullable": true
+    },
+    {
+      "name": "riskScore",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Current risk assessment score",
+      "min": 0,
+      "max": 100
+    },
+    {
+      "name": "isSystem",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this is a system principal",
+      "default": false
+    },
+    {
+      "name": "canImpersonate",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether principal can act as other principals",
+      "default": false
+    },
+    {
+      "name": "tags",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON array of tags for categorization",
+      "nullable": true
+    },
+    {
+      "name": "createdAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When principal was created",
+      "required": true
+    },
+    {
+      "name": "createdBy",
+      "type": "User",
+      "mode": "stored",
+      "description": "Who created this principal",
+      "nullable": true
+    },
+    {
+      "name": "metadata",
+      "type": "object",
+      "mode": "stored",
+      "description": "Additional principal configuration"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "SecurityPrincipal",
+      "principalId": "prin_svc_001",
+      "principalType": "service",
+      "principalName": "svc_data_pipeline",
+      "displayName": "Data Pipeline Service",
+      "description": "ETL service that processes and transforms customer data between systems",
+      "authenticationMethod": "certificate",
+      "certificateThumbprint": "3f:2a:45:67:89:ab:cd:ef:12:34:56:78:90:ab:cd:ef:12:34:56:78",
+      "realm": "services.internal",
+      "trustLevel": 85,
+      "clearanceLevel": 3,
+      "owner": "user_data_team_lead",
+      "organization": "DataEngineering",
+      "department": "Analytics",
+      "attributes": "{\"service_type\":\"etl\",\"data_access_level\":\"full\",\"pii_handler\":true,\"sox_compliant\":true}",
+      "allowedIpRanges": "[\"10.0.0.0/8\",\"172.16.0.0/12\"]",
+      "maxConcurrentSessions": 5,
+      "status": "active",
+      "activatedAt": "2024-01-01T00:00:00Z",
+      "expiresAt": "2025-01-01T00:00:00Z",
+      "lastAuthenticationAt": "2024-03-15T14:00:00Z",
+      "lastActivityAt": "2024-03-15T14:30:00Z",
+      "lastSecurityReview": "2024-02-15T00:00:00Z",
+      "nextReviewDate": "2024-05-15T00:00:00Z",
+      "complianceStatus": "compliant",
+      "riskScore": 25,
+      "isSystem": false,
+      "canImpersonate": false,
+      "tags": "[\"production\",\"critical\",\"data_processor\",\"gdpr_scope\"]",
+      "createdAt": "2024-01-01T00:00:00Z",
+      "metadata": {
+        "kubernetes_namespace": "data-services",
+        "service_account": "data-pipeline-sa"
+      }
+    },
+    {
+      "@type": "SecurityPrincipal",
+      "principalId": "prin_ext_002",
+      "principalType": "external",
+      "principalName": "ext_partner_api",
+      "displayName": "Partner Integration - TechCorp",
+      "description": "External partner API client for inventory synchronization",
+      "authenticationMethod": "api_key",
+      "realm": "partners.external",
+      "trustLevel": 60,
+      "clearanceLevel": 1,
+      "organization": "TechCorp",
+      "attributes": "{\"partner_id\":\"PARTNER_123\",\"integration_type\":\"inventory\",\"rate_limit\":\"1000/hour\"}",
+      "allowedIpRanges": "[\"203.0.113.0/24\"]",
+      "allowedTimeWindows": "[{\"days\":[\"mon\",\"tue\",\"wed\",\"thu\",\"fri\"],\"hours\":\"00:00-23:59\"}]",
+      "maxConcurrentSessions": 3,
+      "status": "active",
+      "activatedAt": "2024-02-01T00:00:00Z",
+      "expiresAt": "2024-08-01T00:00:00Z",
+      "lastAuthenticationAt": "2024-03-15T10:00:00Z",
+      "lastActivityAt": "2024-03-15T10:15:00Z",
+      "lastSecurityReview": "2024-02-01T00:00:00Z",
+      "nextReviewDate": "2024-04-01T00:00:00Z",
+      "complianceStatus": "under_review",
+      "riskScore": 45,
+      "isSystem": false,
+      "canImpersonate": false,
+      "tags": "[\"partner\",\"external\",\"limited_access\",\"inventory_only\"]",
+      "createdAt": "2024-02-01T00:00:00Z",
+      "metadata": {
+        "contract_id": "CONTRACT_2024_001",
+        "data_sharing_agreement": "DSA_2024_TC"
+      }
+    }
+  ]
+}

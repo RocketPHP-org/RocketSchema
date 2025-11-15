@@ -7,18 +7,22 @@
     {
       "name": "use",
       "type": "string",
-      "description": "Purpose of this address (work, home, billing, shipping, headquarters, branch, warehouse, mailing)",
+      "mode": "enum",
+      "description": "Purpose of this address",
+      "enum": ["work", "home", "billing", "shipping", "headquarters", "branch", "warehouse", "mailing"],
       "example": "work"
     },
     {
       "name": "label",
       "type": "string",
+      "mode": "stored",
       "description": "Human-readable label for this address",
       "example": "Head Office"
     },
     {
       "name": "streetAddress",
       "type": "string",
+      "mode": "stored",
       "description": "Street address (number and street name)",
       "required": true,
       "example": "123 Main Street"
@@ -26,6 +30,7 @@
     {
       "name": "addressLocality",
       "type": "string",
+      "mode": "stored",
       "description": "City or locality",
       "required": true,
       "example": "San Francisco"
@@ -33,12 +38,14 @@
     {
       "name": "addressRegion",
       "type": "string",
+      "mode": "stored",
       "description": "State, province, or region",
       "example": "CA"
     },
     {
       "name": "postalCode",
       "type": "string",
+      "mode": "stored",
       "description": "Postal or ZIP code",
       "required": true,
       "example": "94105"
@@ -46,6 +53,7 @@
     {
       "name": "addressCountry",
       "type": "string",
+      "mode": "stored",
       "description": "Country (ISO 3166-1 alpha-2 country code)",
       "required": true,
       "format": "iso-country-code",
@@ -54,18 +62,21 @@
     {
       "name": "postOfficeBoxNumber",
       "type": "string",
+      "mode": "stored",
       "description": "P.O. Box number if applicable",
       "example": "PO Box 123"
     },
     {
       "name": "latitude",
       "type": "number",
+      "mode": "stored",
       "description": "Geographic latitude coordinate for precise location",
       "example": 37.7749
     },
     {
       "name": "longitude",
       "type": "number",
+      "mode": "stored",
       "description": "Geographic longitude coordinate for precise location",
       "example": -122.4194
     }

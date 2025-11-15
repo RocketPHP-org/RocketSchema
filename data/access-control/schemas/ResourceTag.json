@@ -1,0 +1,291 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "ResourceTag",
+  "description": "Attaches metadata labels to resources that drive access control decisions, enabling attribute-based access control (ABAC) where permissions are determined by matching tags between users, resources, and policies. Resource tags are key-value pairs that describe characteristics like classification level, data sensitivity, project ownership, compliance scope, or business criticality. Unlike traditional access control that explicitly lists who can access what, tag-based control uses tag matching rules - a user with 'department:finance' tag can access resources tagged 'visibility:finance'. This approach dramatically simplifies permission management for large-scale systems where explicitly maintaining access lists becomes impractical. Tags support hierarchical relationships (parent tags imply child tags), tag inheritance (resources inherit parent folder tags), and tag propagation (tags flow through data lineage). The entity enables dynamic authorization that automatically adjusts as tags change, policy-driven access where rules reference tags instead of specific resources, and compliance enforcement where regulatory tags trigger specific controls. Tags can be system-generated (auto-classification), user-applied (manual labeling), or inherited (from containers). They support multi-dimensional classification where resources have multiple tag types (sensitivity, project, owner, retention), enabling complex access decisions based on tag combinations. This tagging system is essential for cloud resource management, data governance, regulatory compliance, and implementing scalable access control in dynamic environments where resources are constantly created and modified.",
+  "properties": [
+    {
+      "name": "tagId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "Unique identifier for this tag assignment",
+      "required": true,
+      "unique": true
+    },
+    {
+      "name": "resourceType",
+      "type": "string",
+      "mode": "stored",
+      "description": "Type of resource being tagged",
+      "required": true,
+      "example": "document"
+    },
+    {
+      "name": "resourceId",
+      "type": "string",
+      "mode": "stored",
+      "description": "Identifier of the tagged resource",
+      "required": true
+    },
+    {
+      "name": "tagKey",
+      "type": "string",
+      "mode": "stored",
+      "description": "Tag category or namespace",
+      "required": true,
+      "example": "classification"
+    },
+    {
+      "name": "tagValue",
+      "type": "string",
+      "mode": "stored",
+      "description": "Tag value within the category",
+      "required": true,
+      "example": "confidential"
+    },
+    {
+      "name": "tagType",
+      "type": "string",
+      "mode": "enum",
+      "description": "Category of tag",
+      "enum": ["security", "compliance", "organizational", "technical", "business", "custom"],
+      "required": true
+    },
+    {
+      "name": "source",
+      "type": "string",
+      "mode": "enum",
+      "description": "How tag was applied",
+      "enum": ["manual", "automated", "inherited", "policy", "system"],
+      "default": "manual"
+    },
+    {
+      "name": "confidence",
+      "type": "number",
+      "mode": "stored",
+      "description": "Confidence in tag accuracy (0-1)",
+      "min": 0,
+      "max": 1,
+      "default": 1
+    },
+    {
+      "name": "scope",
+      "type": "string",
+      "mode": "enum",
+      "description": "Tag visibility and usage scope",
+      "enum": ["public", "internal", "private", "system"],
+      "default": "internal"
+    },
+    {
+      "name": "inheritance",
+      "type": "string",
+      "mode": "enum",
+      "description": "How tag inherits to children",
+      "enum": ["none", "direct_children", "recursive", "selective"],
+      "default": "none"
+    },
+    {
+      "name": "propagation",
+      "type": "string",
+      "mode": "enum",
+      "description": "How tag propagates through relationships",
+      "enum": ["none", "upstream", "downstream", "bidirectional"],
+      "default": "none"
+    },
+    {
+      "name": "parentTagId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "Parent tag this was inherited from",
+      "nullable": true
+    },
+    {
+      "name": "tagHierarchy",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON tag hierarchy path",
+      "nullable": true,
+      "example": "[\"data\",\"pii\",\"sensitive_pii\"]"
+    },
+    {
+      "name": "relatedTags",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON array of related tag IDs",
+      "nullable": true
+    },
+    {
+      "name": "conflictingTags",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON array of mutually exclusive tags",
+      "nullable": true,
+      "example": "[\"public\",\"internal\",\"confidential\"]"
+    },
+    {
+      "name": "impliedTags",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON tags automatically implied",
+      "nullable": true,
+      "example": "[{\"key\":\"requires_encryption\",\"value\":\"true\"}]"
+    },
+    {
+      "name": "accessImplications",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON access control effects of this tag",
+      "nullable": true,
+      "example": "{\"required_clearance\":\"secret\",\"restricted_regions\":[\"EU\"],\"audit_level\":\"detailed\"}"
+    },
+    {
+      "name": "policyBindings",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON policies triggered by this tag",
+      "nullable": true,
+      "example": "[\"encryption_policy\",\"retention_policy\",\"access_review_policy\"]"
+    },
+    {
+      "name": "validFrom",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When tag becomes effective",
+      "nullable": true
+    },
+    {
+      "name": "validUntil",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When tag expires",
+      "nullable": true
+    },
+    {
+      "name": "isTemporary",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether tag is temporary",
+      "default": false
+    },
+    {
+      "name": "appliedBy",
+      "type": "User",
+      "mode": "stored",
+      "description": "Who applied this tag",
+      "nullable": true
+    },
+    {
+      "name": "appliedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When tag was applied",
+      "required": true
+    },
+    {
+      "name": "verifiedBy",
+      "type": "User",
+      "mode": "stored",
+      "description": "Who verified tag accuracy",
+      "nullable": true
+    },
+    {
+      "name": "verifiedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When tag was verified",
+      "nullable": true
+    },
+    {
+      "name": "lastReviewedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Last tag review date",
+      "nullable": true
+    },
+    {
+      "name": "nextReviewDate",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When tag needs review",
+      "nullable": true
+    },
+    {
+      "name": "isActive",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether tag is currently active",
+      "default": true
+    },
+    {
+      "name": "removalReason",
+      "type": "string",
+      "mode": "stored",
+      "description": "Why tag was removed",
+      "nullable": true
+    },
+    {
+      "name": "metadata",
+      "type": "object",
+      "mode": "stored",
+      "description": "Additional tag data"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "ResourceTag",
+      "tagId": "tag_001",
+      "resourceType": "document",
+      "resourceId": "doc_financial_report_2024",
+      "tagKey": "data_classification",
+      "tagValue": "highly_confidential",
+      "tagType": "security",
+      "source": "automated",
+      "confidence": 0.95,
+      "scope": "internal",
+      "inheritance": "recursive",
+      "propagation": "downstream",
+      "tagHierarchy": "[\"sensitive\",\"confidential\",\"highly_confidential\"]",
+      "impliedTags": "[{\"key\":\"encryption_required\",\"value\":\"AES256\"},{\"key\":\"access_review\",\"value\":\"quarterly\"}]",
+      "accessImplications": "{\"min_clearance_level\":3,\"required_mfa\":true,\"session_recording\":true,\"watermarking\":true}",
+      "policyBindings": "[\"data_loss_prevention\",\"insider_threat_monitoring\",\"encryption_at_rest\"]",
+      "appliedBy": "system_classifier",
+      "appliedAt": "2024-03-01T10:00:00Z",
+      "verifiedBy": "user_data_steward",
+      "verifiedAt": "2024-03-02T09:00:00Z",
+      "lastReviewedAt": "2024-03-15T00:00:00Z",
+      "nextReviewDate": "2024-06-15T00:00:00Z",
+      "isActive": true,
+      "metadata": {
+        "classification_model": "ml_classifier_v3",
+        "confidence_factors": ["keyword_match", "context_analysis", "metadata_scan"]
+      }
+    },
+    {
+      "@type": "ResourceTag",
+      "tagId": "tag_002",
+      "resourceType": "database",
+      "resourceId": "db_customer_analytics",
+      "tagKey": "compliance_scope",
+      "tagValue": "gdpr",
+      "tagType": "compliance",
+      "source": "manual",
+      "confidence": 1.0,
+      "scope": "internal",
+      "inheritance": "direct_children",
+      "propagation": "downstream",
+      "relatedTags": "[\"tag_pii\",\"tag_eu_data\"]",
+      "conflictingTags": "[\"tag_public_data\"]",
+      "accessImplications": "{\"restricted_regions\":[\"non_eu\"],\"retention_limit\":\"3_years\",\"right_to_deletion\":true}",
+      "policyBindings": "[\"gdpr_compliance_policy\",\"data_retention_policy\",\"cross_border_transfer_policy\"]",
+      "appliedBy": "user_compliance_officer",
+      "appliedAt": "2024-01-15T14:00:00Z",
+      "isTemporary": false,
+      "isActive": true,
+      "metadata": {
+        "legal_basis": "consent",
+        "data_subjects": "eu_residents",
+        "dpo_approved": true
+      }
+    }
+  ]
+}

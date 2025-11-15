@@ -1,0 +1,119 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "TwoFactorBackupCode",
+  "description": "Stores emergency backup codes that users can use to access their account when their primary two-factor authentication method is unavailable. These are typically 8-10 digit codes generated when 2FA is first enabled, and users are instructed to print or save them somewhere safe. Each code can only be used once - after being used, it's permanently invalidated to prevent reuse. Backup codes are the safety net for 2FA, preventing users from being permanently locked out if they lose their phone, authenticator app breaks, or hardware key is damaged. They're particularly critical for traveling users who might not have SMS access, or during phone number changes. The system typically generates 10-20 codes at once, and users can regenerate a new set if they run low. Each code is stored as a hash for security, and the system tracks which codes have been used, when, and from what IP address. This helps detect if backup codes have been compromised. Some systems alert users when backup codes are running low or have been used, as usage often indicates the primary 2FA method has failed.",
+  "properties": [
+    {
+      "name": "twoFactorAuthId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "Links to the 2FA configuration these backup codes belong to",
+      "required": true
+    },
+    {
+      "name": "codeHash",
+      "type": "string",
+      "mode": "stored",
+      "description": "Cryptographic hash of the backup code",
+      "required": true,
+      "private": true
+    },
+    {
+      "name": "codeSequence",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Sequential number of this code in the set (1st, 2nd, etc.)",
+      "required": true
+    },
+    {
+      "name": "isUsed",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this backup code has been consumed",
+      "default": false
+    },
+    {
+      "name": "usedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When this backup code was used for authentication",
+      "nullable": true
+    },
+    {
+      "name": "usedFromIp",
+      "type": "string",
+      "mode": "stored",
+      "description": "IP address from which the code was used",
+      "nullable": true
+    },
+    {
+      "name": "usedUserAgent",
+      "type": "string",
+      "mode": "stored",
+      "description": "Browser or device that used this code",
+      "nullable": true
+    },
+    {
+      "name": "usedLocation",
+      "type": "string",
+      "mode": "stored",
+      "description": "Geographic location where code was used",
+      "nullable": true
+    },
+    {
+      "name": "codeLength",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Number of characters in the backup code",
+      "default": 8
+    },
+    {
+      "name": "createdAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When this backup code was generated",
+      "required": true
+    },
+    {
+      "name": "expiresAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When this code expires and can no longer be used",
+      "nullable": true
+    },
+    {
+      "name": "notificationSent",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether user was notified about this code being used",
+      "default": false
+    }
+  ],
+  "examples": [
+    {
+      "@type": "TwoFactorBackupCode",
+      "twoFactorAuthId": "2fa_auth123",
+      "codeSequence": 1,
+      "isUsed": false,
+      "codeLength": 8,
+      "createdAt": "2024-01-15T10:00:00Z",
+      "expiresAt": "2025-01-15T10:00:00Z",
+      "notificationSent": false
+    },
+    {
+      "@type": "TwoFactorBackupCode",
+      "twoFactorAuthId": "2fa_auth123",
+      "codeSequence": 3,
+      "isUsed": true,
+      "usedAt": "2024-03-10T14:30:00Z",
+      "usedFromIp": "203.0.113.45",
+      "usedUserAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)",
+      "usedLocation": "San Francisco, CA, USA",
+      "codeLength": 8,
+      "createdAt": "2024-01-15T10:00:00Z",
+      "expiresAt": "2025-01-15T10:00:00Z",
+      "notificationSent": true
+    }
+  ]
+}

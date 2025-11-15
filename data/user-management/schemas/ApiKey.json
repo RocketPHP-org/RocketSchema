@@ -1,0 +1,186 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "ApiKey",
+  "description": "Represents an API key for programmatic access to the system. API keys allow applications, scripts, or services to authenticate without using username/password combinations. They're essential for machine-to-machine communication, continuous integration, automated scripts, and third-party integrations. Each API key has a unique identifier, can be restricted by IP address or domain, has configurable permissions, and includes rate limiting to prevent abuse. API keys can be revoked instantly if compromised, and their usage is tracked for security auditing. Unlike user sessions, API keys don't expire automatically but can have validity periods set. They're typically used in HTTP headers or query parameters for authentication.",
+  "properties": [
+    {
+      "name": "apiKeyId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "Unique identifier for this API key",
+      "required": true,
+      "unique": true
+    },
+    {
+      "name": "keyHash",
+      "type": "string",
+      "mode": "stored",
+      "description": "Cryptographically hashed version of the actual key",
+      "required": true,
+      "unique": true,
+      "private": true
+    },
+    {
+      "name": "keyPrefix",
+      "type": "string",
+      "mode": "stored",
+      "description": "Visible prefix to identify the key (first few characters)",
+      "required": true,
+      "example": "sk_live_abc"
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "mode": "stored",
+      "description": "Human-friendly name to identify the key's purpose",
+      "required": true,
+      "example": "Production API Key"
+    },
+    {
+      "name": "description",
+      "type": "string",
+      "mode": "stored",
+      "description": "Detailed description of what this key is used for",
+      "nullable": true
+    },
+    {
+      "name": "type",
+      "type": "string",
+      "mode": "enum",
+      "description": "Classification of the API key",
+      "enum": ["public", "secret", "restricted", "test"],
+      "default": "secret",
+      "example": "secret"
+    },
+    {
+      "name": "userId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "User who created and owns this key",
+      "nullable": true
+    },
+    {
+      "name": "organizationId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "Organization that owns this key",
+      "nullable": true
+    },
+    {
+      "name": "validFrom",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When the key becomes valid",
+      "required": true
+    },
+    {
+      "name": "validUntil",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When the key expires (null for never)",
+      "nullable": true
+    },
+    {
+      "name": "lastUsedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Last time this key was used in an API request",
+      "nullable": true
+    },
+    {
+      "name": "lastUsedIp",
+      "type": "string",
+      "mode": "stored",
+      "description": "IP address from last use",
+      "nullable": true
+    },
+    {
+      "name": "usageCount",
+      "type": "bigint",
+      "mode": "stored",
+      "description": "Total number of API calls made with this key",
+      "default": 0,
+      "min": 0
+    },
+    {
+      "name": "isActive",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether the key is currently usable",
+      "default": true
+    },
+    {
+      "name": "revokedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When the key was revoked (if applicable)",
+      "nullable": true
+    },
+    {
+      "name": "revokedBy",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "User who revoked the key",
+      "nullable": true
+    },
+    {
+      "name": "revokedReason",
+      "type": "string",
+      "mode": "stored",
+      "description": "Explanation for why the key was revoked",
+      "nullable": true
+    },
+    {
+      "name": "createdAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When the key was generated",
+      "required": true
+    },
+    {
+      "name": "createdBy",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "User who created the key",
+      "nullable": true
+    }
+  ],
+  "examples": [
+    {
+      "@type": "ApiKey",
+      "apiKeyId": "key_550e8400",
+      "keyPrefix": "sk_live_4Xb9",
+      "name": "Production E-commerce Integration",
+      "description": "Used by our e-commerce platform to sync inventory and process orders",
+      "type": "secret",
+      "userId": "user_123",
+      "validFrom": "2024-01-01T00:00:00Z",
+      "validUntil": null,
+      "lastUsedAt": "2024-03-15T14:30:00Z",
+      "lastUsedIp": "203.0.113.42",
+      "usageCount": 15420,
+      "isActive": true,
+      "createdAt": "2024-01-01T00:00:00Z"
+    },
+    {
+      "@type": "ApiKey",
+      "apiKeyId": "key_test_999",
+      "keyPrefix": "sk_test_7Yz2",
+      "name": "Development Testing Key",
+      "description": "Temporary key for integration testing",
+      "type": "test",
+      "userId": "developer_456",
+      "validFrom": "2024-03-01T00:00:00Z",
+      "validUntil": "2024-04-01T00:00:00Z",
+      "lastUsedAt": "2024-03-14T10:00:00Z",
+      "lastUsedIp": "10.0.0.50",
+      "usageCount": 250,
+      "isActive": false,
+      "revokedAt": "2024-03-15T00:00:00Z",
+      "revokedBy": "admin_789",
+      "revokedReason": "Key was accidentally committed to public repository",
+      "createdAt": "2024-03-01T00:00:00Z"
+    }
+  ]
+}

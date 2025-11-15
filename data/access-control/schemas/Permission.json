@@ -1,0 +1,237 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "Permission",
+  "description": "Represents a specific authorization to perform an action on a resource within the system. Permissions are the atomic units of access control - the smallest, indivisible rights that can be granted or denied. Each permission typically follows the pattern of 'resource:action' like 'users:delete' or 'reports:view', making it clear what operation is allowed on which entity. Permissions can be simple (binary yes/no) or complex with conditions and constraints. For example, 'documents:edit' might include conditions like 'only documents you created' or 'only during business hours'. The system evaluates permissions at runtime to make access decisions, checking if the current user has the required permission through their roles, groups, or direct assignment. Permissions are versioned to track changes over time, which is crucial for audit trails and compliance. They can be tagged for organization (like 'dangerous', 'pii_access', 'financial') helping administrators understand the risk level. Modern systems might have hundreds or thousands of granular permissions, providing precise control over every feature and data element. This granularity is essential for implementing the principle of least privilege and meeting regulatory requirements like GDPR or HIPAA.",
+  "properties": [
+    {
+      "name": "permissionId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "Unique identifier for this permission",
+      "required": true,
+      "unique": true
+    },
+    {
+      "name": "code",
+      "type": "string",
+      "mode": "stored",
+      "description": "Unique machine-readable permission identifier",
+      "required": true,
+      "unique": true,
+      "example": "users.profile.edit"
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "mode": "stored",
+      "description": "Human-readable permission name",
+      "required": true,
+      "example": "Edit User Profiles"
+    },
+    {
+      "name": "description",
+      "type": "string",
+      "mode": "stored",
+      "description": "Detailed explanation of what this permission allows",
+      "example": "Allows editing user profile information including name, email, and preferences"
+    },
+    {
+      "name": "resource",
+      "type": "string",
+      "mode": "stored",
+      "description": "The resource or entity this permission applies to",
+      "required": true,
+      "example": "users"
+    },
+    {
+      "name": "action",
+      "type": "string",
+      "mode": "stored",
+      "description": "The action allowed on the resource",
+      "required": true,
+      "example": "edit"
+    },
+    {
+      "name": "scope",
+      "type": "string",
+      "mode": "enum",
+      "description": "Scope of the permission",
+      "enum": ["global", "organization", "department", "team", "self", "custom"],
+      "default": "global"
+    },
+    {
+      "name": "category",
+      "type": "string",
+      "mode": "stored",
+      "description": "Category for organizing permissions",
+      "example": "user_management"
+    },
+    {
+      "name": "riskLevel",
+      "type": "string",
+      "mode": "enum",
+      "description": "Risk assessment of granting this permission",
+      "enum": ["low", "medium", "high", "critical"],
+      "default": "medium"
+    },
+    {
+      "name": "requiresMfa",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this permission requires two-factor authentication",
+      "default": false
+    },
+    {
+      "name": "requiresApproval",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether using this permission needs approval",
+      "default": false
+    },
+    {
+      "name": "isSystem",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this is a system permission that cannot be modified",
+      "default": false
+    },
+    {
+      "name": "isDangerous",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this permission can cause data loss or security issues",
+      "default": false
+    },
+    {
+      "name": "conditions",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON conditions that must be met for permission to apply",
+      "nullable": true,
+      "example": "{\"ownership\":\"creator\",\"status\":\"draft\"}"
+    },
+    {
+      "name": "dataFilters",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON filters limiting what data this permission applies to",
+      "nullable": true,
+      "example": "{\"department\":\"self\",\"created_after\":\"30_days_ago\"}"
+    },
+    {
+      "name": "allowedFields",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON array of specific fields this permission covers",
+      "nullable": true,
+      "example": "[\"name\",\"email\",\"phone\"]"
+    },
+    {
+      "name": "deniedFields",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON array of fields explicitly excluded",
+      "nullable": true,
+      "example": "[\"ssn\",\"creditCard\"]"
+    },
+    {
+      "name": "dependencies",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON array of other permissions required",
+      "nullable": true,
+      "example": "[\"users.view\",\"users.list\"]"
+    },
+    {
+      "name": "tags",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON array of tags for categorization",
+      "nullable": true,
+      "example": "[\"pii\",\"gdpr\",\"audit\"]"
+    },
+    {
+      "name": "version",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Version number for tracking changes",
+      "default": 1
+    },
+    {
+      "name": "isActive",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this permission is currently available",
+      "default": true
+    },
+    {
+      "name": "deprecatedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When this permission will be removed",
+      "nullable": true
+    },
+    {
+      "name": "createdAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When this permission was defined",
+      "required": true
+    },
+    {
+      "name": "metadata",
+      "type": "string",
+      "mode": "stored",
+      "description": "Additional configuration data",
+      "nullable": true
+    }
+  ],
+  "examples": [
+    {
+      "@type": "Permission",
+      "permissionId": "perm_users_delete",
+      "code": "users.delete",
+      "name": "Delete Users",
+      "description": "Permanently delete user accounts and all associated data. This action cannot be undone and triggers GDPR data removal processes.",
+      "resource": "users",
+      "action": "delete",
+      "scope": "organization",
+      "category": "user_management",
+      "riskLevel": "critical",
+      "requiresMfa": true,
+      "requiresApproval": true,
+      "isSystem": false,
+      "isDangerous": true,
+      "conditions": "{\"user_status\":[\"inactive\",\"suspended\"],\"account_age_days\":30}",
+      "dependencies": "[\"users.view\",\"users.deactivate\"]",
+      "tags": "[\"dangerous\",\"gdpr\",\"audit\",\"compliance\"]",
+      "version": 2,
+      "isActive": true,
+      "createdAt": "2024-01-01T00:00:00Z",
+      "metadata": "{\"audit_retention_days\":2555,\"requires_legal_review\":true}"
+    },
+    {
+      "@type": "Permission",
+      "permissionId": "perm_reports_view",
+      "code": "reports.view",
+      "name": "View Reports",
+      "description": "View and download generated reports and analytics dashboards",
+      "resource": "reports",
+      "action": "view",
+      "scope": "department",
+      "category": "analytics",
+      "riskLevel": "low",
+      "requiresMfa": false,
+      "requiresApproval": false,
+      "isSystem": false,
+      "isDangerous": false,
+      "dataFilters": "{\"department\":\"same_as_user\",\"classification\":[\"public\",\"internal\"]}",
+      "deniedFields": "[\"salary\",\"performance_rating\",\"ssn\"]",
+      "tags": "[\"analytics\",\"read_only\"]",
+      "version": 1,
+      "isActive": true,
+      "createdAt": "2024-01-15T10:00:00Z"
+    }
+  ]
+}

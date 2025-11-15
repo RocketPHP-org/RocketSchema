@@ -1,0 +1,282 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "AccessPolicy",
+  "description": "Defines high-level security policies that govern access control decisions across the entire system, implementing policy-based access control (PBAC) on top of role and permission-based systems. Access policies are rules that apply globally or to specific contexts, enforcing organizational security requirements like 'all financial data requires MFA' or 'contractors cannot access customer PII'. These policies act as an additional layer above RBAC, allowing dynamic, attribute-based decisions. Policies can be preventive (blocking access even if permissions exist) or permissive (granting access in specific situations). They evaluate multiple factors including user attributes (department, clearance level), resource attributes (classification, owner), environmental context (time, location, threat level), and action context (sensitivity, risk). Policies support complex boolean logic, combining multiple conditions with AND/OR operators. They can enforce compliance requirements ('GDPR data can only be accessed from EU locations'), implement zero-trust principles ('verify device trust before allowing access'), or handle break-glass scenarios ('allow emergency access with heavy auditing'). The entity includes policy versioning for change tracking, testing capabilities to validate policies before activation, and conflict resolution when multiple policies apply. This is essential for large enterprises with complex compliance requirements and dynamic security needs.",
+  "properties": [
+    {
+      "name": "policyId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "Unique identifier for this policy",
+      "required": true,
+      "unique": true
+    },
+    {
+      "name": "code",
+      "type": "string",
+      "mode": "stored",
+      "description": "Unique machine-readable policy identifier",
+      "required": true,
+      "unique": true,
+      "example": "POL_FINANCIAL_MFA"
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "mode": "stored",
+      "description": "Human-readable policy name",
+      "required": true,
+      "example": "Financial Data MFA Requirement"
+    },
+    {
+      "name": "description",
+      "type": "string",
+      "mode": "stored",
+      "description": "Detailed explanation of policy purpose and effect",
+      "required": true,
+      "example": "Requires multi-factor authentication for all access to financial data and transactions over $1000"
+    },
+    {
+      "name": "type",
+      "type": "string",
+      "mode": "enum",
+      "description": "Type of access policy",
+      "enum": ["preventive", "permissive", "detective", "corrective", "mandatory"],
+      "required": true,
+      "example": "preventive"
+    },
+    {
+      "name": "scope",
+      "type": "string",
+      "mode": "enum",
+      "description": "Scope where this policy applies",
+      "enum": ["global", "organization", "department", "resource_type", "custom"],
+      "default": "global"
+    },
+    {
+      "name": "priority",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Evaluation order (higher priority evaluated first)",
+      "default": 0,
+      "required": true
+    },
+    {
+      "name": "effect",
+      "type": "string",
+      "mode": "enum",
+      "description": "What happens when policy conditions are met",
+      "enum": ["allow", "deny", "require_mfa", "require_approval", "audit", "notify"],
+      "required": true,
+      "example": "deny"
+    },
+    {
+      "name": "subjects",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON criteria for who this policy applies to",
+      "required": true,
+      "example": "{\"user_type\":[\"contractor\",\"vendor\"],\"clearance_level\":{\"$lt\":3}}"
+    },
+    {
+      "name": "resources",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON criteria for what resources this covers",
+      "required": true,
+      "example": "{\"classification\":[\"confidential\",\"secret\"],\"data_type\":\"financial\"}"
+    },
+    {
+      "name": "actions",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON array of actions this policy governs",
+      "required": true,
+      "example": "[\"read\",\"write\",\"delete\",\"export\"]"
+    },
+    {
+      "name": "conditions",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON conditions that must be true for policy to apply",
+      "nullable": true,
+      "example": "{\"time_of_day\":{\"$between\":[\"08:00\",\"18:00\"]},\"location\":{\"$in\":[\"office\",\"vpn\"]}}"
+    },
+    {
+      "name": "obligations",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON array of required actions when policy triggers",
+      "nullable": true,
+      "example": "[{\"action\":\"audit_log\",\"level\":\"detailed\"},{\"action\":\"notify\",\"target\":\"security_team\"}]"
+    },
+    {
+      "name": "ruleLogic",
+      "type": "string",
+      "mode": "stored",
+      "description": "Complex boolean logic for policy evaluation",
+      "nullable": true,
+      "example": "((user.department == 'finance' AND resource.value > 10000) OR user.role == 'auditor')"
+    },
+    {
+      "name": "conflictResolution",
+      "type": "string",
+      "mode": "enum",
+      "description": "How to handle conflicts with other policies",
+      "enum": ["deny_overrides", "allow_overrides", "priority_based", "most_restrictive"],
+      "default": "deny_overrides"
+    },
+    {
+      "name": "version",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Policy version number",
+      "default": 1
+    },
+    {
+      "name": "isActive",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this policy is currently enforced",
+      "default": false
+    },
+    {
+      "name": "isDraft",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this is a draft version",
+      "default": true
+    },
+    {
+      "name": "testMode",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether to run in test mode (log but don't enforce)",
+      "default": false
+    },
+    {
+      "name": "validFrom",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When this policy becomes effective",
+      "nullable": true
+    },
+    {
+      "name": "validUntil",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When this policy expires",
+      "nullable": true
+    },
+    {
+      "name": "complianceFramework",
+      "type": "string",
+      "mode": "stored",
+      "description": "Compliance requirement this policy addresses",
+      "nullable": true,
+      "example": "GDPR Article 32"
+    },
+    {
+      "name": "approvedBy",
+      "type": "User",
+      "mode": "stored",
+      "description": "Who approved this policy",
+      "nullable": true
+    },
+    {
+      "name": "approvedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When policy was approved",
+      "nullable": true
+    },
+    {
+      "name": "createdBy",
+      "type": "User",
+      "mode": "stored",
+      "description": "Policy author",
+      "required": true
+    },
+    {
+      "name": "createdAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When policy was created",
+      "required": true
+    },
+    {
+      "name": "metadata",
+      "type": "object",
+      "mode": "stored",
+      "description": "Additional policy configuration"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "AccessPolicy",
+      "policyId": "pol_gdpr_001",
+      "code": "POL_GDPR_DATA_LOCALITY",
+      "name": "GDPR Data Locality Requirement",
+      "description": "Ensures personal data of EU residents is only accessed from approved EU locations or with explicit consent",
+      "type": "preventive",
+      "scope": "global",
+      "priority": 100,
+      "effect": "deny",
+      "subjects": "{\"all_users\":true}",
+      "resources": "{\"data_residency\":\"EU\",\"contains_pii\":true}",
+      "actions": "[\"read\",\"write\",\"export\",\"process\"]",
+      "conditions": "{\"$or\":[{\"access_location\":{\"$in\":\"EU_COUNTRIES\"}},{\"user_consent\":true},{\"legal_basis\":{\"$exists\":true}}]}",
+      "obligations": "[{\"action\":\"audit_log\",\"level\":\"full\",\"retain_days\":2555},{\"action\":\"encrypt\",\"algorithm\":\"AES-256\"}]",
+      "conflictResolution": "deny_overrides",
+      "version": 2,
+      "isActive": true,
+      "isDraft": false,
+      "testMode": false,
+      "complianceFramework": "GDPR Article 44-49",
+      "approvedBy": "compliance_officer",
+      "approvedAt": "2024-01-01T00:00:00Z",
+      "createdAt": "2023-12-01T10:00:00Z",
+      "metadata": {
+        "eu_countries": ["DE","FR","IT","ES","NL","BE","PL"],
+        "audit_requirement": "quarterly_review"
+      }
+    },
+    {
+      "@type": "AccessPolicy",
+      "policyId": "pol_finance_002",
+      "code": "POL_HIGH_VALUE_TRANSACTION_MFA",
+      "name": "High-Value Transaction MFA Policy",
+      "description": "Requires multi-factor authentication and manager approval for financial transactions exceeding thresholds",
+      "type": "preventive",
+      "scope": "resource_type",
+      "priority": 90,
+      "effect": "require_approval",
+      "subjects": "{\"$or\":[{\"role\":{\"$in\":[\"accountant\",\"finance_manager\"]}},{\"department\":\"finance\"}]}",
+      "resources": "{\"resource_type\":\"financial_transaction\",\"value\":{\"$gte\":10000}}",
+      "actions": "[\"approve\",\"execute\",\"modify\"]",
+      "conditions": "{\"$and\":[{\"time\":{\"$between\":[\"06:00\",\"22:00\"]}},{\"location\":{\"$ne\":\"blacklisted_countries\"}}]}",
+      "obligations": "[{\"action\":\"require_mfa\"},{\"action\":\"manager_approval\",\"timeout\":\"24h\"},{\"action\":\"audit_log\",\"include_screenshot\":true}]",
+      "ruleLogic": "transaction.value > 10000 AND (transaction.value > 50000 ? requires_cfo_approval : requires_manager_approval)",
+      "conflictResolution": "most_restrictive",
+      "version": 1,
+      "isActive": true,
+      "isDraft": false,
+      "testMode": false,
+      "validFrom": "2024-01-01T00:00:00Z",
+      "complianceFramework": "SOX Section 404",
+      "approvedBy": "cfo",
+      "approvedAt": "2024-01-01T00:00:00Z",
+      "createdBy": "security_architect",
+      "createdAt": "2023-12-15T14:00:00Z",
+      "metadata": {
+        "thresholds": {
+          "low": 1000,
+          "medium": 10000,
+          "high": 50000,
+          "critical": 100000
+        }
+      }
+    }
+  ]
+}

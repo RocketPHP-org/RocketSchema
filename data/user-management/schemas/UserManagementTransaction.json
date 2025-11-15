@@ -1,0 +1,193 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "UserManagementTransaction",
+  "description": "Manages complex, multi-step operations in user management as atomic transactions, ensuring data consistency and enabling rollback capabilities. Many user operations involve multiple related changes - for example, user registration might create a user record, set up authentication, send verification emails, create default preferences, and assign initial roles. This entity wraps all these steps into a single transaction that either completely succeeds or completely fails, preventing partial states that could leave the system inconsistent. Each transaction records its type (registration, password change, account deletion), current state (pending, in progress, committed, rolled back), and all operations performed. The checkpoint data allows the system to rollback changes if something fails midway through. This is particularly important for operations that interact with external systems - if sending a welcome email fails, the entire registration can be rolled back. The entity supports different isolation levels for concurrent operations and includes retry logic for transient failures. It provides an audit trail of complex operations and helps diagnose issues when multi-step processes fail. This transactional approach is essential for maintaining data integrity in distributed systems where operations might span multiple services or databases.",
+  "properties": [
+    {
+      "name": "transactionId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "Unique identifier for this transaction",
+      "required": true,
+      "unique": true
+    },
+    {
+      "name": "transactionType",
+      "type": "string",
+      "mode": "enum",
+      "description": "Category of operation being performed",
+      "enum": ["user_registration", "password_change", "authentication", "profile_update", "2fa_setup", "api_key_creation", "bulk_operation", "account_deletion", "role_assignment", "permission_update"],
+      "required": true
+    },
+    {
+      "name": "state",
+      "type": "string",
+      "mode": "enum",
+      "description": "Current status of the transaction",
+      "enum": ["pending", "in_progress", "committed", "rolled_back", "failed", "partially_committed"],
+      "required": true,
+      "default": "pending"
+    },
+    {
+      "name": "isolationLevel",
+      "type": "string",
+      "mode": "enum",
+      "description": "Database isolation level for concurrent operations",
+      "enum": ["read_uncommitted", "read_committed", "repeatable_read", "serializable"],
+      "default": "read_committed"
+    },
+    {
+      "name": "initiator",
+      "type": "User",
+      "mode": "stored",
+      "description": "User who initiated this transaction",
+      "nullable": true
+    },
+    {
+      "name": "affectedUserId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "Primary user affected by this transaction",
+      "required": true
+    },
+    {
+      "name": "affectedUserIds",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON array of all affected user IDs for bulk operations",
+      "nullable": true
+    },
+    {
+      "name": "operations",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON array of all operations in this transaction with their status",
+      "required": true,
+      "example": "[{\"operation\":\"create_user\",\"status\":\"completed\"},{\"operation\":\"send_email\",\"status\":\"pending\"}]"
+    },
+    {
+      "name": "startedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When the transaction began",
+      "required": true
+    },
+    {
+      "name": "committedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When all operations were successfully committed",
+      "nullable": true
+    },
+    {
+      "name": "rolledBackAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When the transaction was rolled back",
+      "nullable": true
+    },
+    {
+      "name": "completedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When the transaction finished (success or failure)",
+      "nullable": true
+    },
+    {
+      "name": "errorMessage",
+      "type": "string",
+      "mode": "stored",
+      "description": "Error details if the transaction failed",
+      "nullable": true
+    },
+    {
+      "name": "errorStep",
+      "type": "string",
+      "mode": "stored",
+      "description": "Which operation step failed",
+      "nullable": true
+    },
+    {
+      "name": "checkpointData",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON snapshot of data before transaction for rollback",
+      "nullable": true,
+      "private": true
+    },
+    {
+      "name": "rollbackData",
+      "type": "string",
+      "mode": "stored",
+      "description": "Data needed to reverse the operations",
+      "nullable": true,
+      "private": true
+    },
+    {
+      "name": "retryCount",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Number of retry attempts made",
+      "default": 0
+    },
+    {
+      "name": "maxRetries",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Maximum retries allowed for this transaction",
+      "default": 3
+    },
+    {
+      "name": "metadata",
+      "type": "string",
+      "mode": "stored",
+      "description": "Additional context about the transaction",
+      "nullable": true
+    },
+    {
+      "name": "version",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Version for optimistic locking",
+      "default": 1
+    }
+  ],
+  "examples": [
+    {
+      "@type": "UserManagementTransaction",
+      "transactionId": "txn_abc123",
+      "transactionType": "user_registration",
+      "state": "committed",
+      "isolationLevel": "read_committed",
+      "affectedUserId": "user_new_789",
+      "operations": "[{\"operation\":\"create_user\",\"status\":\"completed\",\"timestamp\":\"2024-03-15T10:00:00Z\"},{\"operation\":\"create_authentication\",\"status\":\"completed\",\"timestamp\":\"2024-03-15T10:00:01Z\"},{\"operation\":\"send_verification_email\",\"status\":\"completed\",\"timestamp\":\"2024-03-15T10:00:02Z\"},{\"operation\":\"assign_default_role\",\"status\":\"completed\",\"timestamp\":\"2024-03-15T10:00:03Z\"}]",
+      "startedAt": "2024-03-15T10:00:00Z",
+      "committedAt": "2024-03-15T10:00:03Z",
+      "completedAt": "2024-03-15T10:00:03Z",
+      "retryCount": 0,
+      "metadata": "{\"registration_source\":\"web\",\"ip_address\":\"192.168.1.100\"}",
+      "version": 2
+    },
+    {
+      "@type": "UserManagementTransaction",
+      "transactionId": "txn_failed_456",
+      "transactionType": "bulk_operation",
+      "state": "rolled_back",
+      "isolationLevel": "serializable",
+      "initiator": "admin_123",
+      "affectedUserId": "batch_operation",
+      "affectedUserIds": "[\"user_001\",\"user_002\",\"user_003\",\"user_004\",\"user_005\"]",
+      "operations": "[{\"operation\":\"update_role\",\"status\":\"completed\",\"users\":[\"user_001\",\"user_002\",\"user_003\"]},{\"operation\":\"update_permissions\",\"status\":\"failed\",\"error\":\"Permission not found\"}]",
+      "startedAt": "2024-03-15T14:00:00Z",
+      "rolledBackAt": "2024-03-15T14:00:05Z",
+      "completedAt": "2024-03-15T14:00:05Z",
+      "errorMessage": "Permission 'advanced_analytics' does not exist",
+      "errorStep": "update_permissions",
+      "checkpointData": "{\"original_roles\":{\"user_001\":\"basic\",\"user_002\":\"basic\",\"user_003\":\"premium\"}}",
+      "retryCount": 2,
+      "maxRetries": 3,
+      "version": 4
+    }
+  ]
+}

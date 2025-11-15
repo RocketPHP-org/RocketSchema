@@ -1,7 +1,0 @@
-{
-  "@type": "Schema",
-  "@context": "https://rocketschema.org/context",
-  "name": "Permission",
-  "description": "Access permissions for documents and content",
-  "properties": []
-}
