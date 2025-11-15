@@ -1,0 +1,64 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "UserGroupRole",
+  "description": "Junction table for roles assigned to groups (many-to-many, 2NF compliance)",
+  "properties": [
+    {
+      "name": "userGroup",
+      "type": "UserGroup",
+      "mode": "stored",
+      "description": "Group reference",
+      "required": true
+    },
+    {
+      "name": "role",
+      "type": "Role",
+      "mode": "stored",
+      "description": "Assigned role",
+      "required": true
+    },
+    {
+      "name": "assignedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When role was assigned",
+      "required": true
+    },
+    {
+      "name": "assignedBy",
+      "type": "User",
+      "mode": "stored",
+      "description": "User who assigned the role"
+    },
+    {
+      "name": "validFrom",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Start of validity"
+    },
+    {
+      "name": "validUntil",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "End of validity"
+    },
+    {
+      "name": "isActive",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether assignment is active",
+      "default": true
+    }
+  ],
+  "indexes": [
+    {
+      "fields": ["userGroup", "role"],
+      "unique": true
+    },
+    {
+      "fields": ["role"],
+      "name": "idx_role"
+    }
+  ]
+}

@@ -1,0 +1,82 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "PrincipalTrust",
+  "description": "Trust relationships between security principals (many-to-many, 2NF compliance)",
+  "properties": [
+    {
+      "name": "trustor",
+      "type": "SecurityPrincipal",
+      "mode": "stored",
+      "description": "Principal giving trust",
+      "required": true
+    },
+    {
+      "name": "trustee",
+      "type": "SecurityPrincipal",
+      "mode": "stored",
+      "description": "Principal receiving trust",
+      "required": true
+    },
+    {
+      "name": "trustType",
+      "type": "string",
+      "mode": "enum",
+      "description": "Type of trust relationship",
+      "enum": ["delegation", "impersonation", "federation", "service", "mutual"],
+      "required": true
+    },
+    {
+      "name": "trustLevel",
+      "type": "string",
+      "mode": "enum",
+      "description": "Level of trust",
+      "enum": ["full", "partial", "limited", "conditional"],
+      "default": "limited"
+    },
+    {
+      "name": "permissions",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON array of permissions granted through trust",
+      "nullable": true
+    },
+    {
+      "name": "constraints",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON constraints on the trust relationship",
+      "nullable": true
+    },
+    {
+      "name": "establishedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When trust was established",
+      "required": true
+    },
+    {
+      "name": "validUntil",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Trust expiration"
+    },
+    {
+      "name": "isActive",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether trust is active",
+      "default": true
+    }
+  ],
+  "indexes": [
+    {
+      "fields": ["trustor", "trustee", "trustType"],
+      "unique": true
+    },
+    {
+      "fields": ["trustee"],
+      "name": "idx_trustee"
+    }
+  ]
+}

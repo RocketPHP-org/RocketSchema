@@ -1,0 +1,71 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "UserGroupPermission",
+  "description": "Direct permissions assigned to groups (many-to-many, 2NF compliance)",
+  "properties": [
+    {
+      "name": "userGroup",
+      "type": "UserGroup",
+      "mode": "stored",
+      "description": "Group reference",
+      "required": true
+    },
+    {
+      "name": "permission",
+      "type": "Permission",
+      "mode": "stored",
+      "description": "Assigned permission",
+      "required": true
+    },
+    {
+      "name": "assignedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When permission was assigned",
+      "required": true
+    },
+    {
+      "name": "assignedBy",
+      "type": "User",
+      "mode": "stored",
+      "description": "User who assigned the permission"
+    },
+    {
+      "name": "isGranted",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether permission is granted (true) or denied (false)",
+      "default": true
+    },
+    {
+      "name": "validFrom",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Start of validity"
+    },
+    {
+      "name": "validUntil",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "End of validity"
+    },
+    {
+      "name": "isActive",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether assignment is active",
+      "default": true
+    }
+  ],
+  "indexes": [
+    {
+      "fields": ["userGroup", "permission"],
+      "unique": true
+    },
+    {
+      "fields": ["permission"],
+      "name": "idx_permission"
+    }
+  ]
+}

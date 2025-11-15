@@ -1,0 +1,90 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "PolicyObligation",
+  "description": "Obligations that must be fulfilled when a policy is applied (normalized from PolicySet)",
+  "properties": [
+    {
+      "name": "policySet",
+      "type": "PolicySet",
+      "mode": "stored",
+      "description": "Parent policy set",
+      "required": true
+    },
+    {
+      "name": "obligationId",
+      "type": "string",
+      "mode": "stored",
+      "description": "Unique obligation identifier",
+      "required": true
+    },
+    {
+      "name": "obligationType",
+      "type": "string",
+      "mode": "enum",
+      "description": "Type of obligation",
+      "enum": ["audit", "notification", "encryption", "consent", "watermark", "approval", "retention"],
+      "required": true
+    },
+    {
+      "name": "action",
+      "type": "string",
+      "mode": "stored",
+      "description": "Action to perform",
+      "required": true
+    },
+    {
+      "name": "triggerOn",
+      "type": "string",
+      "mode": "enum",
+      "description": "When to trigger the obligation",
+      "enum": ["permit", "deny", "always"],
+      "default": "always"
+    },
+    {
+      "name": "parameters",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON string of parameters (denormalized for flexibility)",
+      "nullable": true
+    },
+    {
+      "name": "condition",
+      "type": "string",
+      "mode": "stored",
+      "description": "Condition expression for when to apply obligation",
+      "nullable": true
+    },
+    {
+      "name": "isMandatory",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether the obligation is mandatory",
+      "default": true
+    },
+    {
+      "name": "priority",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Execution priority",
+      "default": 0
+    },
+    {
+      "name": "createdAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Creation timestamp",
+      "required": true
+    }
+  ],
+  "indexes": [
+    {
+      "fields": ["policySet", "obligationId"],
+      "unique": true
+    },
+    {
+      "fields": ["policySet", "triggerOn"],
+      "name": "idx_policy_trigger"
+    }
+  ]
+}

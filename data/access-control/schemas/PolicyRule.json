@@ -1,0 +1,110 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "PolicyRule",
+  "description": "Individual policy rule - normalized from AccessPolicy (1NF compliance)",
+  "properties": [
+    {
+      "name": "policy",
+      "type": "AccessPolicy",
+      "mode": "stored",
+      "description": "Parent policy",
+      "required": true
+    },
+    {
+      "name": "ruleId",
+      "type": "string",
+      "mode": "stored",
+      "description": "Unique rule identifier within policy",
+      "required": true
+    },
+    {
+      "name": "ruleName",
+      "type": "string",
+      "mode": "stored",
+      "description": "Rule name",
+      "required": true
+    },
+    {
+      "name": "effect",
+      "type": "string",
+      "mode": "enum",
+      "description": "Effect of the rule",
+      "enum": ["allow", "deny"],
+      "required": true
+    },
+    {
+      "name": "subjectType",
+      "type": "string",
+      "mode": "stored",
+      "description": "Type of subject (user, role, group, etc.)",
+      "required": true
+    },
+    {
+      "name": "subjectPattern",
+      "type": "string",
+      "mode": "stored",
+      "description": "Pattern to match subjects",
+      "required": true
+    },
+    {
+      "name": "resourceType",
+      "type": "string",
+      "mode": "stored",
+      "description": "Type of resource",
+      "required": true
+    },
+    {
+      "name": "resourcePattern",
+      "type": "string",
+      "mode": "stored",
+      "description": "Pattern to match resources",
+      "required": true
+    },
+    {
+      "name": "action",
+      "type": "string",
+      "mode": "stored",
+      "description": "Action pattern",
+      "required": true
+    },
+    {
+      "name": "conditionExpression",
+      "type": "string",
+      "mode": "stored",
+      "description": "Condition expression (CEL or similar)",
+      "nullable": true
+    },
+    {
+      "name": "priority",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Rule evaluation priority",
+      "default": 0
+    },
+    {
+      "name": "isActive",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether the rule is active",
+      "default": true
+    },
+    {
+      "name": "createdAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Creation timestamp",
+      "required": true
+    }
+  ],
+  "indexes": [
+    {
+      "fields": ["policy", "ruleId"],
+      "unique": true
+    },
+    {
+      "fields": ["policy", "priority"],
+      "name": "idx_policy_priority"
+    }
+  ]
+}

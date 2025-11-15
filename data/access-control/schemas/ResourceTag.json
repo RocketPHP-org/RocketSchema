@@ -1,0 +1,71 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "ResourceTag",
+  "description": "Tags for resources - normalized to avoid multivalued attributes (1NF compliance)",
+  "properties": [
+    {
+      "name": "resourceType",
+      "type": "string",
+      "mode": "stored",
+      "description": "Type of resource",
+      "required": true
+    },
+    {
+      "name": "resourceId",
+      "type": "string",
+      "mode": "stored",
+      "description": "Resource identifier",
+      "required": true
+    },
+    {
+      "name": "tagName",
+      "type": "string",
+      "mode": "stored",
+      "description": "Tag name",
+      "required": true
+    },
+    {
+      "name": "tagValue",
+      "type": "string",
+      "mode": "stored",
+      "description": "Tag value (optional)",
+      "nullable": true
+    },
+    {
+      "name": "tagCategory",
+      "type": "string",
+      "mode": "enum",
+      "description": "Category of tag",
+      "enum": ["security", "classification", "business", "technical", "compliance", "custom"],
+      "default": "custom"
+    },
+    {
+      "name": "addedBy",
+      "type": "User",
+      "mode": "stored",
+      "description": "User who added the tag"
+    },
+    {
+      "name": "createdAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Creation timestamp",
+      "required": true
+    }
+  ],
+  "indexes": [
+    {
+      "fields": ["resourceType", "resourceId", "tagName"],
+      "unique": true
+    },
+    {
+      "fields": ["tagName"],
+      "name": "idx_tag_name"
+    },
+    {
+      "fields": ["resourceType", "resourceId"],
+      "name": "idx_resource"
+    }
+  ]
+}

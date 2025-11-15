@@ -1,0 +1,106 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "ACLEntry",
+  "description": "Access Control List entry - normalized from ResourcePermission (1NF compliance)",
+  "properties": [
+    {
+      "name": "resourceType",
+      "type": "string",
+      "mode": "stored",
+      "description": "Type of resource",
+      "required": true
+    },
+    {
+      "name": "resourceId",
+      "type": "string",
+      "mode": "stored",
+      "description": "Resource identifier",
+      "required": true
+    },
+    {
+      "name": "principalType",
+      "type": "string",
+      "mode": "enum",
+      "description": "Type of principal",
+      "enum": ["user", "role", "group", "service", "anonymous"],
+      "required": true
+    },
+    {
+      "name": "principalId",
+      "type": "string",
+      "mode": "stored",
+      "description": "Principal identifier",
+      "required": true
+    },
+    {
+      "name": "permission",
+      "type": "string",
+      "mode": "stored",
+      "description": "Permission granted or denied",
+      "required": true
+    },
+    {
+      "name": "effect",
+      "type": "string",
+      "mode": "enum",
+      "description": "Allow or deny",
+      "enum": ["allow", "deny"],
+      "required": true,
+      "default": "allow"
+    },
+    {
+      "name": "priority",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Priority for conflict resolution",
+      "default": 0
+    },
+    {
+      "name": "conditions",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON string of conditions (denormalized for performance)",
+      "nullable": true
+    },
+    {
+      "name": "validFrom",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Start of validity"
+    },
+    {
+      "name": "validUntil",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "End of validity"
+    },
+    {
+      "name": "grantedBy",
+      "type": "User",
+      "mode": "stored",
+      "description": "Who granted this ACL entry"
+    },
+    {
+      "name": "createdAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Creation timestamp",
+      "required": true
+    }
+  ],
+  "indexes": [
+    {
+      "fields": ["resourceType", "resourceId", "principalType", "principalId", "permission"],
+      "unique": true
+    },
+    {
+      "fields": ["resourceType", "resourceId"],
+      "name": "idx_resource"
+    },
+    {
+      "fields": ["principalType", "principalId"],
+      "name": "idx_principal"
+    }
+  ]
+}

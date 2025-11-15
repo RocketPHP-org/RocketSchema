@@ -1,0 +1,70 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "UserGroupMember",
+  "description": "Junction table for group members (many-to-many, 2NF compliance)",
+  "properties": [
+    {
+      "name": "userGroup",
+      "type": "UserGroup",
+      "mode": "stored",
+      "description": "Group reference",
+      "required": true
+    },
+    {
+      "name": "user",
+      "type": "User",
+      "mode": "stored",
+      "description": "Member user",
+      "required": true
+    },
+    {
+      "name": "joinedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When user joined the group",
+      "required": true
+    },
+    {
+      "name": "addedBy",
+      "type": "User",
+      "mode": "stored",
+      "description": "User who added this member"
+    },
+    {
+      "name": "membershipType",
+      "type": "string",
+      "mode": "enum",
+      "description": "Type of membership",
+      "enum": ["regular", "manager", "owner"],
+      "default": "regular"
+    },
+    {
+      "name": "isActive",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether membership is active",
+      "default": true
+    },
+    {
+      "name": "leftAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When user left the group"
+    }
+  ],
+  "indexes": [
+    {
+      "fields": ["userGroup", "user"],
+      "unique": true
+    },
+    {
+      "fields": ["user"],
+      "name": "idx_user"
+    },
+    {
+      "fields": ["userGroup", "membershipType"],
+      "name": "idx_group_type"
+    }
+  ]
+}

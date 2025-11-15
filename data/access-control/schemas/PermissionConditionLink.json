@@ -1,0 +1,68 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "PermissionConditionLink",
+  "description": "Junction table linking permissions to conditions (many-to-many, 2NF compliance)",
+  "properties": [
+    {
+      "name": "permission",
+      "type": "Permission",
+      "mode": "stored",
+      "description": "Permission reference",
+      "required": true
+    },
+    {
+      "name": "condition",
+      "type": "PermissionCondition",
+      "mode": "stored",
+      "description": "Condition reference",
+      "required": true
+    },
+    {
+      "name": "linkType",
+      "type": "string",
+      "mode": "enum",
+      "description": "Type of link",
+      "enum": ["required", "optional", "negative"],
+      "default": "required"
+    },
+    {
+      "name": "evaluationOrder",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Order in which to evaluate conditions",
+      "default": 0
+    },
+    {
+      "name": "shortCircuit",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether to stop evaluation if this condition fails",
+      "default": false
+    },
+    {
+      "name": "isActive",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this link is active",
+      "default": true
+    },
+    {
+      "name": "createdAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Creation timestamp",
+      "required": true
+    }
+  ],
+  "indexes": [
+    {
+      "fields": ["permission", "condition"],
+      "unique": true
+    },
+    {
+      "fields": ["permission", "evaluationOrder"],
+      "name": "idx_permission_order"
+    }
+  ]
+}

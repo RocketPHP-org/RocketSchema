@@ -1,0 +1,93 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "ApprovalDecision",
+  "description": "Individual approval decisions for access requests (normalized from AccessRequest)",
+  "properties": [
+    {
+      "name": "accessRequest",
+      "type": "AccessRequest",
+      "mode": "stored",
+      "description": "Parent access request",
+      "required": true
+    },
+    {
+      "name": "approver",
+      "type": "User",
+      "mode": "stored",
+      "description": "User who made the decision",
+      "required": true
+    },
+    {
+      "name": "decision",
+      "type": "string",
+      "mode": "enum",
+      "description": "Decision made",
+      "enum": ["approved", "rejected", "conditional", "abstained"],
+      "required": true
+    },
+    {
+      "name": "decisionTimestamp",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When decision was made",
+      "required": true
+    },
+    {
+      "name": "comment",
+      "type": "string",
+      "mode": "stored",
+      "description": "Decision comment",
+      "nullable": true
+    },
+    {
+      "name": "conditions",
+      "type": "string",
+      "mode": "stored",
+      "description": "Conditions for conditional approval (JSON)",
+      "nullable": true
+    },
+    {
+      "name": "validFor",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Validity duration in seconds",
+      "nullable": true
+    },
+    {
+      "name": "approverRole",
+      "type": "string",
+      "mode": "stored",
+      "description": "Role of approver at time of decision",
+      "nullable": true
+    },
+    {
+      "name": "isOverride",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this is an override decision",
+      "default": false
+    },
+    {
+      "name": "createdAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Creation timestamp",
+      "required": true
+    }
+  ],
+  "indexes": [
+    {
+      "fields": ["accessRequest", "approver"],
+      "unique": true
+    },
+    {
+      "fields": ["approver"],
+      "name": "idx_approver"
+    },
+    {
+      "fields": ["accessRequest", "decision"],
+      "name": "idx_request_decision"
+    }
+  ]
+}

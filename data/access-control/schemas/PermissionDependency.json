@@ -1,0 +1,50 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "PermissionDependency",
+  "description": "Junction table for permission dependencies (many-to-many relationship)",
+  "properties": [
+    {
+      "name": "permission",
+      "type": "Permission",
+      "mode": "stored",
+      "description": "Permission that has dependencies",
+      "required": true
+    },
+    {
+      "name": "dependsOn",
+      "type": "Permission",
+      "mode": "stored",
+      "description": "Required permission",
+      "required": true
+    },
+    {
+      "name": "dependencyType",
+      "type": "string",
+      "mode": "enum",
+      "description": "Type of dependency",
+      "enum": ["required", "recommended", "conflict"],
+      "default": "required"
+    },
+    {
+      "name": "isActive",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this dependency is active",
+      "default": true
+    },
+    {
+      "name": "createdAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Creation timestamp",
+      "required": true
+    }
+  ],
+  "indexes": [
+    {
+      "fields": ["permission", "dependsOn"],
+      "unique": true
+    }
+  ]
+}

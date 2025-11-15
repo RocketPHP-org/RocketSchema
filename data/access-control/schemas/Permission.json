@@ -54,18 +54,6 @@
       "example": "allow"
     },
     {
-      "name": "attributes",
-      "type": "PermissionAttribute[]",
-      "mode": "stored",
-      "description": "Attributes for ABAC evaluation"
-    },
-    {
-      "name": "conditions",
-      "type": "PermissionCondition[]",
-      "mode": "stored",
-      "description": "Conditions that must be met for permission to apply"
-    },
-    {
       "name": "scope",
       "type": "string",
       "mode": "enum",
@@ -79,19 +67,8 @@
       "type": "string",
       "mode": "stored",
       "description": "Custom scope expression for complex scoping rules",
+      "nullable": true,
       "example": "organization.id == user.organizationId && department.region == 'EU'"
-    },
-    {
-      "name": "dataFilters",
-      "type": "DataFilter[]",
-      "mode": "stored",
-      "description": "Filters to apply to data access"
-    },
-    {
-      "name": "fieldRestrictions",
-      "type": "FieldRestriction[]",
-      "mode": "stored",
-      "description": "Field-level access restrictions"
     },
     {
       "name": "category",
@@ -116,12 +93,6 @@
       "default": false
     },
     {
-      "name": "dependencies",
-      "type": "Permission[]",
-      "mode": "stored",
-      "description": "Other permissions required for this permission to be effective"
-    },
-    {
       "name": "isActive",
       "type": "boolean",
       "mode": "stored",
@@ -132,13 +103,15 @@
       "name": "validFrom",
       "type": "DateTime",
       "mode": "stored",
-      "description": "Start of validity period"
+      "description": "Start of validity period",
+      "nullable": true
     },
     {
       "name": "validUntil",
       "type": "DateTime",
       "mode": "stored",
-      "description": "End of validity period"
+      "description": "End of validity period",
+      "nullable": true
     },
     {
       "name": "createdAt",
@@ -148,43 +121,68 @@
       "required": true
     },
     {
-      "name": "metadata",
-      "type": "object",
+      "name": "createdBy",
+      "type": "User",
       "mode": "stored",
-      "description": "Additional metadata for extensibility"
-    }
-  ],
-  "examples": [
-    {
-      "@type": "Permission",
-      "code": "document.read.own_department",
-      "name": "Read Own Department Documents",
-      "description": "Allows reading documents from user's own department only",
-      "resource": "document",
-      "action": "read",
-      "effect": "allow",
-      "scope": "custom",
-      "scopeExpression": "resource.departmentId == user.departmentId",
-      "category": "Document Management",
-      "priority": 10,
-      "isSystem": false,
-      "isActive": true,
-      "createdAt": "2024-01-01T00:00:00Z"
+      "description": "User who created this permission"
     },
     {
-      "@type": "Permission",
-      "code": "user.update.working_hours",
-      "name": "Update User During Working Hours",
-      "description": "Allows updating users only during working hours",
-      "resource": "user",
-      "action": "update",
-      "effect": "allow",
-      "scope": "organization",
-      "category": "User Management",
-      "priority": 5,
-      "isSystem": false,
-      "isActive": true,
-      "createdAt": "2024-01-01T00:00:00Z"
+      "name": "updatedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Last update timestamp"
+    },
+    {
+      "name": "version",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Version number for optimistic locking",
+      "default": 1
+    }
+  ],
+  "relationships": {
+    "attributes": {
+      "type": "one-to-many",
+      "entity": "PermissionAttribute",
+      "foreign_key": "permission"
+    },
+    "conditions": {
+      "type": "many-to-many",
+      "entity": "PermissionCondition",
+      "junction": "PermissionConditionLink"
+    },
+    "dataFilters": {
+      "type": "one-to-many",
+      "entity": "DataFilter",
+      "foreign_key": "permission"
+    },
+    "fieldRestrictions": {
+      "type": "one-to-many",
+      "entity": "FieldRestriction",
+      "foreign_key": "permission"
+    },
+    "dependencies": {
+      "type": "many-to-many",
+      "entity": "Permission",
+      "junction": "PermissionDependency"
+    }
+  },
+  "indexes": [
+    {
+      "fields": ["code"],
+      "unique": true
+    },
+    {
+      "fields": ["resource", "action"],
+      "name": "idx_resource_action"
+    },
+    {
+      "fields": ["category"],
+      "name": "idx_category"
+    },
+    {
+      "fields": ["isActive", "priority"],
+      "name": "idx_active_priority"
     }
   ]
 }

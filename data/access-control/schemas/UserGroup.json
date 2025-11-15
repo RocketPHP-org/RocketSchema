@@ -2,7 +2,7 @@
   "@type": "Schema",
   "@context": "https://rocketschema.org/context",
   "name": "UserGroup",
-  "description": "A group of users for organizational purposes and bulk permission management",
+  "description": "A group of users - NORMALIZED VERSION (3NF compliant)",
   "properties": [
     {
       "name": "code",
@@ -25,7 +25,8 @@
       "name": "description",
       "type": "string",
       "mode": "stored",
-      "description": "Group description and purpose"
+      "description": "Group description and purpose",
+      "nullable": true
     },
     {
       "name": "type",
@@ -40,7 +41,8 @@
       "name": "parentGroup",
       "type": "UserGroup",
       "mode": "stored",
-      "description": "Parent group for hierarchical organization"
+      "description": "Parent group for hierarchical organization",
+      "nullable": true
     },
     {
       "name": "organization",
@@ -49,41 +51,18 @@
       "description": "Organization this group belongs to"
     },
     {
-      "name": "members",
-      "type": "User[]",
-      "mode": "stored",
-      "description": "Users in this group"
-    },
-    {
-      "name": "managers",
-      "type": "User[]",
-      "mode": "stored",
-      "description": "Users who can manage this group"
-    },
-    {
-      "name": "roles",
-      "type": "Role[]",
-      "mode": "stored",
-      "description": "Roles automatically assigned to group members"
-    },
-    {
-      "name": "permissions",
-      "type": "Permission[]",
-      "mode": "stored",
-      "description": "Direct permissions for this group"
-    },
-    {
       "name": "maxMembers",
       "type": "integer",
       "mode": "stored",
       "description": "Maximum number of members allowed (null for unlimited)",
+      "nullable": true,
       "min": 0
     },
     {
-      "name": "memberCount",
+      "name": "currentMemberCount",
       "type": "integer",
-      "mode": "computed",
-      "description": "Current number of members",
+      "mode": "stored",
+      "description": "Current number of active members (denormalized for performance)",
       "default": 0,
       "min": 0
     },
@@ -102,16 +81,11 @@
       "default": false
     },
     {
-      "name": "autoJoinRules",
-      "type": "object",
+      "name": "autoJoinExpression",
+      "type": "string",
       "mode": "stored",
-      "description": "Rules for automatic group membership"
-    },
-    {
-      "name": "settings",
-      "type": "object",
-      "mode": "stored",
-      "description": "Group-specific settings"
+      "description": "Expression for automatic group membership (CEL)",
+      "nullable": true
     },
     {
       "name": "createdAt",
@@ -133,35 +107,46 @@
       "description": "Last update timestamp"
     },
     {
-      "name": "metadata",
-      "type": "object",
+      "name": "version",
+      "type": "integer",
       "mode": "stored",
-      "description": "Additional metadata"
+      "description": "Version number for optimistic locking",
+      "default": 1
     }
   ],
-  "examples": [
+  "relationships": {
+    "members": {
+      "type": "many-to-many",
+      "entity": "User",
+      "junction": "UserGroupMember"
+    },
+    "roles": {
+      "type": "many-to-many",
+      "entity": "Role",
+      "junction": "UserGroupRole"
+    },
+    "permissions": {
+      "type": "many-to-many",
+      "entity": "Permission",
+      "junction": "UserGroupPermission"
+    }
+  },
+  "indexes": [
     {
-      "@type": "UserGroup",
-      "code": "SALES_TEAM",
-      "name": "Sales Team",
-      "description": "All sales department members",
-      "type": "team",
-      "memberCount": 25,
-      "isActive": true,
-      "isSystem": false,
-      "createdAt": "2024-01-01T00:00:00Z"
+      "fields": ["code"],
+      "unique": true
     },
     {
-      "@type": "UserGroup",
-      "code": "ADMINS",
-      "name": "System Administrators",
-      "description": "System administration group with full privileges",
-      "type": "security",
-      "maxMembers": 5,
-      "memberCount": 3,
-      "isActive": true,
-      "isSystem": true,
-      "createdAt": "2024-01-01T00:00:00Z"
+      "fields": ["organization", "type"],
+      "name": "idx_org_type"
+    },
+    {
+      "fields": ["parentGroup"],
+      "name": "idx_parent"
+    },
+    {
+      "fields": ["isActive", "isSystem"],
+      "name": "idx_active_system"
     }
   ]
 }
