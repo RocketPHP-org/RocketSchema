@@ -1,0 +1,108 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "IpRestriction",
+  "description": "Controls network access by defining allowed or denied IP addresses and ranges for credential-based resources. This security mechanism ensures that even if authentication credentials are compromised, they can only be used from pre-approved network locations. Organizations commonly apply this to restrict access to their office networks, data centers, or specific cloud service IP ranges. The entity supports both individual IP addresses and CIDR notation for entire network ranges, providing flexibility for various network architectures from small offices to global enterprises. Restrictions operate in two modes: 'allow' creates whitelists that permit only specified IPs, while 'deny' creates blacklists that block specific sources. These can be combined to build sophisticated access policies, such as allowing an entire corporate network range while denying specific compromised segments within it. Priority-based evaluation ensures predictable rule processing when multiple restrictions overlap. Expiration support enables time-limited access grants for contractors, temporary projects, or emergency access scenarios. This pattern applies across authentication contexts including API keys, user sessions, administrative access, and service-to-service communication, making it a universal security control rather than being tied to any specific authentication mechanism.",
+  "properties": [
+    {
+      "name": "credential",
+      "type": "Credential",
+      "mode": "stored",
+      "description": "The authentication credential (API key, session, certificate, etc.) that this IP restriction protects",
+      "required": true
+    },
+    {
+      "name": "ipAddress",
+      "type": "string",
+      "mode": "stored",
+      "description": "IP address or CIDR range notation (supports both IPv4 and IPv6 formats)",
+      "required": true,
+      "example": "192.168.1.0/24"
+    },
+    {
+      "name": "restrictionType",
+      "type": "string",
+      "mode": "enum",
+      "description": "Whether this IP pattern is permitted (whitelist) or forbidden (blacklist)",
+      "enum": [
+        "allow",
+        "deny"
+      ],
+      "default": "allow",
+      "required": true
+    },
+    {
+      "name": "notes",
+      "type": "string",
+      "mode": "stored",
+      "description": "Human-readable explanation of why this restriction exists or what network it represents",
+      "nullable": true,
+      "example": "Corporate headquarters and regional office networks"
+    },
+    {
+      "name": "priority",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Order of evaluation when multiple restrictions overlap (higher values are evaluated first)",
+      "default": 0,
+      "required": true
+    },
+    {
+      "name": "expiresAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Optional expiration timestamp for time-limited access grants (null indicates permanent restriction)",
+      "nullable": true
+    }
+  ],
+  "examples": [
+    {
+      "@type": "IpRestriction",
+      "credential": {
+        "@type": "Credential",
+        "name": "Production API Key - Data Analytics"
+      },
+      "ipAddress": "10.0.0.0/8",
+      "restrictionType": "allow",
+      "notes": "Internal corporate network spanning all office locations worldwide",
+      "priority": 100,
+      "expiresAt": null
+    },
+    {
+      "@type": "IpRestriction",
+      "credential": {
+        "@type": "Credential",
+        "name": "Admin Portal Session"
+      },
+      "ipAddress": "203.0.113.45",
+      "restrictionType": "deny",
+      "notes": "Blocked due to repeated authentication failures and suspicious scanning behavior",
+      "priority": 200,
+      "expiresAt": null
+    },
+    {
+      "@type": "IpRestriction",
+      "credential": {
+        "@type": "Credential",
+        "name": "Contractor API Access"
+      },
+      "ipAddress": "198.51.100.0/24",
+      "restrictionType": "allow",
+      "notes": "Temporary access for external development team working on integration project",
+      "priority": 50,
+      "expiresAt": "2024-12-31T23:59:59Z"
+    },
+    {
+      "@type": "IpRestriction",
+      "credential": {
+        "@type": "Credential",
+        "name": "Service Account - Payment Processing"
+      },
+      "ipAddress": "2001:db8::/32",
+      "restrictionType": "allow",
+      "notes": "Cloud provider IPv6 range for managed payment gateway service",
+      "priority": 150,
+      "expiresAt": null
+    }
+  ]
+}

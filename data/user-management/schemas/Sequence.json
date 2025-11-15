@@ -1,0 +1,153 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "Sequence",
+  "description": "Provides atomic generation of unique sequential identifiers in distributed systems where traditional database auto-increment mechanisms are insufficient or unavailable. This universal entity implements application-level sequences critical for maintaining uniqueness guarantees across concurrent operations, database sharding, or multi-region deployments. A sequence maintains a current position and increment strategy, with atomic operations ensuring no two requests receive the same value even under high concurrency. Core capabilities include monotonic increasing sequences (traditional auto-increment behavior), cyclic sequences that wrap around after reaching a maximum value, and performance-optimized caching where blocks of values are pre-allocated to reduce database round-trips. Caching is essential for high-throughput scenarios - instead of querying storage for every identifier, applications can reserve batches of 100 or 1000 values and distribute them from memory. The entity supports custom value formatting through pattern templates, handles overflow conditions gracefully, and maintains operational metrics about sequence usage. Common applications span invoice numbering, order reference generation, transaction identifiers, batch processing sequences, and any scenario requiring guaranteed unique sequential values across distributed application servers or during data migrations.",
+  "properties": [
+    {
+      "name": "name",
+      "type": "string",
+      "mode": "stored",
+      "description": "Unique identifier for this sequence, used to retrieve and reference the sequence across the system",
+      "required": true,
+      "unique": true,
+      "example": "invoice_number_sequence"
+    },
+    {
+      "name": "currentValue",
+      "type": "bigint",
+      "mode": "stored",
+      "description": "Current position in the sequence, representing the last value that was allocated",
+      "required": true,
+      "default": 0
+    },
+    {
+      "name": "incrementBy",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Step value added to current position for each allocation, allowing for even/odd sequences or larger jumps",
+      "required": true,
+      "default": 1
+    },
+    {
+      "name": "minimumValue",
+      "type": "bigint",
+      "mode": "stored",
+      "description": "Lower bound for sequence values, enforced when cycling or resetting the sequence",
+      "required": true,
+      "default": 0
+    },
+    {
+      "name": "maximumValue",
+      "type": "bigint",
+      "mode": "stored",
+      "description": "Upper bound for sequence values, after which the sequence either cycles back to minimum or raises an overflow error",
+      "required": true,
+      "default": 9223372036854775807
+    },
+    {
+      "name": "startValue",
+      "type": "bigint",
+      "mode": "stored",
+      "description": "Initial position when the sequence was first created or last reset, used as reference point for sequence behavior",
+      "required": true,
+      "default": 0
+    },
+    {
+      "name": "cycleEnabled",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether the sequence automatically wraps to minimumValue after reaching maximumValue, or raises an error instead",
+      "required": true,
+      "default": false
+    },
+    {
+      "name": "cacheSize",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Number of values to pre-allocate in a single batch for performance optimization, reducing storage access frequency",
+      "required": true,
+      "default": 1,
+      "example": 100
+    },
+    {
+      "name": "formatPattern",
+      "type": "string",
+      "mode": "stored",
+      "description": "Template pattern for formatting sequence values, supporting placeholders like {####} for padded numbers, {YYYY} for year, and literal text",
+      "nullable": true,
+      "example": "INV-{YYYY}-{######}"
+    },
+    {
+      "name": "totalAllocations",
+      "type": "bigint",
+      "mode": "stored",
+      "description": "Cumulative count of all values allocated from this sequence since creation, useful for monitoring and capacity planning",
+      "required": true,
+      "default": 0
+    },
+    {
+      "name": "locked",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Administrative lock preventing new allocations, used during maintenance, migration, or when retiring a sequence",
+      "required": true,
+      "default": false
+    },
+    {
+      "name": "purpose",
+      "type": "string",
+      "mode": "stored",
+      "description": "Human-readable explanation of what this sequence is used for, its business context, and any special handling requirements",
+      "nullable": true,
+      "example": "Generates unique invoice numbers for financial transactions across all business units"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "Sequence",
+      "name": "invoice_number_sequence",
+      "currentValue": 2847563,
+      "incrementBy": 1,
+      "minimumValue": 1000000,
+      "maximumValue": 9999999,
+      "startValue": 1000000,
+      "cycleEnabled": false,
+      "cacheSize": 100,
+      "formatPattern": "INV-{YYYY}-{#######}",
+      "totalAllocations": 1847563,
+      "locked": false,
+      "purpose": "Generates unique invoice numbers for financial transactions across all business units"
+    },
+    {
+      "@type": "Sequence",
+      "name": "daily_batch_counter",
+      "currentValue": 9998456,
+      "incrementBy": 1,
+      "minimumValue": 0,
+      "maximumValue": 9999999,
+      "startValue": 0,
+      "cycleEnabled": true,
+      "cacheSize": 1000,
+      "formatPattern": "BATCH-{#######}",
+      "totalAllocations": 458923147,
+      "locked": false,
+      "purpose": "Cyclic counter for daily batch processing jobs, automatically resets when maximum is reached"
+    },
+    {
+      "@type": "Sequence",
+      "name": "order_reference_generator",
+      "currentValue": 5647382,
+      "incrementBy": 1,
+      "minimumValue": 1,
+      "maximumValue": 999999999,
+      "startValue": 1,
+      "cycleEnabled": false,
+      "cacheSize": 500,
+      "formatPattern": "ORD{#########}",
+      "totalAllocations": 5647382,
+      "locked": false,
+      "purpose": "Generates unique reference codes for customer orders in e-commerce and retail systems"
+    }
+  ]
+}

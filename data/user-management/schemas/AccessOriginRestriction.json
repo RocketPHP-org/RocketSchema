@@ -1,0 +1,149 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "AccessOriginRestriction",
+  "description": "Defines origin-based access control rules for authentication credentials used in distributed systems. When a client application attempts to use authentication credentials from a particular source location, access control systems verify whether that origin is authorized. This entity specifies which source origins are permitted to use specific credentials, preventing unauthorized locations from making requests even if they possess valid authentication tokens. Each origin entry identifies the source location through protocol, domain, and network address components that uniquely identify where requests originate. The entity configures whether descendant origins within a hierarchy are implicitly trusted, which communication methods are permitted, and what metadata can be exchanged during the authorization process. This pattern is fundamental for credentials exposed in client-side applications, mobile apps, or public contexts where the credential value might be observable but usage should still be restricted to approved origins. The system supports wildcard matching for origin hierarchies, enabling scalable management of multi-tenant architectures and distributed deployments. Origin restrictions work in conjunction with other access control mechanisms like IP allowlists, rate limiting, and permission scopes to create defense-in-depth security. These rules are evaluated during authentication and authorization flows to make real-time decisions about whether to permit or deny access based on the requesting origin.",
+  "properties": [
+    {
+      "name": "credential",
+      "type": "ApiKey",
+      "mode": "stored",
+      "description": "The authentication credential these origin restrictions apply to",
+      "required": true
+    },
+    {
+      "name": "originIdentifier",
+      "type": "string",
+      "mode": "stored",
+      "description": "The source origin location identifier including protocol, domain, and port components",
+      "required": true,
+      "example": "https://app.example.com:443"
+    },
+    {
+      "name": "includeChildOrigins",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether all hierarchical descendants of this origin are implicitly authorized",
+      "default": false
+    },
+    {
+      "name": "permittedOperations",
+      "type": "array",
+      "mode": "stored",
+      "description": "List of operation types allowed from this origin",
+      "items": {
+        "type": "string"
+      },
+      "default": ["read", "write"],
+      "example": ["read", "write", "update", "delete"]
+    },
+    {
+      "name": "allowableMetadata",
+      "type": "array",
+      "mode": "stored",
+      "description": "Metadata fields that can be included in requests from this origin",
+      "items": {
+        "type": "string"
+      },
+      "nullable": true,
+      "example": ["content-type", "authorization", "correlation-id"]
+    },
+    {
+      "name": "exposableMetadata",
+      "type": "array",
+      "mode": "stored",
+      "description": "Metadata fields that can be returned in responses to this origin",
+      "items": {
+        "type": "string"
+      },
+      "nullable": true,
+      "example": ["rate-limit-remaining", "rate-limit-reset"]
+    },
+    {
+      "name": "permitStatefulAccess",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether session state and persistent credentials can be used from this origin",
+      "default": false
+    },
+    {
+      "name": "cacheValidityDuration",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Duration in seconds that authorization decisions for this origin should be cached",
+      "default": 3600,
+      "example": 86400
+    },
+    {
+      "name": "note",
+      "type": "string",
+      "mode": "stored",
+      "description": "Administrative note explaining why this origin is authorized",
+      "nullable": true
+    },
+    {
+      "name": "environmentScope",
+      "type": "string",
+      "mode": "enum",
+      "description": "Deployment environment context where this origin restriction applies",
+      "enum": [
+        "development",
+        "testing",
+        "staging",
+        "production",
+        "all"
+      ],
+      "default": "production"
+    },
+    {
+      "name": "isActive",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this origin restriction is currently enforced",
+      "default": true
+    }
+  ],
+  "examples": [
+    {
+      "@type": "AccessOriginRestriction",
+      "credential": "cred_prod_abc123",
+      "originIdentifier": "https://app.example.com",
+      "includeChildOrigins": true,
+      "permittedOperations": ["read", "write", "update", "delete"],
+      "allowableMetadata": ["content-type", "authorization", "request-id"],
+      "exposableMetadata": ["rate-limit-remaining", "rate-limit-reset"],
+      "permitStatefulAccess": true,
+      "cacheValidityDuration": 86400,
+      "note": "Primary production application and all subdomains",
+      "environmentScope": "production",
+      "isActive": true
+    },
+    {
+      "@type": "AccessOriginRestriction",
+      "credential": "cred_dev_xyz789",
+      "originIdentifier": "http://localhost:3000",
+      "includeChildOrigins": false,
+      "permittedOperations": ["read", "write"],
+      "allowableMetadata": ["content-type"],
+      "permitStatefulAccess": false,
+      "cacheValidityDuration": 300,
+      "note": "Local development environment for client application",
+      "environmentScope": "development",
+      "isActive": true
+    },
+    {
+      "@type": "AccessOriginRestriction",
+      "credential": "cred_mobile_def456",
+      "originIdentifier": "app://com.example.mobile",
+      "includeChildOrigins": false,
+      "permittedOperations": ["read", "write", "update"],
+      "allowableMetadata": ["device-id", "app-version", "authorization"],
+      "exposableMetadata": ["sync-timestamp", "server-version"],
+      "permitStatefulAccess": true,
+      "cacheValidityDuration": 43200,
+      "note": "Official mobile application for iOS and Android",
+      "environmentScope": "all",
+      "isActive": true
+    }
+  ]
+}

@@ -1,0 +1,187 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "Notification",
+  "description": "Represents a message or alert intended for delivery to one or more recipients through various communication channels. Notifications serve as a universal mechanism for asynchronous information dissemination across diverse domains including system alerts, operational updates, informational messages, and action requests. This entity captures the core content and intent of a notification independently from its delivery mechanics, enabling reuse across multiple channels and recipients. Notifications can reference related entities (documents, transactions, events) to provide context, include actionable elements that allow recipients to respond or navigate to relevant resources, and be organized into categories for filtering and presentation. The priority level influences delivery urgency and presentation prominence. Expiration times ensure time-sensitive information is automatically retired. This entity is fundamental to any system requiring asynchronous communication, user engagement, or event-driven notifications across industries such as healthcare (patient alerts), finance (transaction notifications), logistics (shipment updates), education (assignment reminders), and enterprise operations (approval requests).",
+  "properties": [
+    {
+      "name": "recipient",
+      "type": "User",
+      "mode": "stored",
+      "description": "The primary intended recipient of this notification",
+      "required": true
+    },
+    {
+      "name": "category",
+      "type": "NotificationCategory",
+      "mode": "stored",
+      "description": "Classification grouping for organizing and filtering notifications by topic or functional area",
+      "required": true
+    },
+    {
+      "name": "severity",
+      "type": "string",
+      "mode": "enum",
+      "description": "Importance level indicating how prominently the notification should be presented and whether it requires immediate attention",
+      "enum": [
+        "informational",
+        "low",
+        "normal",
+        "high",
+        "critical"
+      ],
+      "required": true,
+      "default": "normal",
+      "example": "high"
+    },
+    {
+      "name": "subject",
+      "type": "string",
+      "mode": "stored",
+      "description": "Brief summary of the notification content suitable for display in condensed views or subject lines",
+      "required": true,
+      "example": "Access granted to shared resource"
+    },
+    {
+      "name": "body",
+      "type": "string",
+      "mode": "stored",
+      "description": "Complete message content providing full details and context for the notification",
+      "required": true
+    },
+    {
+      "name": "relatedEntityType",
+      "type": "string",
+      "mode": "stored",
+      "description": "Type name of the entity this notification references, enabling polymorphic relationships to various domain objects",
+      "example": "Order"
+    },
+    {
+      "name": "relatedEntityId",
+      "type": "string",
+      "mode": "stored",
+      "description": "Identifier of the specific entity instance this notification concerns, used in conjunction with relatedEntityType",
+      "example": "ord_2024_03_15_001"
+    },
+    {
+      "name": "effectiveAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "The timestamp when this notification becomes relevant and should be made available to recipients",
+      "required": true
+    },
+    {
+      "name": "expiresAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "The timestamp after which this notification is no longer relevant and should be archived or hidden from active views"
+    },
+    {
+      "name": "actionType",
+      "type": "string",
+      "mode": "stored",
+      "description": "Classification of the action available on this notification, such as navigation, approval, dismissal, or external integration",
+      "example": "navigate"
+    },
+    {
+      "name": "actionLabel",
+      "type": "string",
+      "mode": "stored",
+      "description": "Human-readable text describing the available action, suitable for display on interactive elements",
+      "example": "Review details"
+    },
+    {
+      "name": "actionTarget",
+      "type": "string",
+      "mode": "stored",
+      "description": "Destination or parameter for the action, such as a resource identifier, navigation path, or operation code",
+      "example": "/resources/shared/document-123"
+    },
+    {
+      "name": "locale",
+      "type": "string",
+      "mode": "stored",
+      "description": "Language and regional format code indicating the localization of the subject and body content",
+      "default": "en-US",
+      "example": "en-US"
+    },
+    {
+      "name": "metadata",
+      "type": "object",
+      "mode": "stored",
+      "description": "Additional structured context information specific to the notification purpose, stored as key-value pairs"
+    },
+    {
+      "name": "isAcknowledged",
+      "type": "boolean",
+      "mode": "computed",
+      "description": "Indicates whether the recipient has confirmed awareness of this notification through any interaction",
+      "default": false
+    },
+    {
+      "name": "acknowledgedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Timestamp when the recipient first acknowledged or interacted with this notification"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "Notification",
+      "recipient": {
+        "@type": "User",
+        "username": "alice.johnson"
+      },
+      "category": {
+        "@type": "NotificationCategory",
+        "name": "Security",
+        "code": "security"
+      },
+      "severity": "high",
+      "subject": "Unusual access pattern detected",
+      "body": "Access to your account was detected from an unrecognized device and location. If this activity was not authorized by you, please review your security settings and recent access history immediately. Consider enabling additional authentication factors to protect your account.",
+      "relatedEntityType": "Session",
+      "relatedEntityId": "sess_2024_03_15_8472",
+      "effectiveAt": "2024-03-15T14:23:00Z",
+      "expiresAt": "2024-03-22T14:23:00Z",
+      "actionType": "navigate",
+      "actionLabel": "Review access history",
+      "actionTarget": "/security/activity",
+      "locale": "en-US",
+      "metadata": {
+        "detectionConfidence": 0.87,
+        "riskLevel": "elevated",
+        "detectionMethod": "behavioral-analysis"
+      },
+      "acknowledgedAt": "2024-03-15T14:28:00Z"
+    },
+    {
+      "@type": "Notification",
+      "recipient": {
+        "@type": "User",
+        "username": "carlos.mendez"
+      },
+      "category": {
+        "@type": "NotificationCategory",
+        "name": "Workflow",
+        "code": "workflow"
+      },
+      "severity": "normal",
+      "subject": "Approval required for pending request",
+      "body": "A request requiring your approval has been submitted and is awaiting review. The request involves resource allocation changes that fall within your authorization scope. Please review the details and provide your decision within the next 48 hours to prevent workflow delays.",
+      "relatedEntityType": "ApprovalRequest",
+      "relatedEntityId": "apr_2024_789",
+      "effectiveAt": "2024-03-16T09:00:00Z",
+      "expiresAt": "2024-03-23T09:00:00Z",
+      "actionType": "workflow",
+      "actionLabel": "Review request",
+      "actionTarget": "approval-queue/apr_2024_789",
+      "locale": "en-US",
+      "metadata": {
+        "requestType": "resource-allocation",
+        "submittedBy": "user_3421",
+        "responseDeadline": "2024-03-18T09:00:00Z"
+      }
+    }
+  ]
+}

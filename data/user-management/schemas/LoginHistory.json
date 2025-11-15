@@ -2,175 +2,164 @@
   "@type": "Schema",
   "@context": "https://rocketschema.org/context",
   "name": "LoginHistory",
-  "description": "Comprehensive audit trail of all login attempts to the system. This entity records every single attempt to access an account, whether successful or failed, providing crucial security information for detecting unauthorized access attempts, brute force attacks, and unusual login patterns. It captures detailed information about each attempt including the IP address, device information, geographic location, and the reason for any failures. Security teams use this data to identify compromised accounts, detect attacks in progress, and help users understand who has accessed their account. It's also valuable for compliance requirements that mandate authentication auditing. Failed attempts can trigger security alerts or automatic account locks.",
+  "description": "Comprehensive audit trail of authentication attempts across any system requiring user verification. This entity records every attempt to access an account, whether successful or failed, providing crucial security intelligence for detecting unauthorized access patterns, credential compromise, and anomalous behavior. It captures detailed information about each attempt including network origin, device characteristics, verification method, and reasons for authentication failure. Security teams across industries use this data to identify compromised accounts, detect attacks in progress, investigate security incidents, and provide users with visibility into account access history. The entity supports compliance requirements in healthcare, finance, government, and other regulated sectors that mandate authentication auditing and access monitoring. By tracking authentication patterns over time, organizations can establish behavioral baselines, detect impossible travel scenarios, identify credential stuffing attacks, and implement adaptive authentication policies.",
   "properties": [
     {
-      "name": "user",
+      "name": "account",
       "type": "User",
       "mode": "stored",
-      "description": "User account that was attempted to be accessed (null if username doesn't exist)"
+      "description": "Reference to the user account that was the target of this authentication attempt",
+      "nullable": true
     },
     {
-      "name": "username",
+      "name": "attemptedIdentifier",
       "type": "string",
       "mode": "stored",
-      "description": "The username that was entered in the login attempt",
+      "description": "The identifier that was provided during the authentication attempt, such as username, email, or account number. This field captures what was entered even if the account does not exist.",
       "required": true
     },
     {
-      "name": "timestamp",
+      "name": "attemptedAt",
       "type": "DateTime",
       "mode": "stored",
-      "description": "Exact time when the login attempt occurred",
+      "description": "Precise timestamp when the authentication attempt occurred",
       "required": true
     },
     {
-      "name": "success",
+      "name": "wasSuccessful",
       "type": "boolean",
       "mode": "stored",
-      "description": "Whether the login attempt was successful",
+      "description": "Indicates whether the authentication attempt resulted in successful access to the account",
       "required": true
     },
     {
       "name": "failureReason",
       "type": "string",
       "mode": "enum",
-      "description": "Specific reason why the login failed",
+      "description": "Categorization of why the authentication attempt was rejected",
       "enum": [
         "invalid_credentials",
-        "account_locked",
+        "account_inaccessible",
         "account_suspended",
         "account_inactive",
-        "mfa_required",
-        "mfa_failed",
-        "password_expired"
-      ],
-      "example": "invalid_credentials"
+        "additional_verification_required",
+        "verification_failed",
+        "credential_expired",
+        "access_denied"
+      ]
     },
     {
-      "name": "authMethod",
+      "name": "verificationType",
       "type": "string",
       "mode": "enum",
-      "description": "Authentication method used for this attempt",
+      "description": "The category of verification mechanism used to validate identity during this attempt",
       "enum": [
-        "password",
-        "oauth",
-        "saml",
-        "ldap",
-        "mfa",
+        "credential_based",
+        "delegated_authentication",
+        "directory_service",
+        "token_based",
+        "multifactor",
         "biometric",
-        "api_key"
+        "certificate_based"
       ],
-      "default": "password",
-      "example": "password"
+      "required": true
     },
     {
-      "name": "ipAddress",
+      "name": "originAddress",
       "type": "string",
       "mode": "stored",
-      "description": "IP address from which the login was attempted",
+      "description": "Network address from which the authentication attempt originated, typically an IPv4 or IPv6 address",
       "example": "192.168.1.100"
     },
     {
-      "name": "userAgent",
+      "name": "clientIdentifier",
       "type": "string",
       "mode": "stored",
-      "description": "Browser or application identification string"
+      "description": "Identification string provided by the client application or browser, typically containing platform, application, and version information used to understand the originating environment"
     },
     {
-      "name": "deviceFingerprint",
+      "name": "deviceSignature",
       "type": "string",
       "mode": "stored",
-      "description": "Unique device identifier for tracking"
+      "description": "Unique fingerprint derived from device characteristics such as hardware configuration, installed fonts, screen resolution, and browser capabilities, used to recognize returning devices across sessions"
     },
     {
-      "name": "location",
-      "type": "object",
+      "name": "geoLocation",
+      "type": "GeoLocation",
       "mode": "stored",
-      "description": "Geographic location based on IP address"
+      "description": "Geographic location derived from the origin address through IP geolocation services",
+      "nullable": true
     },
     {
       "name": "riskScore",
       "type": "number",
       "mode": "stored",
-      "description": "Calculated risk level of this login attempt (0-100)",
+      "description": "Computed risk assessment score indicating the likelihood that this attempt represents fraudulent or malicious activity, typically normalized to a 0-100 scale where higher values indicate greater risk",
       "min": 0,
-      "max": 100
+      "max": 100,
+      "nullable": true
     },
     {
-      "name": "riskFactors",
+      "name": "riskIndicators",
       "type": "string[]",
       "mode": "stored",
-      "description": "Specific risk indicators detected",
+      "description": "Collection of specific risk signals detected during analysis of this attempt, such as anomalous location, unrecognized device, proxy usage, or impossible travel between attempts. Each indicator represents a contributing factor to the overall risk assessment.",
       "example": [
         "new_device",
-        "unusual_location"
+        "unusual_location",
+        "proxy_detected"
       ]
     },
     {
       "name": "session",
       "type": "UserSession",
       "mode": "stored",
-      "description": "Session ID created if login was successful"
-    },
-    {
-      "name": "metadata",
-      "type": "string",
-      "mode": "stored",
-      "description": "Additional context about the login attempt"
+      "description": "Reference to the session entity created as a result of successful authentication",
+      "nullable": true
     }
   ],
   "examples": [
     {
       "@type": "LoginHistory",
-      "username": "john.doe",
-      "timestamp": "2024-03-15T10:00:00Z",
-      "success": true,
-      "authMethod": "password",
-      "ipAddress": "192.168.1.100",
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/121.0",
-      "deviceFingerprint": "device_abc123",
-      "location": {
-        "country": "United States",
-        "city": "New York",
-        "coordinates": {
-          "lat": 40.7128,
-          "lon": -74.006
-        }
-      },
+      "attemptedIdentifier": "john.doe",
+      "attemptedAt": "2024-03-15T10:00:00Z",
+      "wasSuccessful": true,
+      "verificationType": "credential_based",
+      "originAddress": "192.168.1.100",
+      "clientIdentifier": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/121.0",
+      "deviceSignature": "fp_a1b2c3d4e5f6",
       "riskScore": 5,
-      "riskFactors": [],
-      "metadata": {
-        "loginPage": "/login",
-        "referrer": "/home"
-      },
-      "session": "sess_xyz789"
+      "riskIndicators": []
     },
     {
       "@type": "LoginHistory",
-      "username": "admin@company.com",
-      "timestamp": "2024-03-15T14:30:00Z",
-      "success": false,
-      "failureReason": "mfa_failed",
-      "authMethod": "password",
-      "ipAddress": "203.0.113.42",
-      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0) Mobile/15E148",
-      "location": {
-        "country": "China",
-        "city": "Beijing"
-      },
+      "attemptedIdentifier": "admin@organization.com",
+      "attemptedAt": "2024-03-15T14:30:00Z",
+      "wasSuccessful": false,
+      "failureReason": "verification_failed",
+      "verificationType": "multifactor",
+      "originAddress": "203.0.113.42",
+      "clientIdentifier": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0) Mobile/15E148",
+      "deviceSignature": "fp_9z8y7x6w5v4u",
       "riskScore": 85,
-      "riskFactors": [
+      "riskIndicators": [
         "unusual_location",
-        "vpn_detected",
+        "proxy_detected",
         "multiple_failed_attempts",
         "impossible_travel"
-      ],
-      "metadata": {
-        "vpnProvider": "NordVPN",
-        "attemptNumber": 3,
-        "timeSinceLastAttempt": 30
-      }
+      ]
+    },
+    {
+      "@type": "LoginHistory",
+      "attemptedIdentifier": "employee_12345",
+      "attemptedAt": "2024-03-16T08:15:00Z",
+      "wasSuccessful": true,
+      "verificationType": "certificate_based",
+      "originAddress": "10.0.5.128",
+      "clientIdentifier": "InternalApp/2.4.1 (Linux; Android 13)",
+      "deviceSignature": "fp_m9n8b7v6c5x4",
+      "riskScore": 2,
+      "riskIndicators": []
     }
   ]
 }

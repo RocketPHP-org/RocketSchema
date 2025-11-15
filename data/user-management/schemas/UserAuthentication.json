@@ -2,159 +2,120 @@
   "@type": "Schema",
   "@context": "https://rocketschema.org/context",
   "name": "UserAuthentication",
-  "description": "Stores and manages all authentication credentials and security settings for a user account. This entity is the vault for sensitive authentication data, keeping passwords securely hashed and tracking login security metrics. It handles password management including expiration policies, change requirements, and history to prevent reuse. The entity monitors failed login attempts to detect and prevent brute force attacks by automatically locking accounts after suspicious activity. It maintains the last successful login details for security auditing and tracks overall account activity. By separating authentication data from the main User entity, the system ensures that sensitive credentials can be protected with stricter access controls and encryption. This is critical for maintaining account security and meeting compliance requirements for credential storage.",
+  "description": "Represents the authentication credentials and security settings for any principal (user, service account, device, or system) that requires secure access verification. This entity serves as the secure vault for sensitive credential data, maintaining cryptographically hashed secrets that verify identity during authentication attempts. It manages the full lifecycle of authentication credentials including creation, expiration policies, mandatory rotation requirements, and eventual deactivation. The entity enforces password complexity and aging policies by referencing external policy definitions, ensuring that credential standards can be updated centrally without modifying individual authentication records. By separating authentication credentials from principal identity data, systems can apply stricter access controls and encryption specifically to this sensitive information. This separation also enables credential rotation without affecting the principal's core identity or authorization mappings. The entity supports multiple cryptographic algorithms to allow for security upgrades over time as stronger hashing methods become available. This design is applicable across industries for securing access to financial systems, healthcare records, manufacturing controls, educational platforms, and any system requiring verified identity before granting access to protected resources.",
   "properties": [
     {
-      "name": "user",
+      "name": "principal",
       "type": "User",
       "mode": "stored",
-      "description": "Links to the user account this authentication belongs to",
+      "description": "Reference to the identity principal (user, service account, device, or system entity) that owns these authentication credentials and will be verified during login or access attempts",
       "required": true,
       "unique": true
     },
     {
-      "name": "passwordHash",
+      "name": "credentialHash",
       "type": "string",
       "mode": "stored",
-      "description": "Password stored using one-way cryptographic hashing - original password cannot be recovered",
+      "description": "The cryptographically hashed representation of the secret credential (password, passphrase, or key) using a one-way hash function that makes it computationally infeasible to reverse the original value, ensuring that even with database access the actual credential cannot be recovered",
       "required": true,
       "private": true
     },
     {
-      "name": "passwordSalt",
+      "name": "credentialSalt",
       "type": "string",
       "mode": "stored",
-      "description": "Random data added to password before hashing for extra security",
+      "description": "Random cryptographic salt value that is combined with the credential before hashing to ensure that identical credentials produce different hash values, defending against rainbow table attacks and making it impossible to identify users with the same credential",
+      "required": false,
+      "nullable": true,
       "private": true
     },
     {
-      "name": "passwordAlgorithm",
+      "name": "hashingAlgorithm",
       "type": "string",
       "mode": "enum",
-      "description": "The cryptographic algorithm used to hash the password",
+      "description": "The specific cryptographic hashing algorithm and configuration used to generate the credential hash, allowing the system to verify credentials correctly and to upgrade to stronger algorithms over time as computational power increases and security standards evolve",
       "enum": [
         "bcrypt",
         "argon2id",
+        "argon2i",
+        "argon2d",
         "scrypt",
-        "pbkdf2"
+        "pbkdf2-sha256",
+        "pbkdf2-sha512"
       ],
-      "default": "argon2id"
-    },
-    {
-      "name": "passwordLastChangedAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "When the password was last updated",
+      "default": "argon2id",
       "required": true
     },
     {
-      "name": "passwordExpiresAt",
+      "name": "credentialSetAt",
       "type": "DateTime",
       "mode": "stored",
-      "description": "When the current password will expire and must be changed",
+      "description": "Timestamp indicating when this credential was originally established or most recently changed, used to calculate credential age for enforcing rotation policies and expiration rules defined in the associated credential policy",
+      "required": true
+    },
+    {
+      "name": "credentialExpiresAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Optional timestamp indicating when this credential will expire and must be replaced, commonly used in regulated industries or high-security environments where periodic credential rotation is mandatory regardless of whether the credential has been compromised",
+      "required": false,
       "nullable": true
     },
     {
-      "name": "mustChangePassword",
+      "name": "requiresReset",
       "type": "boolean",
       "mode": "stored",
-      "description": "Forces user to change password on next login",
-      "default": false
+      "description": "Flag indicating that the principal must establish a new credential before being granted access, typically set during account provisioning, after administrative password reset, following a security incident, or when security policies change requiring stronger credentials",
+      "default": false,
+      "required": true
     },
     {
-      "name": "passwordHistory",
-      "type": "integer",
+      "name": "isActive",
+      "type": "boolean",
       "mode": "stored",
-      "description": "How many previous passwords to remember to prevent reuse",
-      "default": 5
+      "description": "Indicates whether this credential is currently valid and can be used for authentication, allowing credentials to be disabled without deletion to maintain audit history and prevent immediate reuse if reactivated, commonly used during account suspension or security investigations",
+      "default": true,
+      "required": true
     },
     {
-      "name": "failedLoginAttempts",
-      "type": "integer",
-      "mode": "stored",
-      "description": "Counter of consecutive failed login attempts",
-      "default": 0
-    },
-    {
-      "name": "failedLoginResetAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "When the failed attempts counter was last reset",
-      "nullable": true
-    },
-    {
-      "name": "lockedUntil",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "Account locked until this time due to security concerns",
-      "nullable": true
-    },
-    {
-      "name": "lastLoginAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "Timestamp of the most recent successful login",
-      "nullable": true
-    },
-    {
-      "name": "lastLoginIp",
-      "type": "string",
-      "mode": "stored",
-      "description": "IP address from the most recent successful login",
-      "nullable": true
-    },
-    {
-      "name": "lastActivityAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "Last time the user performed any authenticated action",
-      "nullable": true
-    },
-    {
-      "name": "passwordPolicy",
+      "name": "credentialPolicy",
       "type": "PasswordPolicy",
       "mode": "stored",
-      "description": "Reference to the password rules this account must follow",
+      "description": "Reference to the policy entity that defines the complexity requirements, rotation rules, history tracking depth, and other security standards that this credential must satisfy, allowing centralized policy management across groups of principals",
+      "required": false,
       "nullable": true
-    },
-    {
-      "name": "version",
-      "type": "integer",
-      "mode": "stored",
-      "description": "Version number to handle concurrent updates safely",
-      "default": 1
     }
   ],
   "examples": [
     {
       "@type": "UserAuthentication",
-      "passwordAlgorithm": "argon2id",
-      "passwordLastChangedAt": "2024-02-01T10:00:00Z",
-      "passwordExpiresAt": "2024-05-01T10:00:00Z",
-      "mustChangePassword": false,
-      "passwordHistory": 5,
-      "failedLoginAttempts": 0,
-      "lastLoginAt": "2024-03-15T08:30:00Z",
-      "lastLoginIp": "192.168.1.50",
-      "lastActivityAt": "2024-03-15T16:45:00Z",
-      "version": 3,
-      "user": "550e8400-e29b-41d4-a716-446655440000"
+      "principal": "550e8400-e29b-41d4-a716-446655440000",
+      "hashingAlgorithm": "argon2id",
+      "credentialSetAt": "2024-02-01T10:00:00Z",
+      "credentialExpiresAt": "2024-05-01T10:00:00Z",
+      "requiresReset": false,
+      "isActive": true,
+      "credentialPolicy": "policy-corporate-standard"
     },
     {
       "@type": "UserAuthentication",
-      "passwordAlgorithm": "bcrypt",
-      "passwordLastChangedAt": "2023-12-15T00:00:00Z",
-      "passwordExpiresAt": "2024-03-15T00:00:00Z",
-      "mustChangePassword": true,
-      "passwordHistory": 10,
-      "failedLoginAttempts": 3,
-      "failedLoginResetAt": "2024-03-15T14:00:00Z",
-      "lockedUntil": "2024-03-15T14:30:00Z",
-      "lastLoginAt": "2024-03-14T09:00:00Z",
-      "lastLoginIp": "203.0.113.99",
-      "lastActivityAt": "2024-03-14T17:30:00Z",
-      "version": 1,
-      "user": "6ba7b810-9dad-11d1-80b4-00c04fd430c8"
+      "principal": "6ba7b810-9dad-11d1-80b4-00c04fd430c8",
+      "hashingAlgorithm": "bcrypt",
+      "credentialSetAt": "2023-12-15T00:00:00Z",
+      "credentialExpiresAt": "2024-03-15T00:00:00Z",
+      "requiresReset": true,
+      "isActive": true,
+      "credentialPolicy": "policy-high-security"
+    },
+    {
+      "@type": "UserAuthentication",
+      "principal": "7c9e6679-7425-40de-944b-e07fc1f90ae7",
+      "hashingAlgorithm": "argon2id",
+      "credentialSetAt": "2024-01-10T08:30:00Z",
+      "credentialExpiresAt": null,
+      "requiresReset": false,
+      "isActive": false,
+      "credentialPolicy": "policy-service-account"
     }
   ]
 }

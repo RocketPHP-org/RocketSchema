@@ -2,155 +2,261 @@
   "@type": "Schema",
   "@context": "https://rocketschema.org/context",
   "name": "UserSession",
-  "description": "Represents an active user session in the system. When a user logs in successfully, a session is created to track their activity and maintain their authenticated state. Sessions are the bridge between a user's login credentials and their ability to access protected resources. Each session has a unique token, tracks the device and location information, and has an expiration time for security. Multiple sessions can exist for the same user (like being logged in on phone and laptop simultaneously). Sessions are essential for features like 'remember me', activity tracking, and the ability to remotely log out devices. When a user logs out or their session expires, it gets marked as inactive.",
+  "description": "Represents an authenticated session that maintains stateful interaction between a principal and a system. Sessions are created upon successful authentication and serve as the mechanism for tracking ongoing activity, maintaining security context, and managing access to protected resources. Each session contains cryptographic tokens for verification, captures contextual information about the client environment (network origin, client software, device characteristics), and enforces temporal boundaries through expiration policies. Sessions enable concurrent access patterns where a single principal may maintain multiple active sessions across different devices or applications simultaneously. The session lifecycle includes creation, ongoing activity tracking, renewal through refresh mechanisms, and eventual termination either through explicit action, timeout, expiration, or security enforcement. Sessions are fundamental to implementing features such as persistent authentication, activity auditing, anomaly detection, remote termination capabilities, and granular access control based on session context. Geographic and network metadata associated with sessions support security monitoring and compliance requirements across diverse regulatory environments.",
   "properties": [
     {
-      "name": "user",
-      "type": "User",
+      "name": "principal",
+      "type": "SecurityPrincipal",
       "mode": "stored",
-      "description": "The user who owns this session",
+      "description": "The authenticated principal (user, service account, or system) that owns this session and whose identity and permissions are represented during session activity",
       "required": true
     },
     {
       "name": "tokenHash",
       "type": "string",
       "mode": "stored",
-      "description": "Hashed version of the session token for security",
+      "description": "Cryptographic hash of the session token used for secure verification without storing the actual token value, typically using one-way hash functions with salt",
+      "required": true,
       "private": true
     },
     {
       "name": "refreshTokenHash",
       "type": "string",
       "mode": "stored",
-      "description": "Hashed refresh token used to get new access tokens",
+      "description": "Cryptographic hash of the refresh token used to obtain new access tokens without re-authentication, enabling long-lived sessions with short-lived access credentials",
+      "nullable": true,
       "private": true
     },
     {
-      "name": "ipAddress",
+      "name": "originAddress",
       "type": "string",
       "mode": "stored",
-      "description": "IP address from which the session was created",
+      "description": "Network address from which the session was initiated, typically an IPv4 or IPv6 address used for security monitoring and anomaly detection",
+      "required": true,
       "example": "192.168.1.100"
     },
     {
-      "name": "userAgent",
+      "name": "clientIdentifier",
       "type": "string",
       "mode": "stored",
-      "description": "Browser or application information",
-      "example": "Mozilla/5.0..."
+      "description": "Software identifier string provided by the client application, containing information about the application name, version, and platform environment",
+      "required": true,
+      "example": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
     },
     {
-      "name": "deviceType",
+      "name": "deviceCategory",
       "type": "string",
       "mode": "enum",
-      "description": "Type of device used for this session",
+      "description": "Classification of the device or client type accessing through this session, used for applying device-specific policies and user experience optimization",
       "enum": [
         "desktop",
         "mobile",
         "tablet",
-        "api",
+        "programmatic",
+        "embedded",
         "unknown"
       ],
+      "required": true,
       "example": "desktop"
     },
     {
-      "name": "deviceInfo",
+      "name": "platformName",
       "type": "string",
       "mode": "stored",
-      "description": "Additional device details like OS version, browser version",
-      "nullable": true
+      "description": "Operating system or platform name extracted from client information, useful for compatibility tracking and security analysis",
+      "nullable": true,
+      "example": "Windows"
     },
     {
-      "name": "location",
+      "name": "platformVersion",
       "type": "string",
       "mode": "stored",
-      "description": "Geographic location based on IP if available",
-      "nullable": true
+      "description": "Version identifier of the operating system or platform, supporting compatibility checks and vulnerability assessment",
+      "nullable": true,
+      "example": "10.0.19045"
+    },
+    {
+      "name": "applicationName",
+      "type": "string",
+      "mode": "stored",
+      "description": "Name of the client application or software used to establish the session, distinct from the platform operating system",
+      "nullable": true,
+      "example": "Chrome"
+    },
+    {
+      "name": "applicationVersion",
+      "type": "string",
+      "mode": "stored",
+      "description": "Version of the client application, useful for deprecation warnings and feature compatibility determination",
+      "nullable": true,
+      "example": "121.0.6167.140"
+    },
+    {
+      "name": "geographicCountry",
+      "type": "string",
+      "mode": "stored",
+      "description": "Country derived from network address geolocation, supporting compliance with regional data residency and access policies",
+      "nullable": true,
+      "example": "United States"
+    },
+    {
+      "name": "geographicRegion",
+      "type": "string",
+      "mode": "stored",
+      "description": "Sub-national region or state derived from network address, providing finer-grained location context for security and compliance",
+      "nullable": true,
+      "example": "California"
+    },
+    {
+      "name": "geographicLocality",
+      "type": "string",
+      "mode": "stored",
+      "description": "City or locality derived from network address geolocation, useful for fraud detection and user experience personalization",
+      "nullable": true,
+      "example": "San Francisco"
     },
     {
       "name": "lastActivityAt",
       "type": "DateTime",
       "mode": "stored",
-      "description": "Last time this session was used",
+      "description": "Timestamp of the most recent authenticated request or action performed using this session, updated with each interaction to track session liveness and support idle timeout policies",
       "required": true
     },
     {
       "name": "expiresAt",
       "type": "DateTime",
       "mode": "stored",
-      "description": "When this session will automatically expire",
+      "description": "Absolute timestamp when the session will become invalid and require re-authentication, establishing a maximum session lifetime regardless of activity level",
       "required": true
-    },
-    {
-      "name": "isActive",
-      "type": "boolean",
-      "mode": "stored",
-      "description": "Whether the session is currently valid and usable",
-      "default": true
     },
     {
       "name": "terminatedAt",
       "type": "DateTime",
       "mode": "stored",
-      "description": "When the session was ended (logout or forced termination)",
+      "description": "Timestamp when the session was explicitly ended before its natural expiration, through principal action, administrative intervention, or security enforcement",
       "nullable": true
     },
     {
       "name": "terminationReason",
       "type": "string",
       "mode": "enum",
-      "description": "Why the session ended",
+      "description": "Category indicating why the session was terminated, supporting security analysis and user experience improvements for session management",
       "enum": [
-        "logout",
-        "timeout",
-        "revoked",
-        "expired",
-        "security"
+        "principalEnded",
+        "idleTimeout",
+        "administrativeRevocation",
+        "expirationReached",
+        "securityEnforcement",
+        "credentialChange",
+        "policyViolation"
       ],
-      "example": "logout"
+      "nullable": true,
+      "example": "principalEnded"
     },
     {
-      "name": "metadata",
-      "type": "string",
+      "name": "renewalCount",
+      "type": "integer",
       "mode": "stored",
-      "description": "Additional session data like feature flags or permissions cache"
+      "description": "Number of times this session has been renewed or extended through refresh token mechanisms, useful for detecting unusual refresh patterns",
+      "default": 0
+    },
+    {
+      "name": "riskScore",
+      "type": "number",
+      "mode": "stored",
+      "description": "Calculated risk assessment value for this session based on behavioral analysis, geographic anomalies, and security indicators, typically ranging from 0 (low risk) to 1 (high risk)",
+      "nullable": true,
+      "example": 0.15
     }
   ],
   "examples": [
     {
       "@type": "UserSession",
-      "ipAddress": "192.168.1.100",
-      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
-      "deviceType": "desktop",
-      "deviceInfo": {
-        "os": "macOS",
-        "browser": "Chrome",
-        "version": "121.0"
+      "principal": {
+        "@type": "SecurityPrincipal",
+        "identifier": "user_7h2k9p4m"
       },
-      "location": {
-        "country": "United States",
-        "city": "San Francisco",
-        "region": "California"
-      },
+      "originAddress": "192.168.1.100",
+      "clientIdentifier": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
+      "deviceCategory": "desktop",
+      "platformName": "macOS",
+      "platformVersion": "10.15.7",
+      "applicationName": "Chrome",
+      "applicationVersion": "121.0.0.0",
+      "geographicCountry": "United States",
+      "geographicRegion": "California",
+      "geographicLocality": "San Francisco",
       "lastActivityAt": "2024-03-15T10:30:00Z",
       "expiresAt": "2024-03-15T22:00:00Z",
-      "isActive": true
+      "renewalCount": 0,
+      "riskScore": 0.05
     },
     {
       "@type": "UserSession",
-      "ipAddress": "172.58.12.34",
-      "userAgent": "MyApp/2.1.0 (iPhone; iOS 17.0)",
-      "deviceType": "mobile",
-      "deviceInfo": {
-        "os": "iOS",
-        "version": "17.0",
-        "model": "iPhone 14 Pro"
+      "principal": {
+        "@type": "SecurityPrincipal",
+        "identifier": "user_7h2k9p4m"
       },
+      "originAddress": "172.58.12.34",
+      "clientIdentifier": "MyMobileApp/2.1.0 (iPhone; iOS 17.0; Scale/3.00)",
+      "deviceCategory": "mobile",
+      "platformName": "iOS",
+      "platformVersion": "17.0",
+      "applicationName": "MyMobileApp",
+      "applicationVersion": "2.1.0",
+      "geographicCountry": "United States",
+      "geographicRegion": "New York",
+      "geographicLocality": "New York City",
       "lastActivityAt": "2024-03-14T18:45:00Z",
       "expiresAt": "2024-03-21T08:00:00Z",
-      "isActive": false,
       "terminatedAt": "2024-03-14T19:00:00Z",
-      "terminationReason": "logout"
+      "terminationReason": "principalEnded",
+      "renewalCount": 3,
+      "riskScore": 0.12
+    },
+    {
+      "@type": "UserSession",
+      "principal": {
+        "@type": "SecurityPrincipal",
+        "identifier": "service_api_client_45x"
+      },
+      "originAddress": "203.0.113.42",
+      "clientIdentifier": "IntegrationService/1.5.2 (automated)",
+      "deviceCategory": "programmatic",
+      "platformName": "Linux",
+      "platformVersion": "5.15.0",
+      "applicationName": "IntegrationService",
+      "applicationVersion": "1.5.2",
+      "geographicCountry": "Germany",
+      "geographicRegion": "Bavaria",
+      "geographicLocality": "Munich",
+      "lastActivityAt": "2024-03-15T11:20:00Z",
+      "expiresAt": "2024-03-15T12:00:00Z",
+      "renewalCount": 12,
+      "riskScore": 0.02
+    },
+    {
+      "@type": "UserSession",
+      "principal": {
+        "@type": "SecurityPrincipal",
+        "identifier": "user_9k5m2n8p"
+      },
+      "originAddress": "198.51.100.78",
+      "clientIdentifier": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:122.0) Gecko/20100101 Firefox/122.0",
+      "deviceCategory": "desktop",
+      "platformName": "Linux",
+      "platformVersion": "Ubuntu 22.04",
+      "applicationName": "Firefox",
+      "applicationVersion": "122.0",
+      "geographicCountry": "Japan",
+      "geographicRegion": "Tokyo",
+      "geographicLocality": "Tokyo",
+      "lastActivityAt": "2024-03-14T22:30:00Z",
+      "expiresAt": "2024-03-15T23:00:00Z",
+      "terminatedAt": "2024-03-14T23:15:00Z",
+      "terminationReason": "securityEnforcement",
+      "renewalCount": 1,
+      "riskScore": 0.87
     }
   ]
 }

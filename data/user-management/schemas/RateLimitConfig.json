@@ -2,55 +2,35 @@
   "@type": "Schema",
   "@context": "https://rocketschema.org/context",
   "name": "RateLimitConfig",
-  "description": "Defines rate limiting rules to prevent API abuse and ensure fair resource usage across all consumers. Rate limiting is essential for protecting your API from being overwhelmed by too many requests, whether from legitimate heavy users, misbehaving scripts, or malicious attacks. This entity stores configurable limits that can be applied at different granularities - per user, per API key, or per IP address. Limits can be set for various time windows (requests per second, minute, hour, or day) allowing both burst tolerance and sustained usage control. For example, an API might allow 100 requests per minute with a burst of 10 requests per second. The entity supports different scopes, so you can have global limits, endpoint-specific limits, or even different limits for read versus write operations. Priority levels ensure that premium customers or critical services get higher limits. Rate limits are crucial for maintaining service stability, preventing any single consumer from monopolizing resources, and providing predictable performance for all users. They also help control costs in cloud environments where you pay for compute resources.",
+  "description": "Defines consumption control rules that regulate the frequency and volume of resource access over specified time periods. Rate limiting is a fundamental control mechanism for protecting systems from overconsumption, whether from legitimate heavy usage, automated processes, or malicious activity. This entity establishes quantitative boundaries that can be applied to any resource consumer - individuals, applications, devices, or organizational units. Limits are configured with flexible time windows and enforcement algorithms to balance immediate burst capacity with sustained usage thresholds. For example, a system might permit 100 operations per minute while allowing brief bursts of 10 operations per second. The configuration supports different enforcement strategies, from complete rejection to graceful degradation through throttling or queuing. Priority mechanisms ensure that critical operations or high-value consumers receive preferential treatment during contention. Rate limiting applies universally across industries: e-commerce platforms controlling order submission rates, healthcare systems managing data export frequency, financial services regulating transaction velocity, manufacturing systems pacing production requests, or content delivery networks managing bandwidth allocation. This entity provides the policy framework independent of specific implementation technologies.",
   "properties": [
     {
-      "name": "entityType",
-      "type": "string",
-      "mode": "enum",
-      "description": "What type of entity this limit applies to",
-      "enum": [
-        "user",
-        "api_key",
-        "ip_address",
-        "organization"
-      ],
-      "required": true
-    },
-    {
-      "name": "entityId",
+      "name": "name",
       "type": "string",
       "mode": "stored",
-      "description": "Specific entity identifier this limit applies to",
-      "required": true
-    },
-    {
-      "name": "limitName",
-      "type": "string",
-      "mode": "stored",
-      "description": "Descriptive name for this rate limit rule",
+      "description": "Descriptive identifier for this rate limit configuration",
       "required": true,
-      "example": "Standard API Rate Limit"
+      "example": "Standard Operation Limit"
     },
     {
-      "name": "limitType",
-      "type": "string",
-      "mode": "enum",
-      "description": "Time window for the rate limit",
-      "enum": [
-        "requests_per_second",
-        "requests_per_minute",
-        "requests_per_hour",
-        "requests_per_day",
-        "requests_per_month"
-      ],
-      "required": true
+      "name": "subject",
+      "type": "SecurityPrincipal",
+      "mode": "stored",
+      "description": "The security principal (user, application, device, organization) to which this rate limit applies",
+      "nullable": true
     },
     {
-      "name": "limitValue",
+      "name": "resource",
+      "type": "Resource",
+      "mode": "stored",
+      "description": "The specific resource or resource group to which this limit applies",
+      "nullable": true
+    },
+    {
+      "name": "maximumRequests",
       "type": "integer",
       "mode": "stored",
-      "description": "Maximum number of allowed requests in the time window",
+      "description": "Maximum number of allowed operations within the specified time window",
       "required": true,
       "min": 0,
       "example": 1000
@@ -59,127 +39,209 @@
       "name": "windowSize",
       "type": "integer",
       "mode": "stored",
-      "description": "Time window size in seconds",
+      "description": "Duration of the time window in seconds during which the maximum requests limit applies",
       "required": true,
+      "min": 1,
       "example": 3600
     },
     {
-      "name": "burstSize",
+      "name": "windowUnit",
+      "type": "string",
+      "mode": "enum",
+      "description": "Unit of time for the window size to improve readability and configuration",
+      "enum": [
+        "second",
+        "minute",
+        "hour",
+        "day",
+        "month"
+      ],
+      "required": true
+    },
+    {
+      "name": "burstCapacity",
       "type": "integer",
       "mode": "stored",
-      "description": "Maximum requests allowed in a short burst",
-      "default": 10
+      "description": "Maximum number of operations allowed in a rapid burst, typically measured over a few seconds",
+      "nullable": true,
+      "min": 0,
+      "example": 50
     },
     {
       "name": "algorithm",
       "type": "string",
       "mode": "enum",
-      "description": "Rate limiting algorithm to use",
+      "description": "Rate limiting algorithm used to track and enforce the consumption limit",
       "enum": [
-        "token_bucket",
-        "sliding_window",
-        "fixed_window",
-        "leaky_bucket"
+        "tokenBucket",
+        "slidingWindow",
+        "fixedWindow",
+        "leakyBucket",
+        "slidingLog"
       ],
-      "default": "token_bucket"
-    },
-    {
-      "name": "scope",
-      "type": "string",
-      "mode": "stored",
-      "description": "Scope of rate limit (global, endpoint, method)",
-      "default": "global",
-      "example": "api.users.read"
-    },
-    {
-      "name": "tier",
-      "type": "string",
-      "mode": "enum",
-      "description": "Service tier this limit applies to",
-      "enum": [
-        "free",
-        "basic",
-        "premium",
-        "enterprise"
-      ],
-      "nullable": true
+      "required": true,
+      "default": "tokenBucket"
     },
     {
       "name": "priority",
       "type": "integer",
       "mode": "stored",
-      "description": "Priority when multiple limits apply (higher wins)",
-      "default": 0
+      "description": "Precedence value when multiple rate limit configurations apply to the same subject and resource, higher values take precedence",
+      "nullable": true,
+      "default": 0,
+      "example": 50
     },
     {
-      "name": "responseHeaders",
-      "type": "boolean",
-      "mode": "stored",
-      "description": "Whether to include rate limit info in response headers",
-      "default": true
+      "name": "scopeLevel",
+      "type": "string",
+      "mode": "enum",
+      "description": "Granularity at which this rate limit is enforced",
+      "enum": [
+        "global",
+        "resource",
+        "operation",
+        "endpoint"
+      ],
+      "required": true,
+      "default": "global"
     },
     {
       "name": "exceedAction",
       "type": "string",
       "mode": "enum",
-      "description": "What happens when limit is exceeded",
+      "description": "Enforcement action to take when the rate limit is exceeded",
       "enum": [
         "reject",
         "throttle",
         "queue",
-        "log_only"
+        "degradedService",
+        "logOnly"
       ],
+      "required": true,
       "default": "reject"
+    },
+    {
+      "name": "includeUsageMetadata",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether to include current consumption metrics in operation responses to help consumers self-regulate",
+      "nullable": true,
+      "default": true
     },
     {
       "name": "isActive",
       "type": "boolean",
       "mode": "stored",
-      "description": "Whether this rate limit is currently enforced",
+      "description": "Whether this rate limit configuration is currently being enforced",
+      "required": true,
       "default": true
     },
     {
-      "name": "bypassTokens",
+      "name": "effectiveFrom",
       "type": "string",
       "mode": "stored",
-      "description": "Special tokens that bypass this limit",
+      "description": "Timestamp when this rate limit configuration becomes active, in ISO 8601 format",
       "nullable": true,
-      "private": true
+      "example": "2024-01-01T00:00:00Z"
+    },
+    {
+      "name": "effectiveUntil",
+      "type": "string",
+      "mode": "stored",
+      "description": "Timestamp when this rate limit configuration expires, in ISO 8601 format",
+      "nullable": true,
+      "example": "2024-12-31T23:59:59Z"
+    },
+    {
+      "name": "gracePeriod",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Number of seconds to allow operations to complete before enforcement begins after activation",
+      "nullable": true,
+      "min": 0,
+      "example": 300
+    },
+    {
+      "name": "notificationThreshold",
+      "type": "number",
+      "mode": "stored",
+      "description": "Percentage of limit consumption at which to notify the subject, expressed as a decimal between 0 and 1",
+      "nullable": true,
+      "min": 0,
+      "max": 1,
+      "example": 0.8
     }
   ],
   "examples": [
     {
       "@type": "RateLimitConfig",
-      "entityType": "api_key",
-      "entityId": "key_550e8400",
-      "limitName": "Production API Standard Limit",
-      "limitType": "requests_per_hour",
-      "limitValue": 10000,
+      "name": "Standard Operation Limit",
+      "subject": {
+        "@type": "SecurityPrincipal",
+        "name": "Production Application"
+      },
+      "resource": {
+        "@type": "Resource",
+        "name": "Customer Data API"
+      },
+      "maximumRequests": 10000,
       "windowSize": 3600,
-      "burstSize": 50,
-      "algorithm": "token_bucket",
-      "scope": "global",
-      "tier": "premium",
+      "windowUnit": "hour",
+      "burstCapacity": 50,
+      "algorithm": "tokenBucket",
       "priority": 50,
-      "responseHeaders": true,
+      "scopeLevel": "resource",
       "exceedAction": "reject",
-      "isActive": true
+      "includeUsageMetadata": true,
+      "isActive": true,
+      "notificationThreshold": 0.9
     },
     {
       "@type": "RateLimitConfig",
-      "entityType": "ip_address",
-      "entityId": "203.0.113.0/24",
-      "limitName": "Suspicious IP Range Throttle",
-      "limitType": "requests_per_minute",
-      "limitValue": 10,
+      "name": "Document Export Throttle",
+      "subject": {
+        "@type": "SecurityPrincipal",
+        "name": "External Integration Service"
+      },
+      "resource": {
+        "@type": "Resource",
+        "name": "Document Export Endpoint"
+      },
+      "maximumRequests": 100,
       "windowSize": 60,
-      "burstSize": 2,
-      "algorithm": "fixed_window",
-      "scope": "global",
-      "priority": 100,
-      "responseHeaders": false,
+      "windowUnit": "minute",
+      "burstCapacity": 10,
+      "algorithm": "slidingWindow",
+      "priority": 75,
+      "scopeLevel": "operation",
       "exceedAction": "throttle",
-      "isActive": true
+      "includeUsageMetadata": true,
+      "isActive": true,
+      "effectiveFrom": "2024-06-01T00:00:00Z",
+      "gracePeriod": 600
+    },
+    {
+      "@type": "RateLimitConfig",
+      "name": "Transaction Velocity Control",
+      "subject": {
+        "@type": "SecurityPrincipal",
+        "name": "Point of Sale Terminal"
+      },
+      "resource": {
+        "@type": "Resource",
+        "name": "Payment Processing Service"
+      },
+      "maximumRequests": 50,
+      "windowSize": 60,
+      "windowUnit": "minute",
+      "burstCapacity": 5,
+      "algorithm": "leakyBucket",
+      "priority": 100,
+      "scopeLevel": "resource",
+      "exceedAction": "queue",
+      "includeUsageMetadata": false,
+      "isActive": true,
+      "notificationThreshold": 0.75
     }
   ]
 }

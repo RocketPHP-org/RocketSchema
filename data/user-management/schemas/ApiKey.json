@@ -2,13 +2,13 @@
   "@type": "Schema",
   "@context": "https://rocketschema.org/context",
   "name": "ApiKey",
-  "description": "Represents an API key for programmatic access to the system. API keys allow applications, scripts, or services to authenticate without using username/password combinations. They're essential for machine-to-machine communication, continuous integration, automated scripts, and third-party integrations. Each API key has a unique identifier, can be restricted by IP address or domain, has configurable permissions, and includes rate limiting to prevent abuse. API keys can be revoked instantly if compromised, and their usage is tracked for security auditing. Unlike user sessions, API keys don't expire automatically but can have validity periods set. They're typically used in HTTP headers or query parameters for authentication.",
+  "description": "Represents a cryptographic credential for programmatic access to system resources. API keys enable machine-to-machine authentication without requiring interactive login, serving as permanent or long-lived credentials for applications, automation scripts, continuous integration systems, and third-party integrations. Each key maintains a hashed secret for verification, a visible prefix for identification in logs and interfaces, and configurable validity periods. API keys differ from session tokens by their extended lifetime and from certificates by their simpler key-based authentication model. They support various security classifications including public keys for client-side usage, secret keys for server-side operations, and restricted keys with limited permissions. Organizations use API keys to control service access, implement rate limiting, enable credential rotation without password changes, and maintain audit trails of programmatic access. The revocation mechanism allows immediate invalidation if keys are compromised, exposed in version control, or no longer needed. Keys can be scoped to specific users, organizations, or service accounts, supporting both personal automation and organizational integration scenarios across industries including finance, healthcare, e-commerce, logistics, and SaaS platforms.",
   "properties": [
     {
       "name": "keyHash",
       "type": "string",
       "mode": "stored",
-      "description": "Cryptographically hashed version of the actual key",
+      "description": "Cryptographically hashed version of the secret key using a secure one-way hash function (bcrypt, argon2, or SHA-256). Only the hash is stored; the plaintext key is shown once during creation and never stored or retrievable afterward",
       "required": true,
       "unique": true,
       "private": true
@@ -17,149 +17,168 @@
       "name": "keyPrefix",
       "type": "string",
       "mode": "stored",
-      "description": "Visible prefix to identify the key (first few characters)",
+      "description": "Visible prefix extracted from the original key for identification purposes in user interfaces, logs, and audit trails. Typically the first 8-12 characters, formatted to indicate key type and environment without revealing the secret portion",
       "required": true,
-      "example": "sk_live_abc"
+      "example": "api_prod_x7k2"
     },
     {
       "name": "name",
       "type": "string",
       "mode": "stored",
-      "description": "Human-friendly name to identify the key's purpose",
+      "description": "Human-readable label assigned by the creator to identify the key's intended purpose, associated application, or usage context",
       "required": true,
-      "example": "Production API Key"
+      "example": "Production Integration Service"
     },
     {
       "name": "description",
       "type": "string",
       "mode": "stored",
-      "description": "Detailed description of what this key is used for",
+      "description": "Optional detailed explanation of the key's purpose, associated systems, authorized operations, or usage guidelines",
       "nullable": true
     },
     {
-      "name": "type",
+      "name": "classification",
       "type": "string",
       "mode": "enum",
-      "description": "Classification of the API key",
+      "description": "Security classification determining the key's intended usage context and exposure level",
       "enum": [
         "public",
         "secret",
         "restricted",
         "test"
       ],
-      "default": "secret",
+      "required": true,
       "example": "secret"
     },
     {
-      "name": "user",
+      "name": "owner",
       "type": "User",
       "mode": "stored",
-      "description": "User who created and owns this key",
+      "description": "User, service account, or principal who created and maintains ownership of this key. May be null for organization-level keys not tied to a specific user",
       "nullable": true
     },
     {
       "name": "organization",
       "type": "Organization",
       "mode": "stored",
-      "description": "Organization that owns this key",
+      "description": "Organization under whose authority this key operates. Determines the resource scope and billing context for API usage",
       "nullable": true
     },
     {
       "name": "validFrom",
       "type": "DateTime",
       "mode": "stored",
-      "description": "When the key becomes valid",
+      "description": "Timestamp when the key becomes active and can be used for authentication. Enables scheduled activation for pre-deployed keys",
       "required": true
     },
     {
-      "name": "validUntil",
+      "name": "expiresAt",
       "type": "DateTime",
       "mode": "stored",
-      "description": "When the key expires (null for never)",
+      "description": "Timestamp when the key automatically becomes invalid. Null indicates no expiration, requiring explicit revocation. Used for temporary access, contractor keys, or time-limited integrations",
       "nullable": true
-    },
-    {
-      "name": "lastUsedAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "Last time this key was used in an API request",
-      "nullable": true
-    },
-    {
-      "name": "lastUsedIp",
-      "type": "string",
-      "mode": "stored",
-      "description": "IP address from last use",
-      "nullable": true
-    },
-    {
-      "name": "usageCount",
-      "type": "bigint",
-      "mode": "stored",
-      "description": "Total number of API calls made with this key",
-      "default": 0,
-      "min": 0
     },
     {
       "name": "isActive",
       "type": "boolean",
-      "mode": "stored",
-      "description": "Whether the key is currently usable",
-      "default": true
+      "mode": "computed",
+      "description": "Computed status indicating whether the key is currently valid for authentication. True when current time is between validFrom and expiresAt (or no expiration), the key has not been revoked, and no other deactivation conditions exist. This is derived and not stored",
+      "example": true
     },
     {
       "name": "revokedAt",
       "type": "DateTime",
       "mode": "stored",
-      "description": "When the key was revoked (if applicable)",
+      "description": "Timestamp when the key was permanently invalidated. Once set, the key can never be reactivated. Used for compromised keys, deprecated integrations, or organizational policy changes",
       "nullable": true
     },
     {
       "name": "revokedBy",
       "type": "User",
       "mode": "stored",
-      "description": "User who revoked the key",
+      "description": "User or administrator who performed the revocation action. Null if revoked by automated system processes or policy enforcement",
       "nullable": true
     },
     {
-      "name": "revokedReason",
+      "name": "revocationReason",
       "type": "string",
       "mode": "stored",
-      "description": "Explanation for why the key was revoked",
+      "description": "Explanation for why the key was revoked, such as 'Compromised in security incident', 'Accidentally committed to repository', 'Integration deprecated', or 'User departed organization'. Supports security auditing and compliance documentation",
       "nullable": true
+    },
+    {
+      "name": "lastActivityAt",
+      "type": "DateTime",
+      "mode": "computed",
+      "description": "Timestamp of the most recent successful authentication using this key. Computed from activity logs or usage events, not stored directly to avoid denormalization",
+      "nullable": true
+    },
+    {
+      "name": "totalUsageCount",
+      "type": "bigint",
+      "mode": "computed",
+      "description": "Total number of successful API requests authenticated with this key. Computed by aggregating activity records rather than incrementing a counter, ensuring accuracy and enabling historical analysis",
+      "min": 0
     }
   ],
   "examples": [
     {
       "@type": "ApiKey",
-      "keyPrefix": "sk_live_4Xb9",
-      "name": "Production E-commerce Integration",
-      "description": "Used by our e-commerce platform to sync inventory and process orders",
-      "type": "secret",
-      "validFrom": "2024-01-01T00:00:00Z",
-      "validUntil": null,
-      "lastUsedAt": "2024-03-15T14:30:00Z",
-      "lastUsedIp": "203.0.113.42",
-      "usageCount": 15420,
+      "keyPrefix": "api_prod_x7k2",
+      "name": "Production Integration Service",
+      "description": "Primary key for automated data synchronization between inventory management and order processing systems",
+      "classification": "secret",
+      "validFrom": "2024-01-15T00:00:00Z",
+      "expiresAt": null,
       "isActive": true,
-      "user": "user_123"
+      "owner": {
+        "@type": "User",
+        "name": "Service Account - Integration"
+      },
+      "organization": {
+        "@type": "Organization",
+        "name": "Global Logistics Corp"
+      },
+      "lastActivityAt": "2024-03-15T14:30:00Z",
+      "totalUsageCount": 15420
     },
     {
       "@type": "ApiKey",
-      "keyPrefix": "sk_test_7Yz2",
-      "name": "Development Testing Key",
-      "description": "Temporary key for integration testing",
-      "type": "test",
+      "keyPrefix": "api_test_m3n9",
+      "name": "Staging Environment Testing",
+      "description": "Temporary key for QA team to validate new API endpoints before production deployment",
+      "classification": "test",
       "validFrom": "2024-03-01T00:00:00Z",
-      "validUntil": "2024-04-01T00:00:00Z",
-      "lastUsedAt": "2024-03-14T10:00:00Z",
-      "lastUsedIp": "10.0.0.50",
-      "usageCount": 250,
+      "expiresAt": "2024-04-01T00:00:00Z",
       "isActive": false,
-      "revokedAt": "2024-03-15T00:00:00Z",
-      "revokedBy": "admin_789",
-      "revokedReason": "Key was accidentally committed to public repository",
-      "user": "developer_456"
+      "revokedAt": "2024-03-20T16:45:00Z",
+      "revokedBy": {
+        "@type": "User",
+        "name": "Security Admin"
+      },
+      "revocationReason": "Key accidentally exposed in public code repository commit",
+      "owner": {
+        "@type": "User",
+        "name": "QA Lead Engineer"
+      },
+      "lastActivityAt": "2024-03-14T10:00:00Z",
+      "totalUsageCount": 847
+    },
+    {
+      "@type": "ApiKey",
+      "keyPrefix": "api_pub_c8r5",
+      "name": "Client-Side Analytics Tracker",
+      "description": "Public key embedded in web applications for anonymous usage analytics and error reporting",
+      "classification": "public",
+      "validFrom": "2024-02-01T00:00:00Z",
+      "expiresAt": null,
+      "isActive": true,
+      "organization": {
+        "@type": "Organization",
+        "name": "Healthcare Analytics Platform"
+      },
+      "lastActivityAt": "2024-03-16T09:20:00Z",
+      "totalUsageCount": 2847632
     }
   ]
 }

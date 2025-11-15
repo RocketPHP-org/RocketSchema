@@ -1,0 +1,212 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "ActivityLog",
+  "description": "Universal audit trail that records significant actions performed by actors within any system or domain. This entity serves as the foundational record-keeping mechanism for accountability, compliance, security monitoring, and behavioral analysis across diverse industries - from healthcare to finance, education to manufacturing. Every meaningful action is captured with sufficient context to reconstruct events: who performed the action (the actor), what action occurred, when it happened, the outcome, and associated risk indicators. The log accommodates both successful and unsuccessful actions, which is essential for detecting patterns like repeated access attempts, unusual behavior sequences, or systematic process failures. Risk assessment capabilities enable automatic flagging of suspicious or anomalous activities for further investigation. This comprehensive activity record supports regulatory compliance requirements (audit trails for financial transactions, patient data access, educational records, manufacturing quality control), security incident response (forensic reconstruction of events), operational analytics (understanding usage patterns and bottlenecks), and customer support (troubleshooting user issues by reviewing their action history). The design is intentionally domain-agnostic, making it applicable whether tracking medical record access, financial transactions, content modifications, equipment operations, or administrative changes. Long-term retention of activity logs enables trend analysis, policy refinement, and historical accountability across any domain where actions must be traceable and accountable.",
+  "properties": [
+    {
+      "name": "actor",
+      "type": "Actor",
+      "mode": "stored",
+      "description": "The entity (user, system, service, or organization) that performed or initiated this activity. This represents the responsible party for accountability and audit purposes, whether human or automated.",
+      "required": true
+    },
+    {
+      "name": "action",
+      "type": "Action",
+      "mode": "stored",
+      "description": "The specific action or operation that was performed. References a catalog of possible actions within the system, enabling consistent categorization and analysis across all activity types.",
+      "required": true
+    },
+    {
+      "name": "occurredAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "The precise moment when this activity occurred, recorded in UTC. This timestamp is critical for sequencing events, correlation analysis, compliance reporting, and forensic reconstruction of activity sequences.",
+      "required": true
+    },
+    {
+      "name": "session",
+      "type": "Session",
+      "mode": "stored",
+      "description": "The session context within which this activity occurred, linking this action to a broader interaction period. Helps group related activities and understand the sequence of operations within a single session.",
+      "nullable": true
+    },
+    {
+      "name": "connectionContext",
+      "type": "ConnectionContext",
+      "mode": "stored",
+      "description": "Technical details about how the actor connected to perform this action, including network origin, client application, and device information. Useful for detecting anomalous access patterns and security analysis.",
+      "nullable": true
+    },
+    {
+      "name": "outcome",
+      "type": "string",
+      "mode": "enum",
+      "description": "The result of attempting this activity. Success indicates completion as intended, failure means the action was blocked or failed, partial indicates incomplete execution, and pending means the outcome is not yet determined.",
+      "enum": [
+        "success",
+        "failure",
+        "partial",
+        "pending"
+      ],
+      "required": true
+    },
+    {
+      "name": "outcomeDetail",
+      "type": "string",
+      "mode": "stored",
+      "description": "Additional explanation of the outcome, particularly useful for failures or partial completions. Provides human-readable context about why an action succeeded, failed, or was only partially completed.",
+      "nullable": true
+    },
+    {
+      "name": "outcomeCode",
+      "type": "string",
+      "mode": "stored",
+      "description": "Machine-readable code categorizing the outcome, enabling systematic analysis of failure patterns, success rates, and operational issues across many activities.",
+      "nullable": true
+    },
+    {
+      "name": "targetResource",
+      "type": "Resource",
+      "mode": "stored",
+      "description": "The primary resource or object that this activity affected or attempted to affect. This could be a document, record, configuration, physical asset, or any other entity that was the subject of the action.",
+      "nullable": true
+    },
+    {
+      "name": "operation",
+      "type": "Operation",
+      "mode": "stored",
+      "description": "Reference to a larger operation or transaction group that this activity is part of. Enables tracking multi-step processes where several activities together comprise a single logical operation.",
+      "nullable": true
+    },
+    {
+      "name": "riskScore",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Calculated risk assessment score for this activity on a standardized scale, typically 0-100. Higher scores indicate greater deviation from normal patterns or higher potential security concern, enabling automated alerting and prioritization.",
+      "min": 0,
+      "max": 100,
+      "nullable": true
+    },
+    {
+      "name": "riskLevel",
+      "type": "string",
+      "mode": "enum",
+      "description": "Human-readable categorization of the risk level associated with this activity, derived from or aligned with the risk score. Enables filtering and alerting based on qualitative risk assessment.",
+      "enum": [
+        "negligible",
+        "low",
+        "moderate",
+        "high",
+        "critical"
+      ],
+      "nullable": true
+    },
+    {
+      "name": "anomalyIndicators",
+      "type": "string",
+      "mode": "stored",
+      "description": "Semicolon-separated list of specific anomaly or risk indicators detected during this activity, such as unusual timing, unexpected location, atypical behavior sequence, or known threat patterns. Supports security analysis and pattern detection.",
+      "nullable": true
+    },
+    {
+      "name": "severity",
+      "type": "string",
+      "mode": "enum",
+      "description": "The significance or impact level of this activity in terms of system importance, compliance requirements, or business criticality. Helps prioritize review efforts and retention policies.",
+      "enum": [
+        "informational",
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
+      "nullable": true
+    },
+    {
+      "name": "category",
+      "type": "string",
+      "mode": "enum",
+      "description": "Broad classification of this activity type for organizational and analytical purposes. Enables grouping and filtering activities by general purpose across diverse action types.",
+      "enum": [
+        "authentication",
+        "authorization",
+        "data_access",
+        "data_modification",
+        "configuration",
+        "administration",
+        "communication",
+        "transaction",
+        "system_operation"
+      ],
+      "nullable": true
+    },
+    {
+      "name": "auditRequired",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Flag indicating whether this activity requires formal audit review or compliance verification. Helps filter activities that must be examined for regulatory or policy compliance purposes.",
+      "nullable": true
+    },
+    {
+      "name": "retentionPeriod",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Number of days this activity log must be retained before eligible for archival or deletion, based on compliance requirements, policy rules, or legal obligations. Enables automated retention management.",
+      "nullable": true
+    }
+  ],
+  "examples": [
+    {
+      "@type": "ActivityLog",
+      "actor": "actor_user_8291",
+      "action": "action_credential_update",
+      "occurredAt": "2024-03-15T14:30:00Z",
+      "session": "session_web_4729",
+      "connectionContext": "context_desktop_us_east",
+      "outcome": "success",
+      "targetResource": "resource_user_profile_8291",
+      "riskScore": 12,
+      "riskLevel": "low",
+      "anomalyIndicators": "known_device;regular_hours;familiar_location",
+      "severity": "medium",
+      "category": "authentication",
+      "auditRequired": true,
+      "retentionPeriod": 2555
+    },
+    {
+      "@type": "ActivityLog",
+      "actor": "actor_user_5028",
+      "action": "action_access_attempt",
+      "occurredAt": "2024-03-15T02:17:33Z",
+      "connectionContext": "context_mobile_ap_southeast",
+      "outcome": "failure",
+      "outcomeCode": "ACCESS_DENIED",
+      "outcomeDetail": "Access blocked due to multiple consecutive failed attempts exceeding threshold",
+      "targetResource": "resource_account_5028",
+      "riskScore": 87,
+      "riskLevel": "high",
+      "anomalyIndicators": "unusual_hour;new_location;repeated_failures;anonymizer_detected",
+      "severity": "high",
+      "category": "authentication",
+      "auditRequired": true,
+      "retentionPeriod": 2555
+    },
+    {
+      "@type": "ActivityLog",
+      "actor": "actor_system_batch_processor",
+      "action": "action_data_export",
+      "occurredAt": "2024-03-15T03:00:00Z",
+      "outcome": "success",
+      "targetResource": "resource_report_monthly_analytics",
+      "operation": "operation_scheduled_export_3841",
+      "riskScore": 5,
+      "riskLevel": "negligible",
+      "severity": "low",
+      "category": "data_access",
+      "auditRequired": false,
+      "retentionPeriod": 365
+    }
+  ]
+}

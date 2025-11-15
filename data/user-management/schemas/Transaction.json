@@ -1,0 +1,204 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "Transaction",
+  "description": "Represents an atomic unit of work that coordinates multiple related operations to ensure data consistency and integrity across a system. Transactions are fundamental to maintaining reliable state changes in any domain - whether processing customer orders, managing inventory transfers, coordinating content publications, or executing financial settlements. Each transaction guarantees that a set of operations either completely succeeds or completely fails, preventing inconsistent partial states. The entity tracks lifecycle through states (initiated, executing, completed, aborted) and maintains relationships to all operations performed within its scope. When operations span multiple resources or external systems, transactions provide rollback capabilities through checkpoint snapshots that capture state before changes begin. This enables automatic recovery when failures occur midway through complex workflows. Transactions support configurable retry policies for handling transient failures and different concurrency control strategies when multiple transactions might affect overlapping resources. They provide comprehensive audit trails showing exactly what changed, when, and why - essential for debugging complex workflows and meeting compliance requirements. The pattern applies universally across domains: e-commerce checkout processes, batch data imports, multi-step approval workflows, system migrations, and any scenario requiring coordinated changes to multiple resources with guaranteed consistency.",
+  "properties": [
+    {
+      "name": "transactionType",
+      "type": "TransactionType",
+      "mode": "stored",
+      "description": "Classification defining the category and behavioral characteristics of this transaction",
+      "required": true
+    },
+    {
+      "name": "state",
+      "type": "string",
+      "mode": "enum",
+      "description": "Current execution phase in the transaction lifecycle",
+      "enum": [
+        "initiated",
+        "executing",
+        "completed",
+        "aborted",
+        "failed",
+        "partially_completed"
+      ],
+      "required": true,
+      "default": "initiated"
+    },
+    {
+      "name": "concurrencyStrategy",
+      "type": "string",
+      "mode": "enum",
+      "description": "Approach for handling concurrent access to overlapping resources during execution",
+      "enum": [
+        "optimistic",
+        "pessimistic",
+        "serialized",
+        "eventual"
+      ],
+      "default": "optimistic"
+    },
+    {
+      "name": "initiatingActor",
+      "type": "Actor",
+      "mode": "stored",
+      "description": "Entity or agent that triggered the creation of this transaction",
+      "nullable": true
+    },
+    {
+      "name": "primaryResource",
+      "type": "Resource",
+      "mode": "stored",
+      "description": "Main resource being affected by operations within this transaction",
+      "nullable": true
+    },
+    {
+      "name": "initiatedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Timestamp when the transaction was created and entered initiated state",
+      "required": true
+    },
+    {
+      "name": "deadline",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Maximum time allowed before transaction must complete or abort",
+      "nullable": true
+    },
+    {
+      "name": "outcome",
+      "type": "string",
+      "mode": "enum",
+      "description": "Final result classification when transaction reaches terminal state",
+      "enum": [
+        "success",
+        "failure",
+        "timeout",
+        "cancelled",
+        "partial"
+      ],
+      "nullable": true
+    },
+    {
+      "name": "failureReason",
+      "type": "string",
+      "mode": "stored",
+      "description": "Human-readable explanation of why transaction did not complete successfully",
+      "nullable": true
+    },
+    {
+      "name": "failureCode",
+      "type": "string",
+      "mode": "stored",
+      "description": "Machine-readable error identifier for categorizing and handling failures",
+      "nullable": true
+    },
+    {
+      "name": "retryAttempt",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Number of times this transaction has been retried after transient failures",
+      "default": 0
+    },
+    {
+      "name": "maxRetryAttempts",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Maximum number of retry attempts permitted before marking as permanently failed",
+      "default": 3
+    },
+    {
+      "name": "retryStrategy",
+      "type": "string",
+      "mode": "enum",
+      "description": "Algorithm for scheduling retry attempts when transient failures occur",
+      "enum": [
+        "immediate",
+        "linear_backoff",
+        "exponential_backoff",
+        "fixed_delay"
+      ],
+      "default": "exponential_backoff"
+    },
+    {
+      "name": "priority",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Relative importance for scheduling execution when system resources are constrained",
+      "default": 5,
+      "nullable": true
+    },
+    {
+      "name": "correlationIdentifier",
+      "type": "string",
+      "mode": "stored",
+      "description": "External identifier linking this transaction to related workflows or parent processes",
+      "nullable": true,
+      "unique": true
+    },
+    {
+      "name": "compensationRequired",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether compensating actions are needed to reverse changes if transaction aborts",
+      "default": false
+    }
+  ],
+  "examples": [
+    {
+      "@type": "Transaction",
+      "transactionType": "order_fulfillment_tx",
+      "state": "completed",
+      "concurrencyStrategy": "optimistic",
+      "initiatingActor": "customer_service_agent_42",
+      "primaryResource": "order_89234",
+      "initiatedAt": "2024-03-15T14:22:10Z",
+      "deadline": "2024-03-15T14:27:10Z",
+      "outcome": "success",
+      "retryAttempt": 0,
+      "maxRetryAttempts": 3,
+      "retryStrategy": "exponential_backoff",
+      "priority": 7,
+      "correlationIdentifier": "checkout_session_xyz789",
+      "compensationRequired": true
+    },
+    {
+      "@type": "Transaction",
+      "transactionType": "inventory_transfer_tx",
+      "state": "aborted",
+      "concurrencyStrategy": "pessimistic",
+      "initiatingActor": "automated_scheduler_01",
+      "primaryResource": "warehouse_delta",
+      "initiatedAt": "2024-03-15T09:15:00Z",
+      "deadline": "2024-03-15T09:20:00Z",
+      "outcome": "failure",
+      "failureReason": "Insufficient inventory quantity at source location to complete transfer",
+      "failureCode": "INSUFFICIENT_QUANTITY",
+      "retryAttempt": 2,
+      "maxRetryAttempts": 3,
+      "retryStrategy": "linear_backoff",
+      "priority": 5,
+      "correlationIdentifier": "restock_batch_2024_q1_17",
+      "compensationRequired": true
+    },
+    {
+      "@type": "Transaction",
+      "transactionType": "content_publication_tx",
+      "state": "executing",
+      "concurrencyStrategy": "serialized",
+      "initiatingActor": "editor_jane_smith",
+      "primaryResource": "article_draft_5521",
+      "initiatedAt": "2024-03-15T11:45:30Z",
+      "deadline": "2024-03-15T12:00:00Z",
+      "retryAttempt": 0,
+      "maxRetryAttempts": 2,
+      "retryStrategy": "fixed_delay",
+      "priority": 8,
+      "correlationIdentifier": "editorial_workflow_mar_wk2",
+      "compensationRequired": false
+    }
+  ]
+}
