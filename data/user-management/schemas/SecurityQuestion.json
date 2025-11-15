@@ -1,0 +1,120 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "SecurityQuestion",
+  "description": "Security questions for account recovery and additional authentication",
+  "properties": [
+    {
+      "name": "user",
+      "type": "User",
+      "mode": "stored",
+      "description": "User who set up this security question",
+      "required": true
+    },
+    {
+      "name": "question",
+      "type": "string",
+      "mode": "stored",
+      "description": "The security question",
+      "required": true,
+      "example": "What was the name of your first pet?"
+    },
+    {
+      "name": "questionCategory",
+      "type": "string",
+      "mode": "enum",
+      "description": "Category of question",
+      "enum": ["personal", "family", "education", "location", "preferences", "custom"],
+      "default": "personal"
+    },
+    {
+      "name": "answerHash",
+      "type": "string",
+      "mode": "stored",
+      "description": "Hashed answer (normalized and hashed)",
+      "required": true,
+      "private": true
+    },
+    {
+      "name": "hint",
+      "type": "string",
+      "mode": "stored",
+      "description": "Optional hint for the answer"
+    },
+    {
+      "name": "order",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Display order for multiple questions",
+      "default": 1,
+      "min": 1
+    },
+    {
+      "name": "isActive",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this question is active",
+      "default": true
+    },
+    {
+      "name": "lastUsedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Last time this question was used for verification"
+    },
+    {
+      "name": "failedAttempts",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Number of consecutive failed attempts",
+      "default": 0,
+      "min": 0
+    },
+    {
+      "name": "lockedUntil",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Question locked until this timestamp"
+    },
+    {
+      "name": "createdAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Creation timestamp",
+      "required": true
+    },
+    {
+      "name": "updatedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Last update timestamp"
+    },
+    {
+      "name": "metadata",
+      "type": "object",
+      "mode": "stored",
+      "description": "Additional metadata"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "SecurityQuestion",
+      "question": "What was the name of your first pet?",
+      "questionCategory": "personal",
+      "hint": "Golden Retriever",
+      "order": 1,
+      "isActive": true,
+      "failedAttempts": 0,
+      "createdAt": "2024-01-15T10:00:00Z"
+    },
+    {
+      "@type": "SecurityQuestion",
+      "question": "In what city were you born?",
+      "questionCategory": "location",
+      "order": 2,
+      "isActive": true,
+      "failedAttempts": 0,
+      "createdAt": "2024-01-15T10:00:00Z"
+    }
+  ]
+}

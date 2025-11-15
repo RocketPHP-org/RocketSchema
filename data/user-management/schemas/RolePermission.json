@@ -1,0 +1,61 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "RolePermission",
+  "description": "Association between roles and permissions",
+  "properties": [
+    {
+      "name": "role",
+      "type": "Role",
+      "mode": "stored",
+      "description": "Reference to the role",
+      "required": true
+    },
+    {
+      "name": "permission",
+      "type": "Permission",
+      "mode": "stored",
+      "description": "Reference to the permission",
+      "required": true
+    },
+    {
+      "name": "isGranted",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether the permission is granted (true) or explicitly denied (false)",
+      "default": true
+    },
+    {
+      "name": "constraints",
+      "type": "object",
+      "mode": "stored",
+      "description": "Additional constraints on this permission for this role"
+    },
+    {
+      "name": "assignedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When the permission was assigned to the role",
+      "required": true
+    },
+    {
+      "name": "assignedBy",
+      "type": "User",
+      "mode": "stored",
+      "description": "User who assigned this permission"
+    },
+    {
+      "name": "metadata",
+      "type": "object",
+      "mode": "stored",
+      "description": "Additional metadata"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "RolePermission",
+      "isGranted": true,
+      "assignedAt": "2024-01-01T00:00:00Z"
+    }
+  ]
+}

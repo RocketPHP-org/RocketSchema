@@ -1,0 +1,167 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "UserGroup",
+  "description": "A group of users for organizational purposes and bulk permission management",
+  "properties": [
+    {
+      "name": "code",
+      "type": "string",
+      "mode": "stored",
+      "description": "Unique group code",
+      "required": true,
+      "unique": true,
+      "example": "SALES_TEAM"
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "mode": "stored",
+      "description": "Group name",
+      "required": true,
+      "example": "Sales Team"
+    },
+    {
+      "name": "description",
+      "type": "string",
+      "mode": "stored",
+      "description": "Group description and purpose"
+    },
+    {
+      "name": "type",
+      "type": "string",
+      "mode": "enum",
+      "description": "Type of group",
+      "enum": ["department", "team", "project", "security", "custom"],
+      "default": "custom",
+      "example": "team"
+    },
+    {
+      "name": "parentGroup",
+      "type": "UserGroup",
+      "mode": "stored",
+      "description": "Parent group for hierarchical organization"
+    },
+    {
+      "name": "organization",
+      "type": "Organization",
+      "mode": "stored",
+      "description": "Organization this group belongs to"
+    },
+    {
+      "name": "members",
+      "type": "User[]",
+      "mode": "stored",
+      "description": "Users in this group"
+    },
+    {
+      "name": "managers",
+      "type": "User[]",
+      "mode": "stored",
+      "description": "Users who can manage this group"
+    },
+    {
+      "name": "roles",
+      "type": "Role[]",
+      "mode": "stored",
+      "description": "Roles automatically assigned to group members"
+    },
+    {
+      "name": "permissions",
+      "type": "Permission[]",
+      "mode": "stored",
+      "description": "Direct permissions for this group"
+    },
+    {
+      "name": "maxMembers",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Maximum number of members allowed (null for unlimited)",
+      "min": 0
+    },
+    {
+      "name": "memberCount",
+      "type": "integer",
+      "mode": "computed",
+      "description": "Current number of members",
+      "default": 0,
+      "min": 0
+    },
+    {
+      "name": "isActive",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether the group is active",
+      "default": true
+    },
+    {
+      "name": "isSystem",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this is a protected system group",
+      "default": false
+    },
+    {
+      "name": "autoJoinRules",
+      "type": "object",
+      "mode": "stored",
+      "description": "Rules for automatic group membership"
+    },
+    {
+      "name": "settings",
+      "type": "object",
+      "mode": "stored",
+      "description": "Group-specific settings"
+    },
+    {
+      "name": "createdAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Creation timestamp",
+      "required": true
+    },
+    {
+      "name": "createdBy",
+      "type": "User",
+      "mode": "stored",
+      "description": "User who created the group"
+    },
+    {
+      "name": "updatedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Last update timestamp"
+    },
+    {
+      "name": "metadata",
+      "type": "object",
+      "mode": "stored",
+      "description": "Additional metadata"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "UserGroup",
+      "code": "SALES_TEAM",
+      "name": "Sales Team",
+      "description": "All sales department members",
+      "type": "team",
+      "memberCount": 25,
+      "isActive": true,
+      "isSystem": false,
+      "createdAt": "2024-01-01T00:00:00Z"
+    },
+    {
+      "@type": "UserGroup",
+      "code": "ADMINS",
+      "name": "System Administrators",
+      "description": "System administration group with full privileges",
+      "type": "security",
+      "maxMembers": 5,
+      "memberCount": 3,
+      "isActive": true,
+      "isSystem": true,
+      "createdAt": "2024-01-01T00:00:00Z"
+    }
+  ]
+}

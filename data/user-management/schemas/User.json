@@ -1,0 +1,184 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "User",
+  "description": "A system user account with authentication credentials, profile information, and access control",
+  "properties": [
+    {
+      "name": "username",
+      "type": "string",
+      "mode": "stored",
+      "description": "Unique username for authentication",
+      "required": true,
+      "unique": true,
+      "example": "john.doe"
+    },
+    {
+      "name": "email",
+      "type": "string",
+      "mode": "stored",
+      "description": "Primary email address",
+      "required": true,
+      "unique": true,
+      "format": "email",
+      "example": "john.doe@example.com"
+    },
+    {
+      "name": "emailVerified",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether the email address has been verified",
+      "default": false
+    },
+    {
+      "name": "emailVerifiedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Timestamp when email was verified"
+    },
+    {
+      "name": "passwordHash",
+      "type": "string",
+      "mode": "stored",
+      "description": "Hashed password (never store plain text)",
+      "required": true,
+      "private": true
+    },
+    {
+      "name": "passwordSalt",
+      "type": "string",
+      "mode": "stored",
+      "description": "Salt used for password hashing",
+      "private": true
+    },
+    {
+      "name": "passwordLastChangedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Last password change timestamp"
+    },
+    {
+      "name": "mustChangePassword",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Flag indicating user must change password on next login",
+      "default": false
+    },
+    {
+      "name": "person",
+      "type": "Person",
+      "mode": "stored",
+      "description": "Reference to Person entity for demographic information"
+    },
+    {
+      "name": "status",
+      "type": "string",
+      "mode": "enum",
+      "description": "Account status",
+      "enum": ["active", "inactive", "suspended", "locked", "pending"],
+      "default": "pending",
+      "example": "active"
+    },
+    {
+      "name": "statusReason",
+      "type": "string",
+      "mode": "stored",
+      "description": "Reason for current status (e.g., 'Too many failed login attempts')"
+    },
+    {
+      "name": "lastLoginAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Last successful login timestamp"
+    },
+    {
+      "name": "lastLoginIp",
+      "type": "string",
+      "mode": "stored",
+      "description": "IP address of last successful login"
+    },
+    {
+      "name": "lastActivityAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Last activity timestamp"
+    },
+    {
+      "name": "failedLoginAttempts",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Number of consecutive failed login attempts",
+      "default": 0
+    },
+    {
+      "name": "lockedUntil",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Account locked until this timestamp"
+    },
+    {
+      "name": "registeredAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Registration timestamp",
+      "required": true
+    },
+    {
+      "name": "registrationSource",
+      "type": "string",
+      "mode": "enum",
+      "description": "How the user registered",
+      "enum": ["web", "mobile", "api", "admin", "import", "social"],
+      "example": "web"
+    },
+    {
+      "name": "locale",
+      "type": "string",
+      "mode": "stored",
+      "description": "User's preferred locale (e.g., en-US, fr-FR)",
+      "example": "en-US"
+    },
+    {
+      "name": "timezone",
+      "type": "string",
+      "mode": "stored",
+      "description": "User's timezone",
+      "example": "America/New_York"
+    },
+    {
+      "name": "roles",
+      "type": "UserRole[]",
+      "mode": "stored",
+      "description": "User's assigned roles"
+    },
+    {
+      "name": "groups",
+      "type": "UserGroup[]",
+      "mode": "stored",
+      "description": "Groups the user belongs to"
+    },
+    {
+      "name": "metadata",
+      "type": "object",
+      "mode": "stored",
+      "description": "Additional metadata for extensibility"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "User",
+      "username": "john.doe",
+      "email": "john.doe@example.com",
+      "emailVerified": true,
+      "emailVerifiedAt": "2024-01-15T10:30:00Z",
+      "status": "active",
+      "lastLoginAt": "2024-03-15T14:30:00Z",
+      "lastLoginIp": "192.168.1.100",
+      "failedLoginAttempts": 0,
+      "registeredAt": "2024-01-01T09:00:00Z",
+      "registrationSource": "web",
+      "locale": "en-US",
+      "timezone": "America/New_York"
+    }
+  ]
+}

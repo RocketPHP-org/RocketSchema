@@ -1,0 +1,193 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "UserNotification",
+  "description": "Notifications and alerts for users",
+  "properties": [
+    {
+      "name": "user",
+      "type": "User",
+      "mode": "stored",
+      "description": "User who receives this notification",
+      "required": true
+    },
+    {
+      "name": "type",
+      "type": "string",
+      "mode": "enum",
+      "description": "Type of notification",
+      "enum": ["info", "warning", "error", "success", "security", "system"],
+      "required": true,
+      "example": "info"
+    },
+    {
+      "name": "category",
+      "type": "string",
+      "mode": "stored",
+      "description": "Notification category",
+      "required": true,
+      "example": "account"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "mode": "stored",
+      "description": "Notification title",
+      "required": true,
+      "example": "Password Changed"
+    },
+    {
+      "name": "message",
+      "type": "string",
+      "mode": "stored",
+      "description": "Notification message content",
+      "required": true
+    },
+    {
+      "name": "priority",
+      "type": "string",
+      "mode": "enum",
+      "description": "Notification priority",
+      "enum": ["low", "medium", "high", "urgent"],
+      "default": "medium",
+      "example": "high"
+    },
+    {
+      "name": "channel",
+      "type": "string",
+      "mode": "enum",
+      "description": "Delivery channel",
+      "enum": ["in_app", "email", "sms", "push", "webhook"],
+      "default": "in_app",
+      "example": "in_app"
+    },
+    {
+      "name": "status",
+      "type": "string",
+      "mode": "enum",
+      "description": "Notification status",
+      "enum": ["pending", "sent", "delivered", "read", "failed", "dismissed"],
+      "default": "pending",
+      "example": "sent"
+    },
+    {
+      "name": "sentAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When the notification was sent"
+    },
+    {
+      "name": "deliveredAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When the notification was delivered"
+    },
+    {
+      "name": "readAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When the notification was read"
+    },
+    {
+      "name": "dismissedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When the notification was dismissed"
+    },
+    {
+      "name": "expiresAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When the notification expires"
+    },
+    {
+      "name": "actionUrl",
+      "type": "string",
+      "mode": "stored",
+      "description": "URL for notification action",
+      "format": "uri"
+    },
+    {
+      "name": "actionLabel",
+      "type": "string",
+      "mode": "stored",
+      "description": "Label for action button",
+      "example": "View Details"
+    },
+    {
+      "name": "data",
+      "type": "object",
+      "mode": "stored",
+      "description": "Additional notification data"
+    },
+    {
+      "name": "relatedEntity",
+      "type": "object",
+      "mode": "stored",
+      "description": "Related entity reference"
+    },
+    {
+      "name": "retryCount",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Number of delivery retry attempts",
+      "default": 0,
+      "min": 0
+    },
+    {
+      "name": "failureReason",
+      "type": "string",
+      "mode": "stored",
+      "description": "Reason for delivery failure"
+    },
+    {
+      "name": "createdAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Creation timestamp",
+      "required": true
+    },
+    {
+      "name": "createdBy",
+      "type": "User",
+      "mode": "stored",
+      "description": "User or system that created the notification"
+    },
+    {
+      "name": "metadata",
+      "type": "object",
+      "mode": "stored",
+      "description": "Additional metadata"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "UserNotification",
+      "type": "security",
+      "category": "account",
+      "title": "New Login Detected",
+      "message": "A new login was detected from an unrecognized device",
+      "priority": "high",
+      "channel": "in_app",
+      "status": "sent",
+      "sentAt": "2024-03-15T10:00:00Z",
+      "actionUrl": "/security/recent-activity",
+      "actionLabel": "Review Activity",
+      "createdAt": "2024-03-15T10:00:00Z"
+    },
+    {
+      "@type": "UserNotification",
+      "type": "info",
+      "category": "system",
+      "title": "System Maintenance",
+      "message": "System will be under maintenance on March 20, 2024 from 2:00 AM to 4:00 AM",
+      "priority": "medium",
+      "channel": "email",
+      "status": "delivered",
+      "sentAt": "2024-03-10T09:00:00Z",
+      "deliveredAt": "2024-03-10T09:01:00Z",
+      "expiresAt": "2024-03-20T06:00:00Z",
+      "createdAt": "2024-03-10T09:00:00Z"
+    }
+  ]
+}

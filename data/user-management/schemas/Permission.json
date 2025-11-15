@@ -1,0 +1,131 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "Permission",
+  "description": "A granular permission that can be assigned to roles for access control",
+  "properties": [
+    {
+      "name": "code",
+      "type": "string",
+      "mode": "stored",
+      "description": "Unique permission code",
+      "required": true,
+      "unique": true,
+      "example": "user.create"
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "mode": "stored",
+      "description": "Human-readable permission name",
+      "required": true,
+      "example": "Create User"
+    },
+    {
+      "name": "description",
+      "type": "string",
+      "mode": "stored",
+      "description": "Detailed description of what this permission allows",
+      "example": "Allows creating new user accounts"
+    },
+    {
+      "name": "resource",
+      "type": "string",
+      "mode": "stored",
+      "description": "Resource this permission applies to",
+      "required": true,
+      "example": "user"
+    },
+    {
+      "name": "action",
+      "type": "string",
+      "mode": "stored",
+      "description": "Action allowed on the resource",
+      "required": true,
+      "example": "create"
+    },
+    {
+      "name": "scope",
+      "type": "string",
+      "mode": "enum",
+      "description": "Scope of the permission",
+      "enum": ["global", "organization", "team", "self"],
+      "default": "organization",
+      "example": "organization"
+    },
+    {
+      "name": "category",
+      "type": "string",
+      "mode": "stored",
+      "description": "Category for grouping permissions",
+      "example": "User Management"
+    },
+    {
+      "name": "isSystem",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this is a protected system permission",
+      "default": false
+    },
+    {
+      "name": "dependencies",
+      "type": "Permission[]",
+      "mode": "stored",
+      "description": "Other permissions required for this permission to be effective"
+    },
+    {
+      "name": "conditions",
+      "type": "object",
+      "mode": "stored",
+      "description": "Additional conditions or constraints for the permission"
+    },
+    {
+      "name": "isActive",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether the permission is active",
+      "default": true
+    },
+    {
+      "name": "createdAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Creation timestamp",
+      "required": true
+    },
+    {
+      "name": "metadata",
+      "type": "object",
+      "mode": "stored",
+      "description": "Additional metadata for extensibility"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "Permission",
+      "code": "user.create",
+      "name": "Create User",
+      "description": "Allows creating new user accounts",
+      "resource": "user",
+      "action": "create",
+      "scope": "organization",
+      "category": "User Management",
+      "isSystem": true,
+      "isActive": true,
+      "createdAt": "2024-01-01T00:00:00Z"
+    },
+    {
+      "@type": "Permission",
+      "code": "user.read",
+      "name": "View User",
+      "description": "Allows viewing user information",
+      "resource": "user",
+      "action": "read",
+      "scope": "organization",
+      "category": "User Management",
+      "isSystem": true,
+      "isActive": true,
+      "createdAt": "2024-01-01T00:00:00Z"
+    }
+  ]
+}

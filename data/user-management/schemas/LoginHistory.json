@@ -1,0 +1,128 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "LoginHistory",
+  "description": "Audit log of user login attempts and authentications",
+  "properties": [
+    {
+      "name": "user",
+      "type": "User",
+      "mode": "stored",
+      "description": "User who attempted to login (null for unknown usernames)"
+    },
+    {
+      "name": "username",
+      "type": "string",
+      "mode": "stored",
+      "description": "Username used in the login attempt",
+      "required": true
+    },
+    {
+      "name": "timestamp",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When the login attempt occurred",
+      "required": true
+    },
+    {
+      "name": "success",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether the login was successful",
+      "required": true
+    },
+    {
+      "name": "failureReason",
+      "type": "string",
+      "mode": "enum",
+      "description": "Reason for login failure",
+      "enum": ["invalid_credentials", "account_locked", "account_suspended", "account_inactive", "mfa_required", "mfa_failed", "password_expired"],
+      "example": "invalid_credentials"
+    },
+    {
+      "name": "authMethod",
+      "type": "string",
+      "mode": "enum",
+      "description": "Authentication method used",
+      "enum": ["password", "oauth", "saml", "ldap", "mfa", "biometric", "api_key"],
+      "default": "password",
+      "example": "password"
+    },
+    {
+      "name": "ipAddress",
+      "type": "string",
+      "mode": "stored",
+      "description": "IP address of the login attempt",
+      "example": "192.168.1.100"
+    },
+    {
+      "name": "userAgent",
+      "type": "string",
+      "mode": "stored",
+      "description": "User agent string"
+    },
+    {
+      "name": "deviceFingerprint",
+      "type": "string",
+      "mode": "stored",
+      "description": "Device fingerprint for fraud detection"
+    },
+    {
+      "name": "location",
+      "type": "object",
+      "mode": "stored",
+      "description": "Geolocation data"
+    },
+    {
+      "name": "riskScore",
+      "type": "number",
+      "mode": "stored",
+      "description": "Calculated risk score for this login attempt (0-100)",
+      "min": 0,
+      "max": 100
+    },
+    {
+      "name": "riskFactors",
+      "type": "string[]",
+      "mode": "stored",
+      "description": "Risk factors identified",
+      "example": ["new_device", "unusual_location"]
+    },
+    {
+      "name": "sessionId",
+      "type": "string",
+      "mode": "stored",
+      "description": "Session ID if login was successful"
+    },
+    {
+      "name": "metadata",
+      "type": "object",
+      "mode": "stored",
+      "description": "Additional metadata"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "LoginHistory",
+      "username": "john.doe",
+      "timestamp": "2024-03-15T10:00:00Z",
+      "success": true,
+      "authMethod": "password",
+      "ipAddress": "192.168.1.100",
+      "userAgent": "Mozilla/5.0...",
+      "riskScore": 15,
+      "sessionId": "sess_abc123"
+    },
+    {
+      "@type": "LoginHistory",
+      "username": "jane.smith",
+      "timestamp": "2024-03-15T10:05:00Z",
+      "success": false,
+      "failureReason": "invalid_credentials",
+      "authMethod": "password",
+      "ipAddress": "10.0.0.50",
+      "riskScore": 45,
+      "riskFactors": ["multiple_failed_attempts", "new_device"]
+    }
+  ]
+}

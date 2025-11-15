@@ -1,7 +1,0 @@
-{
-  "@type": "Schema",
-  "@context": "https://rocketschema.org/context",
-  "name": "User",
-  "description": "A user account for system access and authentication - represents a Person with login credentials and permissions",
-  "properties": []
-}

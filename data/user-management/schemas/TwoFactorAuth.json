@@ -1,0 +1,150 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "TwoFactorAuth",
+  "description": "Two-factor authentication configuration for enhanced security",
+  "properties": [
+    {
+      "name": "user",
+      "type": "User",
+      "mode": "stored",
+      "description": "User this 2FA configuration belongs to",
+      "required": true
+    },
+    {
+      "name": "method",
+      "type": "string",
+      "mode": "enum",
+      "description": "2FA method",
+      "enum": ["totp", "sms", "email", "authenticator", "hardware_key", "biometric", "backup_codes"],
+      "required": true,
+      "example": "totp"
+    },
+    {
+      "name": "isEnabled",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether 2FA is enabled",
+      "default": false
+    },
+    {
+      "name": "isPrimary",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this is the primary 2FA method",
+      "default": false
+    },
+    {
+      "name": "secret",
+      "type": "string",
+      "mode": "stored",
+      "description": "Encrypted secret for TOTP",
+      "private": true
+    },
+    {
+      "name": "phoneNumber",
+      "type": "string",
+      "mode": "stored",
+      "description": "Phone number for SMS-based 2FA",
+      "format": "phone"
+    },
+    {
+      "name": "email",
+      "type": "string",
+      "mode": "stored",
+      "description": "Email for email-based 2FA",
+      "format": "email"
+    },
+    {
+      "name": "deviceInfo",
+      "type": "object",
+      "mode": "stored",
+      "description": "Information about hardware key or authenticator device"
+    },
+    {
+      "name": "backupCodes",
+      "type": "string[]",
+      "mode": "stored",
+      "description": "Encrypted backup codes",
+      "private": true
+    },
+    {
+      "name": "usedBackupCodes",
+      "type": "string[]",
+      "mode": "stored",
+      "description": "List of used backup codes",
+      "private": true
+    },
+    {
+      "name": "verifiedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When the 2FA method was verified"
+    },
+    {
+      "name": "lastUsedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Last time this 2FA method was used"
+    },
+    {
+      "name": "failedAttempts",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Number of consecutive failed 2FA attempts",
+      "default": 0
+    },
+    {
+      "name": "lockedUntil",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "2FA locked until this timestamp due to failed attempts"
+    },
+    {
+      "name": "trustedDevices",
+      "type": "object[]",
+      "mode": "stored",
+      "description": "List of trusted devices that don't require 2FA"
+    },
+    {
+      "name": "createdAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Creation timestamp",
+      "required": true
+    },
+    {
+      "name": "updatedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Last update timestamp"
+    },
+    {
+      "name": "metadata",
+      "type": "object",
+      "mode": "stored",
+      "description": "Additional metadata"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "TwoFactorAuth",
+      "method": "totp",
+      "isEnabled": true,
+      "isPrimary": true,
+      "verifiedAt": "2024-01-15T10:00:00Z",
+      "lastUsedAt": "2024-03-15T14:30:00Z",
+      "failedAttempts": 0,
+      "createdAt": "2024-01-15T10:00:00Z"
+    },
+    {
+      "@type": "TwoFactorAuth",
+      "method": "sms",
+      "isEnabled": true,
+      "isPrimary": false,
+      "phoneNumber": "+1234567890",
+      "verifiedAt": "2024-01-20T11:00:00Z",
+      "createdAt": "2024-01-20T11:00:00Z"
+    }
+  ]
+}

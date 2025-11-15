@@ -1,0 +1,126 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "Role",
+  "description": "A role in the system that groups permissions and can be assigned to users",
+  "properties": [
+    {
+      "name": "code",
+      "type": "string",
+      "mode": "stored",
+      "description": "Unique role code/identifier",
+      "required": true,
+      "unique": true,
+      "example": "ADMIN"
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "mode": "stored",
+      "description": "Human-readable role name",
+      "required": true,
+      "example": "Administrator"
+    },
+    {
+      "name": "description",
+      "type": "string",
+      "mode": "stored",
+      "description": "Detailed description of the role's purpose",
+      "example": "Full system administration privileges"
+    },
+    {
+      "name": "type",
+      "type": "string",
+      "mode": "enum",
+      "description": "Type of role",
+      "enum": ["system", "organization", "custom"],
+      "default": "custom",
+      "example": "system"
+    },
+    {
+      "name": "isSystem",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this is a protected system role that cannot be modified",
+      "default": false
+    },
+    {
+      "name": "isDefault",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this role is assigned by default to new users",
+      "default": false
+    },
+    {
+      "name": "priority",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Role priority for conflict resolution (higher number = higher priority)",
+      "default": 0
+    },
+    {
+      "name": "permissions",
+      "type": "RolePermission[]",
+      "mode": "stored",
+      "description": "Permissions assigned to this role"
+    },
+    {
+      "name": "parentRole",
+      "type": "Role",
+      "mode": "stored",
+      "description": "Parent role for inheritance hierarchy"
+    },
+    {
+      "name": "isActive",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether the role is active and can be assigned",
+      "default": true
+    },
+    {
+      "name": "createdAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Creation timestamp",
+      "required": true
+    },
+    {
+      "name": "createdBy",
+      "type": "User",
+      "mode": "stored",
+      "description": "User who created this role"
+    },
+    {
+      "name": "metadata",
+      "type": "object",
+      "mode": "stored",
+      "description": "Additional metadata for extensibility"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "Role",
+      "code": "ADMIN",
+      "name": "Administrator",
+      "description": "Full system administration privileges",
+      "type": "system",
+      "isSystem": true,
+      "isDefault": false,
+      "priority": 100,
+      "isActive": true,
+      "createdAt": "2024-01-01T00:00:00Z"
+    },
+    {
+      "@type": "Role",
+      "code": "USER",
+      "name": "Standard User",
+      "description": "Basic user access",
+      "type": "system",
+      "isSystem": true,
+      "isDefault": true,
+      "priority": 10,
+      "isActive": true,
+      "createdAt": "2024-01-01T00:00:00Z"
+    }
+  ]
+}

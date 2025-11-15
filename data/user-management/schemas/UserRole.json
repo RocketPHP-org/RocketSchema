@@ -1,0 +1,93 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "UserRole",
+  "description": "Association between users and roles with temporal validity",
+  "properties": [
+    {
+      "name": "user",
+      "type": "User",
+      "mode": "stored",
+      "description": "Reference to the user",
+      "required": true
+    },
+    {
+      "name": "role",
+      "type": "Role",
+      "mode": "stored",
+      "description": "Reference to the role",
+      "required": true
+    },
+    {
+      "name": "scope",
+      "type": "string",
+      "mode": "enum",
+      "description": "Scope of the role assignment",
+      "enum": ["global", "organization", "department", "project"],
+      "default": "organization"
+    },
+    {
+      "name": "scopeId",
+      "type": "string",
+      "mode": "stored",
+      "description": "ID of the scope entity (e.g., organization ID, department ID)"
+    },
+    {
+      "name": "assignedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When the role was assigned",
+      "required": true
+    },
+    {
+      "name": "assignedBy",
+      "type": "User",
+      "mode": "stored",
+      "description": "User who assigned this role"
+    },
+    {
+      "name": "validFrom",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Start of validity period",
+      "required": true
+    },
+    {
+      "name": "validUntil",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "End of validity period (null for permanent assignment)"
+    },
+    {
+      "name": "isActive",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this role assignment is currently active",
+      "default": true
+    },
+    {
+      "name": "reason",
+      "type": "string",
+      "mode": "stored",
+      "description": "Reason for role assignment"
+    },
+    {
+      "name": "metadata",
+      "type": "object",
+      "mode": "stored",
+      "description": "Additional metadata"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "UserRole",
+      "scope": "organization",
+      "scopeId": "org-123",
+      "assignedAt": "2024-01-15T10:00:00Z",
+      "validFrom": "2024-01-15T10:00:00Z",
+      "validUntil": null,
+      "isActive": true,
+      "reason": "New employee onboarding"
+    }
+  ]
+}

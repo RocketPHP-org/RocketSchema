@@ -1,0 +1,109 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "UserPreference",
+  "description": "User preferences and settings for customization",
+  "properties": [
+    {
+      "name": "user",
+      "type": "User",
+      "mode": "stored",
+      "description": "User these preferences belong to",
+      "required": true
+    },
+    {
+      "name": "category",
+      "type": "string",
+      "mode": "stored",
+      "description": "Preference category",
+      "required": true,
+      "example": "notification"
+    },
+    {
+      "name": "key",
+      "type": "string",
+      "mode": "stored",
+      "description": "Preference key within the category",
+      "required": true,
+      "example": "email_marketing"
+    },
+    {
+      "name": "value",
+      "type": "object",
+      "mode": "stored",
+      "description": "Preference value (can be any JSON value)",
+      "required": true
+    },
+    {
+      "name": "type",
+      "type": "string",
+      "mode": "enum",
+      "description": "Type of preference value",
+      "enum": ["boolean", "string", "number", "array", "object"],
+      "example": "boolean"
+    },
+    {
+      "name": "isUserModifiable",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether users can modify this preference",
+      "default": true
+    },
+    {
+      "name": "defaultValue",
+      "type": "object",
+      "mode": "stored",
+      "description": "Default value if not set"
+    },
+    {
+      "name": "validValues",
+      "type": "object",
+      "mode": "stored",
+      "description": "List of valid values or validation rules"
+    },
+    {
+      "name": "description",
+      "type": "string",
+      "mode": "stored",
+      "description": "Description of what this preference controls"
+    },
+    {
+      "name": "updatedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Last update timestamp",
+      "required": true
+    },
+    {
+      "name": "metadata",
+      "type": "object",
+      "mode": "stored",
+      "description": "Additional metadata"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "UserPreference",
+      "category": "notification",
+      "key": "email_marketing",
+      "value": true,
+      "type": "boolean",
+      "isUserModifiable": true,
+      "defaultValue": false,
+      "description": "Receive marketing emails",
+      "updatedAt": "2024-03-15T10:00:00Z"
+    },
+    {
+      "@type": "UserPreference",
+      "category": "ui",
+      "key": "theme",
+      "value": "dark",
+      "type": "string",
+      "isUserModifiable": true,
+      "defaultValue": "light",
+      "validValues": ["light", "dark", "auto"],
+      "description": "UI theme preference",
+      "updatedAt": "2024-03-15T10:00:00Z"
+    }
+  ]
+}

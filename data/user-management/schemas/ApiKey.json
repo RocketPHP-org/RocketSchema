@@ -1,0 +1,202 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "ApiKey",
+  "description": "API key for machine-to-machine authentication and service access",
+  "properties": [
+    {
+      "name": "key",
+      "type": "string",
+      "mode": "stored",
+      "description": "The API key (should be hashed)",
+      "required": true,
+      "unique": true,
+      "private": true
+    },
+    {
+      "name": "keyPrefix",
+      "type": "string",
+      "mode": "stored",
+      "description": "Visible prefix of the key for identification",
+      "required": true,
+      "example": "sk_live_abc"
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "mode": "stored",
+      "description": "Friendly name for the API key",
+      "required": true,
+      "example": "Production API Key"
+    },
+    {
+      "name": "description",
+      "type": "string",
+      "mode": "stored",
+      "description": "Description of the key's purpose"
+    },
+    {
+      "name": "type",
+      "type": "string",
+      "mode": "enum",
+      "description": "Type of API key",
+      "enum": ["public", "secret", "restricted", "test"],
+      "default": "secret",
+      "example": "secret"
+    },
+    {
+      "name": "user",
+      "type": "User",
+      "mode": "stored",
+      "description": "User who owns this API key"
+    },
+    {
+      "name": "organization",
+      "type": "Organization",
+      "mode": "stored",
+      "description": "Organization that owns this API key"
+    },
+    {
+      "name": "permissions",
+      "type": "Permission[]",
+      "mode": "stored",
+      "description": "Specific permissions granted to this API key"
+    },
+    {
+      "name": "scopes",
+      "type": "string[]",
+      "mode": "stored",
+      "description": "OAuth-style scopes for this key",
+      "example": ["read:users", "write:products"]
+    },
+    {
+      "name": "rateLimit",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Requests per hour limit",
+      "default": 1000,
+      "min": 0
+    },
+    {
+      "name": "rateLimitRemaining",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Remaining requests in current window"
+    },
+    {
+      "name": "rateLimitResetsAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When the rate limit resets"
+    },
+    {
+      "name": "ipWhitelist",
+      "type": "string[]",
+      "mode": "stored",
+      "description": "List of allowed IP addresses/ranges",
+      "example": ["192.168.1.0/24", "10.0.0.1"]
+    },
+    {
+      "name": "allowedOrigins",
+      "type": "string[]",
+      "mode": "stored",
+      "description": "Allowed origins for browser-based requests",
+      "example": ["https://example.com", "https://app.example.com"]
+    },
+    {
+      "name": "validFrom",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Start of validity period",
+      "required": true
+    },
+    {
+      "name": "validUntil",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "End of validity period (null for no expiration)"
+    },
+    {
+      "name": "lastUsedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Last time this key was used"
+    },
+    {
+      "name": "lastUsedIp",
+      "type": "string",
+      "mode": "stored",
+      "description": "IP address of last use"
+    },
+    {
+      "name": "usageCount",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Total number of times used",
+      "default": 0,
+      "min": 0
+    },
+    {
+      "name": "isActive",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether the key is active",
+      "default": true
+    },
+    {
+      "name": "revokedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When the key was revoked"
+    },
+    {
+      "name": "revokedBy",
+      "type": "User",
+      "mode": "stored",
+      "description": "User who revoked the key"
+    },
+    {
+      "name": "revokedReason",
+      "type": "string",
+      "mode": "stored",
+      "description": "Reason for revocation"
+    },
+    {
+      "name": "createdAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Creation timestamp",
+      "required": true
+    },
+    {
+      "name": "createdBy",
+      "type": "User",
+      "mode": "stored",
+      "description": "User who created the key"
+    },
+    {
+      "name": "metadata",
+      "type": "object",
+      "mode": "stored",
+      "description": "Additional metadata"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "ApiKey",
+      "keyPrefix": "sk_live_abc",
+      "name": "Production API Key",
+      "description": "Main production API key for e-commerce integration",
+      "type": "secret",
+      "scopes": ["read:products", "write:orders"],
+      "rateLimit": 5000,
+      "validFrom": "2024-01-01T00:00:00Z",
+      "validUntil": null,
+      "lastUsedAt": "2024-03-15T14:30:00Z",
+      "lastUsedIp": "203.0.113.0",
+      "usageCount": 15420,
+      "isActive": true,
+      "createdAt": "2024-01-01T00:00:00Z"
+    }
+  ]
+}

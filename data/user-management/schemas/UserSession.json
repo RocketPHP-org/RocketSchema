@@ -1,0 +1,132 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "UserSession",
+  "description": "An active user session for tracking authentication and activity",
+  "properties": [
+    {
+      "name": "sessionId",
+      "type": "string",
+      "mode": "stored",
+      "description": "Unique session identifier",
+      "required": true,
+      "unique": true
+    },
+    {
+      "name": "user",
+      "type": "User",
+      "mode": "stored",
+      "description": "User associated with this session",
+      "required": true
+    },
+    {
+      "name": "tokenHash",
+      "type": "string",
+      "mode": "stored",
+      "description": "Hashed session token",
+      "private": true
+    },
+    {
+      "name": "refreshTokenHash",
+      "type": "string",
+      "mode": "stored",
+      "description": "Hashed refresh token",
+      "private": true
+    },
+    {
+      "name": "ipAddress",
+      "type": "string",
+      "mode": "stored",
+      "description": "IP address of the session",
+      "example": "192.168.1.100"
+    },
+    {
+      "name": "userAgent",
+      "type": "string",
+      "mode": "stored",
+      "description": "User agent string",
+      "example": "Mozilla/5.0..."
+    },
+    {
+      "name": "deviceType",
+      "type": "string",
+      "mode": "enum",
+      "description": "Type of device",
+      "enum": ["desktop", "mobile", "tablet", "api", "unknown"],
+      "example": "desktop"
+    },
+    {
+      "name": "deviceInfo",
+      "type": "object",
+      "mode": "stored",
+      "description": "Additional device information"
+    },
+    {
+      "name": "location",
+      "type": "object",
+      "mode": "stored",
+      "description": "Geolocation information if available"
+    },
+    {
+      "name": "createdAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Session creation time",
+      "required": true
+    },
+    {
+      "name": "lastActivityAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Last activity timestamp",
+      "required": true
+    },
+    {
+      "name": "expiresAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Session expiration time",
+      "required": true
+    },
+    {
+      "name": "isActive",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether the session is active",
+      "default": true
+    },
+    {
+      "name": "terminatedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When the session was terminated"
+    },
+    {
+      "name": "terminationReason",
+      "type": "string",
+      "mode": "enum",
+      "description": "Reason for termination",
+      "enum": ["logout", "timeout", "revoked", "expired", "security"],
+      "example": "logout"
+    },
+    {
+      "name": "metadata",
+      "type": "object",
+      "mode": "stored",
+      "description": "Additional metadata"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "UserSession",
+      "sessionId": "sess_abc123xyz",
+      "ipAddress": "192.168.1.100",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+      "deviceType": "desktop",
+      "createdAt": "2024-03-15T10:00:00Z",
+      "lastActivityAt": "2024-03-15T10:30:00Z",
+      "expiresAt": "2024-03-15T22:00:00Z",
+      "isActive": true
+    }
+  ]
+}

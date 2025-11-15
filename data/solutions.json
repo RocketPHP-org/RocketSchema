@@ -6,6 +6,7 @@
     "icon": "user-heart",
     "color": "purple",
     "domains": [
+      "user-management",
       "support-types",
       "reference-data",
       "core-entities",
@@ -13,6 +14,8 @@
       "crm"
     ],
     "features": [
+      "Advanced User Authentication",
+      "Role-Based Access Control",
       "Customer Management",
       "Marketing Consent (GDPR)",
       "Customer Segmentation",
@@ -35,6 +38,7 @@
     "icon": "shopping-cart",
     "color": "blue",
     "domains": [
+      "user-management",
       "support-types",
       "reference-data",
       "core-entities",
@@ -51,6 +55,7 @@
       "Payment Processing",
       "Inventory Management",
       "Customer Accounts",
+      "User Authentication & 2FA",
       "Reviews & Ratings",
       "Shipping & Fulfillment"
     ],
@@ -69,6 +74,7 @@
     "icon": "building",
     "color": "green",
     "domains": [
+      "user-management",
       "support-types",
       "reference-data",
       "core-entities",
@@ -86,6 +92,7 @@
       "Inventory Control",
       "Fleet Management",
       "Customer Relations",
+      "User & Access Management",
       "Supplier Management",
       "Document Management"
     ],
@@ -104,6 +111,7 @@
     "icon": "heart-pulse",
     "color": "red",
     "domains": [
+      "user-management",
       "support-types",
       "reference-data",
       "core-entities",
@@ -124,6 +132,7 @@
       "Prescription Management",
       "Lab Results",
       "Medical Billing",
+      "Secure User Authentication",
       "HIPAA Compliance"
     ],
     "useCases": [
@@ -141,6 +150,7 @@
     "icon": "user-check",
     "color": "orange",
     "domains": [
+      "user-management",
       "support-types",
       "reference-data",
       "core-entities",
@@ -151,6 +161,7 @@
     ],
     "features": [
       "Employee Records",
+      "User Access Control",
       "Recruitment & ATS",
       "Payroll Processing",
       "Performance Management",
@@ -173,6 +184,7 @@
     "icon": "truck",
     "color": "yellow",
     "domains": [
+      "user-management",
       "support-types",
       "reference-data",
       "core-entities",
@@ -186,6 +198,7 @@
       "Maintenance Scheduling",
       "Fuel Management",
       "Driver Management",
+      "User Authentication",
       "Accident Reporting",
       "Fleet Analytics",
       "Cost Management"
@@ -205,6 +218,7 @@
     "icon": "book-open",
     "color": "indigo",
     "domains": [
+      "user-management",
       "support-types",
       "reference-data",
       "core-entities",
@@ -216,7 +230,7 @@
       "Article Management",
       "Version Control",
       "Search & Discovery",
-      "Permissions & ACL",
+      "Advanced Permissions & ACL",
       "Categories & Tags",
       "Comments & Collaboration"
     ],
@@ -235,6 +249,7 @@
     "icon": "rocket",
     "color": "cyan",
     "domains": [
+      "user-management",
       "support-types",
       "reference-data",
       "core-entities",
@@ -244,9 +259,10 @@
       "tax"
     ],
     "features": [
-      "User Management",
+      "Advanced User Management",
       "Organization/Tenants",
-      "Authentication",
+      "Multi-Factor Authentication",
+      "API Key Management",
       "Subscription Billing",
       "Audit Logging",
       "External Integrations",

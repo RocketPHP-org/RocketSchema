@@ -1,0 +1,171 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "OAuthProvider",
+  "description": "OAuth/SSO provider configuration for external authentication",
+  "properties": [
+    {
+      "name": "user",
+      "type": "User",
+      "mode": "stored",
+      "description": "User account linked to this OAuth provider",
+      "required": true
+    },
+    {
+      "name": "provider",
+      "type": "string",
+      "mode": "enum",
+      "description": "OAuth provider name",
+      "enum": ["google", "facebook", "github", "microsoft", "apple", "linkedin", "twitter", "gitlab", "okta", "auth0", "saml", "custom"],
+      "required": true,
+      "example": "google"
+    },
+    {
+      "name": "providerUserId",
+      "type": "string",
+      "mode": "stored",
+      "description": "User ID from the OAuth provider",
+      "required": true
+    },
+    {
+      "name": "providerEmail",
+      "type": "string",
+      "mode": "stored",
+      "description": "Email from the OAuth provider",
+      "format": "email"
+    },
+    {
+      "name": "providerUsername",
+      "type": "string",
+      "mode": "stored",
+      "description": "Username from the OAuth provider"
+    },
+    {
+      "name": "providerDisplayName",
+      "type": "string",
+      "mode": "stored",
+      "description": "Display name from the OAuth provider"
+    },
+    {
+      "name": "providerAvatarUrl",
+      "type": "string",
+      "mode": "stored",
+      "description": "Avatar URL from the OAuth provider",
+      "format": "uri"
+    },
+    {
+      "name": "accessToken",
+      "type": "string",
+      "mode": "stored",
+      "description": "Encrypted OAuth access token",
+      "private": true
+    },
+    {
+      "name": "refreshToken",
+      "type": "string",
+      "mode": "stored",
+      "description": "Encrypted OAuth refresh token",
+      "private": true
+    },
+    {
+      "name": "tokenExpiresAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When the access token expires"
+    },
+    {
+      "name": "scopes",
+      "type": "string[]",
+      "mode": "stored",
+      "description": "OAuth scopes granted",
+      "example": ["email", "profile", "openid"]
+    },
+    {
+      "name": "isPrimary",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this is the primary OAuth provider",
+      "default": false
+    },
+    {
+      "name": "isVerified",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether the provider account is verified",
+      "default": false
+    },
+    {
+      "name": "lastSyncAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Last time profile was synced from provider"
+    },
+    {
+      "name": "linkedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When the provider was linked",
+      "required": true
+    },
+    {
+      "name": "lastLoginAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Last login using this provider"
+    },
+    {
+      "name": "providerData",
+      "type": "object",
+      "mode": "stored",
+      "description": "Additional data from the provider"
+    },
+    {
+      "name": "isActive",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this provider link is active",
+      "default": true
+    },
+    {
+      "name": "unlinkedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When the provider was unlinked"
+    },
+    {
+      "name": "metadata",
+      "type": "object",
+      "mode": "stored",
+      "description": "Additional metadata"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "OAuthProvider",
+      "provider": "google",
+      "providerUserId": "118234567890123456789",
+      "providerEmail": "john.doe@gmail.com",
+      "providerDisplayName": "John Doe",
+      "providerAvatarUrl": "https://lh3.googleusercontent.com/a/example",
+      "scopes": ["email", "profile", "openid"],
+      "isPrimary": true,
+      "isVerified": true,
+      "linkedAt": "2024-01-15T10:00:00Z",
+      "lastLoginAt": "2024-03-15T14:30:00Z",
+      "isActive": true
+    },
+    {
+      "@type": "OAuthProvider",
+      "provider": "github",
+      "providerUserId": "12345678",
+      "providerUsername": "johndoe",
+      "providerEmail": "john@example.com",
+      "providerDisplayName": "John Doe",
+      "scopes": ["user", "repo"],
+      "isPrimary": false,
+      "isVerified": true,
+      "linkedAt": "2024-02-01T11:00:00Z",
+      "isActive": true
+    }
+  ]
+}
