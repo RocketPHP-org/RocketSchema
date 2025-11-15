@@ -5,19 +5,18 @@
   "description": "Ensures atomic, consistent access control changes by grouping related permission modifications into transactional units that either completely succeed or completely fail. This entity addresses the critical challenge of maintaining authorization integrity when multiple interdependent changes must occur together - like rotating roles during organizational restructuring, migrating permissions between systems, or implementing new compliance policies. Each transaction encapsulates a series of access control operations (grant, revoke, modify) with ACID properties: Atomicity ensures all changes apply or none do, Consistency maintains valid permission states throughout, Isolation prevents concurrent transactions from interfering, and Durability ensures completed changes persist. Transactions support complex scenarios like swapping user roles (must revoke old before granting new), cascading permission updates (parent change affects all children), and compensating transactions (automatic rollback operations). The entity tracks transaction state through phases: planning (validating changes), execution (applying changes), verification (confirming success), and commitment (making permanent). It handles distributed transactions across multiple systems, two-phase commit protocols for coordination, and saga patterns for long-running operations. Transaction logs provide audit trails for compliance, enable point-in-time recovery for access control state, and support what-if analysis for proposed changes. This transactional approach is essential for maintaining security during bulk permission updates, preventing privilege escalation during transitions, and ensuring zero-downtime access control migrations.",
   "properties": [
     {
-      "name": "transactionId",
-      "type": "uuid",
-      "mode": "stored",
-      "description": "Unique identifier for this transaction",
-      "required": true,
-      "unique": true
-    },
-    {
       "name": "transactionType",
       "type": "string",
       "mode": "enum",
       "description": "Category of transaction",
-      "enum": ["role_rotation", "permission_migration", "bulk_update", "policy_deployment", "emergency_change", "rollback"],
+      "enum": [
+        "role_rotation",
+        "permission_migration",
+        "bulk_update",
+        "policy_deployment",
+        "emergency_change",
+        "rollback"
+      ],
       "required": true
     },
     {
@@ -41,7 +40,18 @@
       "type": "string",
       "mode": "enum",
       "description": "Current transaction state",
-      "enum": ["draft", "validating", "preparing", "executing", "verifying", "committing", "committed", "rolling_back", "rolled_back", "failed"],
+      "enum": [
+        "draft",
+        "validating",
+        "preparing",
+        "executing",
+        "verifying",
+        "committing",
+        "committed",
+        "rolling_back",
+        "rolled_back",
+        "failed"
+      ],
       "default": "draft",
       "required": true
     },
@@ -50,7 +60,12 @@
       "type": "string",
       "mode": "enum",
       "description": "Transaction isolation level",
-      "enum": ["read_uncommitted", "read_committed", "repeatable_read", "serializable"],
+      "enum": [
+        "read_uncommitted",
+        "read_committed",
+        "repeatable_read",
+        "serializable"
+      ],
       "default": "serializable"
     },
     {
@@ -58,7 +73,11 @@
       "type": "string",
       "mode": "enum",
       "description": "How atomicity is enforced",
-      "enum": ["all_or_nothing", "best_effort", "eventual_consistency"],
+      "enum": [
+        "all_or_nothing",
+        "best_effort",
+        "eventual_consistency"
+      ],
       "default": "all_or_nothing"
     },
     {
@@ -233,7 +252,6 @@
   "examples": [
     {
       "@type": "AccessControlTransaction",
-      "transactionId": "txn_role_rotation_001",
       "transactionType": "role_rotation",
       "description": "Quarterly security role rotation - Q1 2024 admin privilege reduction",
       "operations": "[{\"seq\":1,\"op\":\"revoke\",\"type\":\"role\",\"target\":\"role_super_admin\",\"users\":[\"user_001\",\"user_002\"]},{\"seq\":2,\"op\":\"grant\",\"type\":\"role\",\"target\":\"role_admin\",\"users\":[\"user_001\",\"user_002\"]},{\"seq\":3,\"op\":\"grant\",\"type\":\"role\",\"target\":\"role_super_admin\",\"users\":[\"user_003\"]},{\"seq\":4,\"op\":\"audit\",\"type\":\"log\",\"message\":\"Q1 2024 role rotation completed\"}]",
@@ -259,7 +277,6 @@
     },
     {
       "@type": "AccessControlTransaction",
-      "transactionId": "txn_emergency_002",
       "transactionType": "emergency_change",
       "description": "Emergency revocation of compromised contractor access",
       "operations": "[{\"seq\":1,\"op\":\"revoke\",\"type\":\"all_permissions\",\"user\":\"contractor_compromised\"},{\"seq\":2,\"op\":\"revoke\",\"type\":\"all_roles\",\"user\":\"contractor_compromised\"},{\"seq\":3,\"op\":\"disable\",\"type\":\"account\",\"user\":\"contractor_compromised\"},{\"seq\":4,\"op\":\"notify\",\"targets\":[\"security_team\",\"contractor_manager\"]}]",

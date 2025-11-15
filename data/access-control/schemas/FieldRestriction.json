@@ -5,14 +5,6 @@
   "description": "Controls access to specific fields within data records, implementing column-level security that determines which attributes users can see, modify, or interact with regardless of their access to the parent record. This granular control is essential when users need access to records but shouldn't see all fields - for example, HR staff might access employee records but not see salary information, or customer service reps might view orders but not credit card details. Field restrictions support various protection levels: complete hiding (field doesn't exist), masking (showing '****' instead of values), redaction (showing partial data like last 4 digits), transformation (showing ranges instead of exact values), and read-only (visible but not editable). The entity handles field dependencies where restricting one field affects others, inheritance where child objects inherit parent field restrictions, and conditional restrictions based on field values or user context. It enables compliance with privacy regulations requiring data minimization, implements need-to-know principles for sensitive attributes, and supports dynamic schemas where different users see different views of the same data. Field restrictions can be temporary (hiding data during blackout periods), progressive (revealing more fields as trust increases), or contextual (showing fields only in certain workflows). This field-level security is crucial for multi-tenant SaaS applications, healthcare systems protecting patient data, and financial systems managing sensitive financial information.",
   "properties": [
     {
-      "name": "restrictionId",
-      "type": "uuid",
-      "mode": "stored",
-      "description": "Unique identifier for this field restriction",
-      "required": true,
-      "unique": true
-    },
-    {
       "name": "resourceType",
       "type": "string",
       "mode": "stored",
@@ -223,7 +215,6 @@
   "examples": [
     {
       "@type": "FieldRestriction",
-      "restrictionId": "restrict_salary_001",
       "resourceType": "employee_profile",
       "fieldName": "salary",
       "fieldPath": "compensation.base_salary",
@@ -251,7 +242,6 @@
     },
     {
       "@type": "FieldRestriction",
-      "restrictionId": "restrict_ssn_002",
       "resourceType": "customer_record",
       "fieldName": "social_security_number",
       "fieldPath": "personal_info.ssn",

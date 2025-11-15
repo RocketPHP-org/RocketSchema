@@ -5,14 +5,6 @@
   "description": "Groups related access policies into cohesive sets that can be managed, deployed, and evaluated together, providing organizational structure for complex policy landscapes. Policy sets are containers that bundle policies sharing common purposes, compliance requirements, or organizational scope - like 'GDPR Compliance Policies' or 'Financial Data Protection'. This hierarchical organization allows policy administrators to manage hundreds of policies efficiently, deploy entire policy frameworks at once, and ensure comprehensive coverage without gaps or conflicts. Each set can contain other sets (nested hierarchy), individual policies, and rules, with sophisticated combination algorithms determining how multiple policies interact. The entity supports different policy combination methods: permit-overrides (any allow wins), deny-overrides (any deny wins), first-applicable (stop at first match), or consensus-based. Policy sets can be versioned as a unit, enabling rollback of entire policy frameworks if issues arise. They support staged deployment where sets are tested in non-production before enterprise-wide activation. The entity handles policy inheritance where child organizations inherit parent policy sets but can add local policies. This is essential for multi-tenant systems where base policies apply to all while allowing customization, regulatory compliance where entire frameworks must be adopted together, and enterprise governance where consistent policy application across divisions is required.",
   "properties": [
     {
-      "name": "policySetId",
-      "type": "uuid",
-      "mode": "stored",
-      "description": "Unique identifier for this policy set",
-      "required": true,
-      "unique": true
-    },
-    {
       "name": "code",
       "type": "string",
       "mode": "stored",
@@ -59,8 +51,8 @@
       "example": "organization:finance_dept"
     },
     {
-      "name": "parentSetId",
-      "type": "uuid",
+      "name": "parentSet",
+      "type": "PolicySet",
       "mode": "stored",
       "description": "Parent policy set in hierarchy",
       "nullable": true
@@ -222,7 +214,6 @@
   "examples": [
     {
       "@type": "PolicySet",
-      "policySetId": "ps_financial_001",
       "code": "PS_FINANCIAL_COMPLIANCE",
       "name": "Financial Services Compliance Suite",
       "description": "Complete policy framework for financial data protection, transaction security, and regulatory compliance",
@@ -253,13 +244,11 @@
     },
     {
       "@type": "PolicySet",
-      "policySetId": "ps_gdpr_002",
       "code": "PS_GDPR_PRIVACY",
       "name": "GDPR Privacy Protection Framework",
       "description": "EU data protection policies ensuring GDPR compliance for personal data processing",
       "category": "privacy",
       "scope": "global",
-      "parentSetId": "ps_master_privacy",
       "policies": "[\"pol_consent_management\",\"pol_right_to_erasure\",\"pol_data_portability\",\"pol_breach_notification\"]",
       "combiningAlgorithm": "deny_overrides",
       "priority": 90,
@@ -284,7 +273,8 @@
           "32"
         ],
         "automated_enforcement": true
-      }
+      },
+      "parentSet": "ps_master_privacy"
     }
   ]
 }

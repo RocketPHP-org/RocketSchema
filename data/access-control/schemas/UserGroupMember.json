@@ -5,14 +5,6 @@
   "description": "Manages the membership of users within groups, tracking who belongs to which group, their role within the group, and the complete lifecycle of their membership. This junction table goes beyond simple user-to-group mapping by recording how users joined (invitation, request, automatic), who approved their membership, when they joined and will leave, and what special roles they have within the group (owner, moderator, member). It handles complex membership scenarios like temporary project assignments where a consultant joins for 3 months, or rotating leadership where the 'team lead' role passes between members monthly. The entity tracks membership status changes, from pending approval through active membership to eventual departure, maintaining history for audit purposes. It supports group-specific roles that are different from system-wide roles - someone might be a 'Viewer' globally but an 'Admin' within their department group. The entity also manages membership inheritance in hierarchical groups and handles conflicts when users belong to multiple groups with different permission sets. This detailed tracking is essential for compliance reporting ('Who had access to financial data last quarter?') and security investigations ('Which groups was this user part of when the breach occurred?').",
   "properties": [
     {
-      "name": "membershipId",
-      "type": "uuid",
-      "mode": "stored",
-      "description": "Unique identifier for this membership record",
-      "required": true,
-      "unique": true
-    },
-    {
       "name": "group",
       "type": "UserGroup",
       "mode": "stored",
@@ -204,7 +196,6 @@
   "examples": [
     {
       "@type": "UserGroupMember",
-      "membershipId": "mem_abc123",
       "memberRole": "admin",
       "joinedAt": "2024-01-15T10:00:00Z",
       "joinMethod": "invited",
@@ -227,7 +218,6 @@
     },
     {
       "@type": "UserGroupMember",
-      "membershipId": "mem_temp_789",
       "memberRole": "guest",
       "joinedAt": "2024-03-01T09:00:00Z",
       "joinMethod": "requested",

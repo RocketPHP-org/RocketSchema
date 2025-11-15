@@ -5,14 +5,6 @@
   "description": "Defines the permission model for different types of resources in the system, establishing what operations are possible on each resource type and how permissions are inherited, delegated, and combined. This entity acts as a template that describes all possible permissions for resource categories like 'documents', 'databases', or 'apis', serving as the blueprint for access control decisions. It defines not just CRUD operations but complex, resource-specific actions like 'publish', 'archive', 'approve', or 'rollback'. Each resource type can have its own permission hierarchy where having 'manage' permission might automatically grant 'write' and 'read'. The entity specifies ownership models (who gets what permissions when creating a resource), inheritance rules (how folder permissions flow to files), and aggregation patterns (how multiple permissions combine). It handles resource lifecycle permissions, defining who can transition resources between states like draft → review → published. The entity also defines permission dependencies (you need 'read' to have 'write'), mutual exclusions (can't have both 'approve' and 'submit'), and contextual variations (different permissions in different environments). This is essential for building flexible yet consistent authorization across diverse resource types while maintaining principle of least privilege. It enables features like temporary access elevation, permission templates for common scenarios, and automated permission assignment based on resource characteristics.",
   "properties": [
     {
-      "name": "permissionId",
-      "type": "uuid",
-      "mode": "stored",
-      "description": "Unique identifier for this resource permission",
-      "required": true,
-      "unique": true
-    },
-    {
       "name": "resourceType",
       "type": "string",
       "mode": "stored",
@@ -263,7 +255,6 @@
   "examples": [
     {
       "@type": "ResourcePermission",
-      "permissionId": "perm_doc_publish",
       "resourceType": "document",
       "permissionCode": "document.publish",
       "permissionName": "Publish Document",
@@ -297,7 +288,6 @@
     },
     {
       "@type": "ResourcePermission",
-      "permissionId": "perm_db_export",
       "resourceType": "database",
       "permissionCode": "database.export",
       "permissionName": "Export Database",

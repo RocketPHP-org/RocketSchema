@@ -5,14 +5,6 @@
   "description": "Represents a collection of users who share common access requirements, organizational structure, or functional responsibilities. Groups provide an additional layer of access management between individual users and roles, making it easier to manage permissions for teams, departments, or projects. Instead of assigning roles to each user individually, you assign roles to a group, and all group members inherit those roles. Groups can be hierarchical - a 'Company' group might contain 'Department' groups, which contain 'Team' groups. Members inherit permissions from all their parent groups. Groups can be static (manually managed membership) or dynamic (automatically populated based on user attributes like department or location). They're essential for modeling real-world organizational structures in the access control system. Groups can have their own permissions independent of roles, useful for resource ownership (like 'Marketing Team owns marketing folders'). They support temporary membership for contractors or project-based work, and can enforce approval workflows for joining sensitive groups. This entity is crucial for scalable access management in large organizations where managing individual user permissions would be impractical.",
   "properties": [
     {
-      "name": "groupId",
-      "type": "uuid",
-      "mode": "stored",
-      "description": "Unique identifier for this group",
-      "required": true,
-      "unique": true
-    },
-    {
       "name": "code",
       "type": "string",
       "mode": "stored",
@@ -53,8 +45,8 @@
       "example": "team"
     },
     {
-      "name": "parentGroupId",
-      "type": "uuid",
+      "name": "parentGroup",
+      "type": "UserGroup",
       "mode": "stored",
       "description": "Parent group in the hierarchy",
       "nullable": true
@@ -167,12 +159,11 @@
   "examples": [
     {
       "@type": "UserGroup",
-      "groupId": "grp_backend_eng",
       "code": "eng_backend",
       "name": "Backend Engineering",
       "description": "Core backend engineering team responsible for APIs, databases, and infrastructure",
       "type": "team",
-      "parentGroupId": "grp_engineering",
+      "parentGroup": "grp_engineering",
       "membershipType": "hybrid",
       "membershipRules": "{\"department\":\"engineering\",\"team\":\"backend\"}",
       "maxMembers": 50,
@@ -193,7 +184,6 @@
     },
     {
       "@type": "UserGroup",
-      "groupId": "grp_project_phoenix",
       "code": "proj_phoenix",
       "name": "Project Phoenix Team",
       "description": "Cross-functional team for Q2 2024 Phoenix initiative",

@@ -5,14 +5,6 @@
   "description": "Represents any entity that can be authenticated and authorized in the system, providing a unified abstraction for users, service accounts, API clients, and automated systems. A security principal is anything that can have permissions and make requests - it could be a human user, a microservice, an IoT device, a scheduled job, or an external system. This abstraction allows the access control system to treat all these entities consistently while maintaining their unique characteristics. Each principal has credentials for authentication (passwords, certificates, keys), attributes for authorization decisions (clearance level, department, trust score), and a security context that defines their capabilities. Service principals enable machine-to-machine authentication without user involvement, essential for automated workflows and microservices. System principals represent internal components that need controlled access to resources. External principals handle third-party integrations with limited, scoped access. The entity tracks the principal's lifecycle from creation through various trust states to eventual deactivation. It maintains security posture information like last security review, compliance status, and risk assessments. This unified approach simplifies access control policies - a single policy can apply to users, services, and systems without separate implementations. It's fundamental for zero-trust architectures where every request must be authenticated and authorized regardless of source.",
   "properties": [
     {
-      "name": "principalId",
-      "type": "uuid",
-      "mode": "stored",
-      "description": "Unique identifier for this security principal",
-      "required": true,
-      "unique": true
-    },
-    {
       "name": "principalType",
       "type": "string",
       "mode": "enum",
@@ -269,7 +261,6 @@
   "examples": [
     {
       "@type": "SecurityPrincipal",
-      "principalId": "prin_svc_001",
       "principalType": "service",
       "principalName": "svc_data_pipeline",
       "displayName": "Data Pipeline Service",
@@ -304,7 +295,6 @@
     },
     {
       "@type": "SecurityPrincipal",
-      "principalId": "prin_ext_002",
       "principalType": "external",
       "principalName": "ext_partner_api",
       "displayName": "Partner Integration - TechCorp",

@@ -5,14 +5,6 @@
   "description": "Enables temporary transfer of permissions from one user to another, supporting scenarios like vacation coverage, emergency access, and task delegation. This entity manages the complex process of permission delegation where a user (delegator) temporarily grants some or all of their permissions to another user (delegate). This is essential for business continuity - when a manager goes on vacation, they can delegate approval permissions to their deputy. The delegation can be partial (only specific permissions) or complete (all permissions), time-bounded (active only during specific dates), and conditional (only for certain resources or contexts). The system tracks the delegation chain to prevent recursive delegations and maintains audit trails showing who used delegated permissions and when. Delegations can require approval from security teams or higher management, especially for sensitive permissions. The entity handles automatic activation and deactivation based on schedules, sends notifications when delegations are used, and can instantly revoke delegations if misuse is detected. This is critical for maintaining operational flexibility while preserving security and accountability, as all actions taken with delegated permissions are traceable back to both the delegate and the original permission holder.",
   "properties": [
     {
-      "name": "delegationId",
-      "type": "uuid",
-      "mode": "stored",
-      "description": "Unique identifier for this delegation",
-      "required": true,
-      "unique": true
-    },
-    {
       "name": "delegator",
       "type": "User",
       "mode": "stored",
@@ -217,7 +209,6 @@
   "examples": [
     {
       "@type": "DelegatedPermission",
-      "delegationId": "del_vacation_123",
       "delegationType": "partial",
       "reason": "Two-week vacation coverage for team management duties",
       "permissions": "[\"approve_timesheets\",\"approve_expenses_under_1000\",\"manage_team_calendar\",\"conduct_one_on_ones\"]",
@@ -242,7 +233,6 @@
     },
     {
       "@type": "DelegatedPermission",
-      "delegationId": "del_emergency_456",
       "delegationType": "emergency",
       "reason": "Emergency access for critical production incident while primary admin unreachable",
       "permissions": "[\"production_deploy\",\"database_write\",\"configuration_change\",\"service_restart\"]",

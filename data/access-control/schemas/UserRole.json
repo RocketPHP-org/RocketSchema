@@ -19,14 +19,6 @@
       "required": true
     },
     {
-      "name": "assignmentId",
-      "type": "uuid",
-      "mode": "stored",
-      "description": "Unique identifier for this specific assignment",
-      "required": true,
-      "unique": true
-    },
-    {
       "name": "assignedBy",
       "type": "User",
       "mode": "stored",
@@ -194,7 +186,6 @@
   "examples": [
     {
       "@type": "UserRole",
-      "assignmentId": "assign_abc123",
       "assignedAt": "2024-03-01T10:00:00Z",
       "assignmentReason": "Promoted to Engineering Manager",
       "activatedAt": "2024-03-01T10:00:00Z",
@@ -216,7 +207,6 @@
     },
     {
       "@type": "UserRole",
-      "assignmentId": "assign_temp_789",
       "assignedBy": "manager_123",
       "assignedAt": "2024-03-10T08:00:00Z",
       "assignmentReason": "Covering for admin during vacation",

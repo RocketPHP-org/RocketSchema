@@ -5,14 +5,6 @@
   "description": "Records decisions made on access requests, permission changes, and policy exceptions, capturing the complete decision-making process including approver rationale, conditions, and stipulations. This entity goes beyond simple approve/deny to document the nuanced decisions made in complex authorization scenarios - conditional approvals with restrictions, time-limited grants with review requirements, or partial approvals for subset of requested permissions. Each decision captures the approver's identity, their authority level, the basis for their decision (policy compliance, business need, risk assessment), and any concerns or observations. Decisions can include stipulations like 'approved for 30 days pending security training' or 'denied but can resubmit with manager endorsement'. The entity supports multi-stage approval workflows where each approver adds their decision to build consensus, escalation paths where initial denials can be overridden, and delegation where approvers pass decisions to others. It maintains decision history for audit trails, precedent analysis for consistency, and machine learning to improve future decision-making. Decisions can trigger automated actions like permission provisioning, notification sending, or follow-up scheduling. This comprehensive decision recording is essential for regulatory compliance, demonstrating due diligence in access control, and continuous improvement of authorization processes through decision analytics.",
   "properties": [
     {
-      "name": "decisionId",
-      "type": "uuid",
-      "mode": "stored",
-      "description": "Unique identifier for this decision",
-      "required": true,
-      "unique": true
-    },
-    {
       "name": "requestId",
       "type": "uuid",
       "mode": "stored",
@@ -31,7 +23,15 @@
       "type": "string",
       "mode": "enum",
       "description": "The decision made",
-      "enum": ["approved", "denied", "conditional", "deferred", "escalated", "partial", "revoked"],
+      "enum": [
+        "approved",
+        "denied",
+        "conditional",
+        "deferred",
+        "escalated",
+        "partial",
+        "revoked"
+      ],
       "required": true
     },
     {
@@ -54,7 +54,13 @@
       "type": "string",
       "mode": "enum",
       "description": "Level of approval in hierarchy",
-      "enum": ["initial", "secondary", "final", "override", "emergency"],
+      "enum": [
+        "initial",
+        "secondary",
+        "final",
+        "override",
+        "emergency"
+      ],
       "required": true
     },
     {
@@ -233,7 +239,6 @@
   "examples": [
     {
       "@type": "ApprovalDecision",
-      "decisionId": "dec_001",
       "requestId": "req_access_001",
       "decision": "conditional",
       "decisionDate": "2024-03-15T14:30:00Z",
@@ -260,7 +265,6 @@
     },
     {
       "@type": "ApprovalDecision",
-      "decisionId": "dec_002",
       "requestId": "req_role_002",
       "decision": "denied",
       "decisionDate": "2024-03-15T10:00:00Z",

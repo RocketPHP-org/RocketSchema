@@ -5,14 +5,6 @@
   "description": "Defines mandatory actions that must be performed when a policy decision is made, ensuring that access control decisions are accompanied by necessary security, compliance, or operational activities. Obligations are the 'must-do' requirements triggered by policy evaluation - when access is granted, specific actions like logging, encryption, notification, or data masking must occur. Unlike the access decision itself (permit/deny), obligations are post-decision requirements that enforce additional controls. For example, accessing sensitive data might obligate the system to create detailed audit logs, send notifications to data owners, or apply encryption to responses. Obligations can be conditional based on the decision outcome - different obligations for permit versus deny. They support compliance requirements like GDPR's notification obligations for data breaches or HIPAA's audit requirements for patient record access. The entity tracks obligation fulfillment to ensure all required actions complete successfully - if an obligation fails, the entire access might be revoked. Obligations can be chained (one triggering another), time-bound (must complete within X seconds), or compensating (alternative actions if primary fails). This mechanism transforms simple yes/no access decisions into complex, auditable, compliant operations that meet regulatory and business requirements while maintaining security posture.",
   "properties": [
     {
-      "name": "obligationId",
-      "type": "uuid",
-      "mode": "stored",
-      "description": "Unique identifier for this obligation",
-      "required": true,
-      "unique": true
-    },
-    {
       "name": "policyId",
       "type": "uuid",
       "mode": "stored",
@@ -196,7 +188,6 @@
   "examples": [
     {
       "@type": "PolicyObligation",
-      "obligationId": "obl_audit_001",
       "policyId": "pol_sensitive_data",
       "obligationCode": "OBL_AUDIT_SENSITIVE",
       "name": "Sensitive Data Access Audit",
@@ -222,7 +213,6 @@
     },
     {
       "@type": "PolicyObligation",
-      "obligationId": "obl_encrypt_002",
       "policyId": "pol_data_export",
       "obligationCode": "OBL_ENCRYPT_EXPORT",
       "name": "Export Data Encryption",

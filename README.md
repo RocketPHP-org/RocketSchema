@@ -1,3 +1,14 @@
+
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=RocketPHP-org_RocketSchema&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=RocketPHP-org_RocketSchema)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=RocketPHP-org_RocketSchema&metric=bugs)](https://sonarcloud.io/summary/new_code?id=RocketPHP-org_RocketSchema)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=RocketPHP-org_RocketSchema&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=RocketPHP-org_RocketSchema)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=RocketPHP-org_RocketSchema&metric=coverage)](https://sonarcloud.io/summary/new_code?id=RocketPHP-org_RocketSchema)
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=RocketPHP-org_RocketSchema&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=RocketPHP-org_RocketSchema)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=RocketPHP-org_RocketSchema&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=RocketPHP-org_RocketSchema)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=RocketPHP-org_RocketSchema&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=RocketPHP-org_RocketSchema)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=RocketPHP-org_RocketSchema&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=RocketPHP-org_RocketSchema)
+[![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=RocketPHP-org_RocketSchema&metric=duplicated_lines_density)](https://sonarcloud.io/summary/new_code?id=RocketPHP-org_RocketSchema)
+
 # RocketSchema
 
 **A universal schema standard for business applications**

@@ -5,14 +5,6 @@
   "description": "Associates conditions with permissions, roles, or policies, creating dynamic authorization rules where access rights are contingent upon runtime condition evaluation. This junction entity bridges static permission definitions with dynamic conditions, enabling context-aware access control. Rather than granting permissions unconditionally, this link makes them dependent on specific circumstances being met. For example, linking 'delete_records' permission with 'business_hours' condition ensures deletion only occurs during monitored times. The entity supports multiple conditions per permission with complex boolean combinations (ALL must pass, ANY can pass, custom logic), weighted conditions where some are more important than others, and fallback chains where alternative conditions apply if primary ones fail. It handles condition precedence, determining which conditions to evaluate first for performance optimization, and short-circuit evaluation to skip unnecessary checks. The link can be temporary (conditions only apply during specific periods), progressive (different conditions at different trust levels), or contextual (different conditions in different environments). This mechanism enables sophisticated scenarios like escalating approval requirements based on risk, time-based permission activation for temporary access, and compliance rules that overlay business permissions. The entity maintains evaluation history for audit purposes and performance metrics for optimization.",
   "properties": [
     {
-      "name": "linkId",
-      "type": "uuid",
-      "mode": "stored",
-      "description": "Unique identifier for this condition link",
-      "required": true,
-      "unique": true
-    },
-    {
       "name": "targetType",
       "type": "string",
       "mode": "enum",
@@ -34,8 +26,8 @@
       "required": true
     },
     {
-      "name": "conditionId",
-      "type": "uuid",
+      "name": "condition",
+      "type": "PermissionCondition",
       "mode": "stored",
       "description": "The condition being linked",
       "required": true
@@ -208,10 +200,8 @@
   "examples": [
     {
       "@type": "PermissionConditionLink",
-      "linkId": "link_001",
       "targetType": "permission",
       "targetId": "perm_delete_records",
-      "conditionId": "cond_business_hours",
       "linkType": "required",
       "evaluationOrder": 1,
       "combineOperator": "AND",
@@ -230,14 +220,13 @@
       "metadata": {
         "business_justification": "Prevent accidental deletions outside monitored hours",
         "compliance_requirement": "SOX-404"
-      }
+      },
+      "condition": "cond_business_hours"
     },
     {
       "@type": "PermissionConditionLink",
-      "linkId": "link_002",
       "targetType": "role",
       "targetId": "role_financial_approver",
-      "conditionId": "cond_amount_limit",
       "linkType": "restricting",
       "evaluationOrder": 2,
       "combineOperator": "AND",
@@ -258,7 +247,8 @@
       "metadata": {
         "annual_review_required": true,
         "auto_adjust_for_inflation": true
-      }
+      },
+      "condition": "cond_amount_limit"
     }
   ]
 }

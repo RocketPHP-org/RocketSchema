@@ -5,23 +5,15 @@
   "description": "Defines relationships and prerequisites between permissions, establishing a dependency graph that ensures permissions are granted in proper order and with necessary prerequisites. This entity captures the complex interdependencies where certain permissions require others to function properly - you can't have 'approve_documents' without 'read_documents', or 'delete_database' without 'modify_database'. Dependencies can be hard requirements (permission won't work without prerequisite), soft recommendations (permission works better with prerequisite), or mutual exclusions (permissions that conflict). The entity supports transitive dependencies where A requires B requires C, circular dependency detection to prevent infinite loops, and conditional dependencies that apply only in certain contexts. It enables permission bundles where granting one permission automatically grants required dependencies, permission hierarchies where higher-level permissions include lower-level ones, and safety checks that prevent dangerous permission combinations. Dependencies can be temporal (permission A must be held for X days before getting B), sequential (must use A before being granted B), or concurrent (must have A while using B). This dependency management is crucial for maintaining system integrity, implementing progressive trust models where users gain permissions over time, and ensuring compliance with security policies that mandate certain permission combinations. The entity helps administrators understand permission relationships and prevents configuration errors.",
   "properties": [
     {
-      "name": "dependencyId",
-      "type": "uuid",
-      "mode": "stored",
-      "description": "Unique identifier for this dependency",
-      "required": true,
-      "unique": true
-    },
-    {
-      "name": "permissionId",
-      "type": "uuid",
+      "name": "permission",
+      "type": "Permission",
       "mode": "stored",
       "description": "The permission that has dependencies",
       "required": true
     },
     {
-      "name": "requiredPermissionId",
-      "type": "uuid",
+      "name": "requiredPermission",
+      "type": "Permission",
       "mode": "stored",
       "description": "The permission that is required",
       "required": true
@@ -230,9 +222,6 @@
   "examples": [
     {
       "@type": "PermissionDependency",
-      "dependencyId": "dep_001",
-      "permissionId": "perm_write_document",
-      "requiredPermissionId": "perm_read_document",
       "dependencyType": "prerequisite",
       "strength": "required",
       "direction": "depends_on",
@@ -251,13 +240,12 @@
       "metadata": {
         "documented_requirement": true,
         "security_policy": "least_privilege"
-      }
+      },
+      "permission": "perm_write_document",
+      "requiredPermission": "perm_read_document"
     },
     {
       "@type": "PermissionDependency",
-      "dependencyId": "dep_002",
-      "permissionId": "perm_approve_transaction",
-      "requiredPermissionId": "perm_create_transaction",
       "dependencyType": "conflicting",
       "strength": "required",
       "direction": "bidirectional",
@@ -277,7 +265,9 @@
       "metadata": {
         "compliance_requirement": "SOX",
         "audit_flag": true
-      }
+      },
+      "permission": "perm_approve_transaction",
+      "requiredPermission": "perm_create_transaction"
     }
   ]
 }

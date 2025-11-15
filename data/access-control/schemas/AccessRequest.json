@@ -5,14 +5,6 @@
   "description": "Manages formal requests for access to resources, roles, or permissions that require approval, implementing a complete workflow from request submission through review to final grant or denial. This entity handles scenarios where users need access beyond their current permissions - requesting a new role, access to sensitive data, temporary elevated privileges, or entry to restricted systems. Each request captures comprehensive justification including business need, duration required, specific resources needed, and risk acknowledgment. The approval workflow can be simple (single manager) or complex (multiple stakeholders, security review, legal sign-off), with configurable routing based on request type, risk level, and resource sensitivity. The entity tracks the complete lifecycle: draft, submitted, under review, approved/denied, provisioned, and expired. It supports emergency requests that bypass normal workflows with heavy auditing, time-boxed access that automatically expires, and conditional approvals with specific constraints. Requests can include attestations where requesters confirm understanding of policies, accept liability, or complete required training. The system handles delegation where managers can request on behalf of their teams, bulk requests for multiple users, and recurring requests for periodic access needs. This formal process is essential for compliance with regulations requiring documented access approval, maintaining zero-standing privileges, and providing evidence of proper authorization during audits.",
   "properties": [
     {
-      "name": "requestId",
-      "type": "uuid",
-      "mode": "stored",
-      "description": "Unique identifier for this access request",
-      "required": true,
-      "unique": true
-    },
-    {
       "name": "requestType",
       "type": "string",
       "mode": "enum",
@@ -305,7 +297,6 @@
   "examples": [
     {
       "@type": "AccessRequest",
-      "requestId": "req_abc123",
       "requestType": "role",
       "justification": "Need production database access to investigate and resolve critical performance issues affecting customers",
       "businessNeed": "operational",
@@ -337,7 +328,6 @@
     },
     {
       "@type": "AccessRequest",
-      "requestId": "req_emrg_789",
       "requestType": "emergency",
       "justification": "Critical security incident - need immediate access to investigate potential data breach",
       "businessNeed": "emergency",

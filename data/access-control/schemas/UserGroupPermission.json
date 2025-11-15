@@ -5,14 +5,6 @@
   "description": "Grants specific permissions directly to groups without using roles, providing fine-grained control for group-specific access needs. While roles bundle multiple permissions, sometimes groups need individual permissions that don't fit into existing roles. This entity allows granting permissions like 'edit team wiki' or 'access project dashboard' directly to a group. All group members inherit these permissions automatically. This is useful for resource ownership - the 'Marketing Team' group might have 'full control' permission on marketing folders, or the 'Security Team' might have 'audit log access' without needing a special role. The entity supports conditional permissions based on context (time, location, resource attributes) and can override role-based permissions when needed. For example, a group might be denied a specific dangerous permission even if their roles would normally grant it. The system tracks permission inheritance through group hierarchies and resolves conflicts using priority levels. This direct permission assignment is essential for implementing resource-based access control where groups own and manage specific assets. It also enables quick, temporary permission grants for urgent situations without creating throwaway roles.",
   "properties": [
     {
-      "name": "assignmentId",
-      "type": "uuid",
-      "mode": "stored",
-      "description": "Unique identifier for this permission assignment",
-      "required": true,
-      "unique": true
-    },
-    {
       "name": "group",
       "type": "UserGroup",
       "mode": "stored",
@@ -211,7 +203,6 @@
   "examples": [
     {
       "@type": "UserGroupPermission",
-      "assignmentId": "perm_mkt_folders",
       "grantType": "grant",
       "grantedBy": "admin_it",
       "grantedAt": "2024-01-20T11:00:00Z",
@@ -234,7 +225,6 @@
     },
     {
       "@type": "UserGroupPermission",
-      "assignmentId": "perm_sec_audit",
       "grantType": "grant",
       "grantedBy": "ciso",
       "grantedAt": "2024-02-01T09:00:00Z",

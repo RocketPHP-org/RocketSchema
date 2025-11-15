@@ -5,14 +5,6 @@
   "description": "Orchestrates complex, multi-step authorization workflows where access decisions require sequential evaluation of multiple policies, conditions, and approvals in a specific order. This entity represents authorization chains that cannot be evaluated in parallel - each step depends on the outcome of previous steps, creating sophisticated decision trees. For example, accessing classified documents might require: first checking security clearance, then verifying need-to-know, then checking time-window restrictions, then obtaining supervisor approval, and finally logging the access attempt. Each step in the sequence can have different evaluation criteria, different fallback behaviors, and different side effects. The sequence supports branching logic where different paths are taken based on intermediate results, loops for retry scenarios, and rollback capabilities if later steps fail. It enables progressive authorization where initial steps grant partial access and subsequent steps unlock additional capabilities. The entity tracks sequence execution state, allowing long-running authorization processes that span multiple user sessions or require human intervention. Sequences can be templated for common scenarios (onboarding workflow, privileged access elevation), dynamically generated based on risk assessment, or manually configured for special cases. This sequential processing is essential for implementing complex compliance requirements, multi-party approval processes, and adaptive security protocols that adjust based on accumulating evidence of legitimacy or risk.",
   "properties": [
     {
-      "name": "sequenceId",
-      "type": "uuid",
-      "mode": "stored",
-      "description": "Unique identifier for this sequence",
-      "required": true,
-      "unique": true
-    },
-    {
       "name": "sequenceName",
       "type": "string",
       "mode": "stored",
@@ -32,7 +24,14 @@
       "type": "string",
       "mode": "enum",
       "description": "Category of sequence",
-      "enum": ["authorization", "approval", "verification", "escalation", "remediation", "audit"],
+      "enum": [
+        "authorization",
+        "approval",
+        "verification",
+        "escalation",
+        "remediation",
+        "audit"
+      ],
       "required": true
     },
     {
@@ -55,7 +54,15 @@
       "type": "string",
       "mode": "enum",
       "description": "Current state of sequence execution",
-      "enum": ["pending", "running", "paused", "completed", "failed", "rolled_back", "cancelled"],
+      "enum": [
+        "pending",
+        "running",
+        "paused",
+        "completed",
+        "failed",
+        "rolled_back",
+        "cancelled"
+      ],
       "default": "pending"
     },
     {
@@ -101,7 +108,12 @@
       "type": "string",
       "mode": "enum",
       "description": "How to handle rollbacks",
-      "enum": ["none", "full", "partial", "compensating"],
+      "enum": [
+        "none",
+        "full",
+        "partial",
+        "compensating"
+      ],
       "default": "none"
     },
     {
@@ -187,7 +199,13 @@
       "type": "string",
       "mode": "enum",
       "description": "Final result of sequence",
-      "enum": ["granted", "denied", "partial", "expired", "error"],
+      "enum": [
+        "granted",
+        "denied",
+        "partial",
+        "expired",
+        "error"
+      ],
       "nullable": true
     },
     {
@@ -228,7 +246,6 @@
   "examples": [
     {
       "@type": "AccessControlSequence",
-      "sequenceId": "seq_classified_001",
       "sequenceName": "Classified Document Access Workflow",
       "description": "Multi-step verification and approval process for accessing classified documents",
       "sequenceType": "authorization",
@@ -256,7 +273,6 @@
     },
     {
       "@type": "AccessControlSequence",
-      "sequenceId": "seq_emergency_002",
       "sequenceName": "Emergency Access Escalation",
       "description": "Rapid escalation sequence for emergency production access",
       "sequenceType": "escalation",

@@ -5,14 +5,6 @@
   "description": "Attaches metadata labels to resources that drive access control decisions, enabling attribute-based access control (ABAC) where permissions are determined by matching tags between users, resources, and policies. Resource tags are key-value pairs that describe characteristics like classification level, data sensitivity, project ownership, compliance scope, or business criticality. Unlike traditional access control that explicitly lists who can access what, tag-based control uses tag matching rules - a user with 'department:finance' tag can access resources tagged 'visibility:finance'. This approach dramatically simplifies permission management for large-scale systems where explicitly maintaining access lists becomes impractical. Tags support hierarchical relationships (parent tags imply child tags), tag inheritance (resources inherit parent folder tags), and tag propagation (tags flow through data lineage). The entity enables dynamic authorization that automatically adjusts as tags change, policy-driven access where rules reference tags instead of specific resources, and compliance enforcement where regulatory tags trigger specific controls. Tags can be system-generated (auto-classification), user-applied (manual labeling), or inherited (from containers). They support multi-dimensional classification where resources have multiple tag types (sensitivity, project, owner, retention), enabling complex access decisions based on tag combinations. This tagging system is essential for cloud resource management, data governance, regulatory compliance, and implementing scalable access control in dynamic environments where resources are constantly created and modified.",
   "properties": [
     {
-      "name": "tagId",
-      "type": "uuid",
-      "mode": "stored",
-      "description": "Unique identifier for this tag assignment",
-      "required": true,
-      "unique": true
-    },
-    {
       "name": "resourceType",
       "type": "string",
       "mode": "stored",
@@ -48,7 +40,14 @@
       "type": "string",
       "mode": "enum",
       "description": "Category of tag",
-      "enum": ["security", "compliance", "organizational", "technical", "business", "custom"],
+      "enum": [
+        "security",
+        "compliance",
+        "organizational",
+        "technical",
+        "business",
+        "custom"
+      ],
       "required": true
     },
     {
@@ -56,7 +55,13 @@
       "type": "string",
       "mode": "enum",
       "description": "How tag was applied",
-      "enum": ["manual", "automated", "inherited", "policy", "system"],
+      "enum": [
+        "manual",
+        "automated",
+        "inherited",
+        "policy",
+        "system"
+      ],
       "default": "manual"
     },
     {
@@ -73,7 +78,12 @@
       "type": "string",
       "mode": "enum",
       "description": "Tag visibility and usage scope",
-      "enum": ["public", "internal", "private", "system"],
+      "enum": [
+        "public",
+        "internal",
+        "private",
+        "system"
+      ],
       "default": "internal"
     },
     {
@@ -81,7 +91,12 @@
       "type": "string",
       "mode": "enum",
       "description": "How tag inherits to children",
-      "enum": ["none", "direct_children", "recursive", "selective"],
+      "enum": [
+        "none",
+        "direct_children",
+        "recursive",
+        "selective"
+      ],
       "default": "none"
     },
     {
@@ -89,7 +104,12 @@
       "type": "string",
       "mode": "enum",
       "description": "How tag propagates through relationships",
-      "enum": ["none", "upstream", "downstream", "bidirectional"],
+      "enum": [
+        "none",
+        "upstream",
+        "downstream",
+        "bidirectional"
+      ],
       "default": "none"
     },
     {
@@ -233,7 +253,6 @@
   "examples": [
     {
       "@type": "ResourceTag",
-      "tagId": "tag_001",
       "resourceType": "document",
       "resourceId": "doc_financial_report_2024",
       "tagKey": "data_classification",
@@ -257,12 +276,15 @@
       "isActive": true,
       "metadata": {
         "classification_model": "ml_classifier_v3",
-        "confidence_factors": ["keyword_match", "context_analysis", "metadata_scan"]
+        "confidence_factors": [
+          "keyword_match",
+          "context_analysis",
+          "metadata_scan"
+        ]
       }
     },
     {
       "@type": "ResourceTag",
-      "tagId": "tag_002",
       "resourceType": "database",
       "resourceId": "db_customer_analytics",
       "tagKey": "compliance_scope",

@@ -5,14 +5,6 @@
   "description": "Defines a named collection of permissions that can be assigned to users or groups, implementing Role-Based Access Control (RBAC) in the system. Roles are the cornerstone of scalable permission management - instead of assigning individual permissions to thousands of users, you create roles like 'Editor', 'Manager', or 'Admin' and assign appropriate permissions to each role. Users then inherit all permissions from their assigned roles. This dramatically simplifies access management, especially in large organizations where many people have similar job functions. Roles can be hierarchical, where a 'Senior Manager' role might inherit all permissions from 'Manager' plus additional elevated privileges. System roles (like 'Super Admin') are built-in and protected from modification, while custom roles can be created to match specific organizational needs. Each role has a priority level to resolve conflicts when a user has multiple roles with contradicting permissions. Roles can be scoped to specific contexts - for example, someone might be an 'Admin' for one department but 'Viewer' for another. This entity makes it easy to implement least-privilege access, conduct access reviews, and maintain compliance with security policies by providing a clear, auditable structure for who can do what in the system.",
   "properties": [
     {
-      "name": "roleId",
-      "type": "uuid",
-      "mode": "stored",
-      "description": "Unique identifier for this role",
-      "required": true,
-      "unique": true
-    },
-    {
       "name": "code",
       "type": "string",
       "mode": "stored",
@@ -103,8 +95,8 @@
       "default": 0
     },
     {
-      "name": "parentRoleId",
-      "type": "uuid",
+      "name": "parentRole",
+      "type": "Role",
       "mode": "stored",
       "description": "Parent role from which permissions are inherited",
       "nullable": true
@@ -158,7 +150,6 @@
   "examples": [
     {
       "@type": "Role",
-      "roleId": "role_abc123",
       "code": "FINANCE_MANAGER",
       "name": "Finance Manager",
       "description": "Full access to financial data, reports, and budgeting tools. Can approve expenses up to $50,000 and manage team members in finance department.",
@@ -171,7 +162,6 @@
       "requiresApproval": true,
       "maxAssignments": 5,
       "priority": 75,
-      "parentRoleId": "role_employee",
       "expirationDays": 365,
       "allowedIpRanges": "[\"10.0.0.0/8\",\"vpn.company.com\"]",
       "allowedTimeWindows": "[{\"days\":[\"mon\",\"tue\",\"wed\",\"thu\",\"fri\"],\"start\":\"07:00\",\"end\":\"19:00\",\"timezone\":\"America/New_York\"}]",
@@ -181,7 +171,6 @@
     },
     {
       "@type": "Role",
-      "roleId": "role_def456",
       "code": "GUEST_VIEWER",
       "name": "Guest Viewer",
       "description": "Read-only access to public content and basic application features. Cannot modify any data or access sensitive information.",
@@ -194,7 +183,6 @@
       "requiresApproval": false,
       "maxAssignments": null,
       "priority": 10,
-      "parentRoleId": null,
       "expirationDays": 30,
       "tags": "[\"public\",\"readonly\",\"guest\"]",
       "isActive": true,
