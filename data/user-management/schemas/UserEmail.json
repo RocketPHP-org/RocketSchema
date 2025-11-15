@@ -1,0 +1,103 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "UserEmail",
+  "description": "Secondary emails for users (normalized from User for multi-email support)",
+  "properties": [
+    {
+      "name": "userId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "User reference",
+      "required": true
+    },
+    {
+      "name": "email",
+      "type": "string",
+      "mode": "stored",
+      "description": "Email address",
+      "required": true,
+      "format": "email"
+    },
+    {
+      "name": "emailType",
+      "type": "string",
+      "mode": "enum",
+      "description": "Type of email",
+      "enum": ["primary", "secondary", "recovery", "notification"],
+      "default": "secondary"
+    },
+    {
+      "name": "isVerified",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether email is verified",
+      "default": false
+    },
+    {
+      "name": "verifiedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Verification timestamp",
+      "nullable": true
+    },
+    {
+      "name": "verificationToken",
+      "type": "string",
+      "mode": "stored",
+      "description": "Token for email verification",
+      "nullable": true,
+      "private": true
+    },
+    {
+      "name": "verificationSentAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When verification was sent",
+      "nullable": true
+    },
+    {
+      "name": "isPrimary",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this is the primary email",
+      "default": false
+    },
+    {
+      "name": "canReceiveNotifications",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether to send notifications to this email",
+      "default": true
+    },
+    {
+      "name": "addedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When email was added",
+      "required": true
+    },
+    {
+      "name": "lastUsedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Last time email was used",
+      "nullable": true
+    }
+  ],
+  "indexes": [
+    {
+      "fields": ["email"],
+      "unique": true
+    },
+    {
+      "fields": ["userId", "emailType"],
+      "name": "idx_user_type"
+    },
+    {
+      "fields": ["userId", "isPrimary"],
+      "name": "idx_user_primary",
+      "where": "isPrimary = true"
+    }
+  ]
+}

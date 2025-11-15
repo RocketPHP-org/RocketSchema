@@ -1,0 +1,75 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "TwoFactorBackupCode",
+  "description": "Backup codes for 2FA recovery (normalized from TwoFactorAuth)",
+  "properties": [
+    {
+      "name": "twoFactorAuthId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "Reference to TwoFactorAuth",
+      "required": true
+    },
+    {
+      "name": "codeHash",
+      "type": "string",
+      "mode": "stored",
+      "description": "Hashed backup code",
+      "required": true,
+      "private": true
+    },
+    {
+      "name": "codeSequence",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Code sequence number",
+      "required": true
+    },
+    {
+      "name": "isUsed",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether the code has been used",
+      "default": false
+    },
+    {
+      "name": "usedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When the code was used",
+      "nullable": true
+    },
+    {
+      "name": "usedFromIp",
+      "type": "string",
+      "mode": "stored",
+      "description": "IP address from which code was used",
+      "nullable": true
+    },
+    {
+      "name": "createdAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Creation timestamp",
+      "required": true
+    },
+    {
+      "name": "expiresAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Expiration timestamp",
+      "nullable": true
+    }
+  ],
+  "indexes": [
+    {
+      "fields": ["twoFactorAuthId", "codeSequence"],
+      "unique": true
+    },
+    {
+      "fields": ["twoFactorAuthId", "isUsed"],
+      "name": "idx_2fa_unused"
+    }
+  ]
+}

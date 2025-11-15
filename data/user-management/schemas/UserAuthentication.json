@@ -1,0 +1,152 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "UserAuthentication",
+  "description": "User authentication credentials - separated for security (normalized from User)",
+  "properties": [
+    {
+      "name": "userId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "User reference",
+      "required": true,
+      "unique": true
+    },
+    {
+      "name": "passwordHash",
+      "type": "string",
+      "mode": "stored",
+      "description": "Hashed password (bcrypt/argon2)",
+      "required": true,
+      "private": true
+    },
+    {
+      "name": "passwordSalt",
+      "type": "string",
+      "mode": "stored",
+      "description": "Salt used for password hashing",
+      "private": true
+    },
+    {
+      "name": "passwordAlgorithm",
+      "type": "string",
+      "mode": "enum",
+      "description": "Hashing algorithm used",
+      "enum": ["bcrypt", "argon2id", "scrypt", "pbkdf2"],
+      "default": "argon2id"
+    },
+    {
+      "name": "passwordLastChangedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Last password change timestamp",
+      "required": true
+    },
+    {
+      "name": "passwordExpiresAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When password expires",
+      "nullable": true
+    },
+    {
+      "name": "mustChangePassword",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Flag indicating user must change password on next login",
+      "default": false
+    },
+    {
+      "name": "passwordHistory",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Number of password history entries to keep",
+      "default": 5
+    },
+    {
+      "name": "failedLoginAttempts",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Number of consecutive failed login attempts",
+      "default": 0
+    },
+    {
+      "name": "failedLoginResetAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When failed attempts counter was reset",
+      "nullable": true
+    },
+    {
+      "name": "lockedUntil",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Account locked until this timestamp",
+      "nullable": true
+    },
+    {
+      "name": "lastLoginAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Last successful login timestamp",
+      "nullable": true
+    },
+    {
+      "name": "lastLoginIp",
+      "type": "string",
+      "mode": "stored",
+      "description": "IP address of last successful login",
+      "nullable": true
+    },
+    {
+      "name": "lastActivityAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Last activity timestamp",
+      "nullable": true
+    },
+    {
+      "name": "passwordPolicy",
+      "type": "PasswordPolicy",
+      "mode": "stored",
+      "description": "Applied password policy",
+      "nullable": true
+    },
+    {
+      "name": "version",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Version for optimistic locking",
+      "default": 1
+    },
+    {
+      "name": "createdAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Creation timestamp",
+      "required": true
+    },
+    {
+      "name": "updatedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Last update timestamp"
+    }
+  ],
+  "indexes": [
+    {
+      "fields": ["userId"],
+      "unique": true
+    },
+    {
+      "fields": ["lockedUntil"],
+      "name": "idx_locked",
+      "where": "lockedUntil IS NOT NULL"
+    },
+    {
+      "fields": ["passwordExpiresAt"],
+      "name": "idx_password_expires",
+      "where": "passwordExpiresAt IS NOT NULL"
+    }
+  ]
+}

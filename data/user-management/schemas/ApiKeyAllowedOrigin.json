@@ -1,0 +1,76 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "ApiKeyAllowedOrigin",
+  "description": "Allowed origins for CORS (normalized from ApiKey)",
+  "properties": [
+    {
+      "name": "apiKeyId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "Reference to API key",
+      "required": true
+    },
+    {
+      "name": "origin",
+      "type": "string",
+      "mode": "stored",
+      "description": "Allowed origin URL",
+      "required": true,
+      "example": "https://example.com"
+    },
+    {
+      "name": "allowSubdomains",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether to allow all subdomains",
+      "default": false
+    },
+    {
+      "name": "allowedMethods",
+      "type": "string",
+      "mode": "stored",
+      "description": "Comma-separated HTTP methods",
+      "default": "GET,POST",
+      "example": "GET,POST,PUT,DELETE"
+    },
+    {
+      "name": "allowedHeaders",
+      "type": "string",
+      "mode": "stored",
+      "description": "Comma-separated allowed headers",
+      "nullable": true
+    },
+    {
+      "name": "maxAge",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Preflight cache duration in seconds",
+      "default": 3600
+    },
+    {
+      "name": "addedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When origin was added",
+      "required": true
+    },
+    {
+      "name": "isActive",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether origin is active",
+      "default": true
+    }
+  ],
+  "indexes": [
+    {
+      "fields": ["apiKeyId", "origin"],
+      "unique": true
+    },
+    {
+      "fields": ["apiKeyId", "isActive"],
+      "name": "idx_key_origin_active"
+    }
+  ]
+}

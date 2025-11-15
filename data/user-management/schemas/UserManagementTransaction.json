@@ -1,0 +1,125 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "UserManagementTransaction",
+  "description": "Transaction management for user operations (ACID compliance)",
+  "properties": [
+    {
+      "name": "transactionId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "Unique transaction identifier",
+      "required": true,
+      "unique": true
+    },
+    {
+      "name": "transactionType",
+      "type": "string",
+      "mode": "enum",
+      "description": "Type of transaction",
+      "enum": ["user_registration", "password_change", "authentication", "profile_update", "2fa_setup", "api_key_creation", "bulk_operation"],
+      "required": true
+    },
+    {
+      "name": "state",
+      "type": "string",
+      "mode": "enum",
+      "description": "Transaction state",
+      "enum": ["pending", "in_progress", "committed", "rolled_back", "failed"],
+      "required": true,
+      "default": "pending"
+    },
+    {
+      "name": "isolationLevel",
+      "type": "string",
+      "mode": "enum",
+      "description": "Transaction isolation level",
+      "enum": ["read_uncommitted", "read_committed", "repeatable_read", "serializable"],
+      "default": "read_committed"
+    },
+    {
+      "name": "initiator",
+      "type": "User",
+      "mode": "stored",
+      "description": "User who initiated the transaction",
+      "nullable": true
+    },
+    {
+      "name": "affectedUserId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "Primary affected user",
+      "required": true
+    },
+    {
+      "name": "operations",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON array of operations",
+      "required": true
+    },
+    {
+      "name": "startedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Transaction start time",
+      "required": true
+    },
+    {
+      "name": "committedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Transaction commit time",
+      "nullable": true
+    },
+    {
+      "name": "rolledBackAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Transaction rollback time",
+      "nullable": true
+    },
+    {
+      "name": "errorMessage",
+      "type": "string",
+      "mode": "stored",
+      "description": "Error message if failed",
+      "nullable": true
+    },
+    {
+      "name": "checkpointData",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON checkpoint for rollback",
+      "nullable": true
+    },
+    {
+      "name": "retryCount",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Number of retry attempts",
+      "default": 0
+    },
+    {
+      "name": "version",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Version for optimistic locking",
+      "default": 1
+    }
+  ],
+  "indexes": [
+    {
+      "fields": ["transactionId"],
+      "unique": true
+    },
+    {
+      "fields": ["affectedUserId", "state"],
+      "name": "idx_user_state"
+    },
+    {
+      "fields": ["state", "startedAt"],
+      "name": "idx_state_time"
+    }
+  ]
+}

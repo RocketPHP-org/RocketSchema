@@ -1,0 +1,89 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "UserManagementSequence",
+  "description": "Sequence generator for atomic ID generation (ACID compliance)",
+  "properties": [
+    {
+      "name": "sequenceName",
+      "type": "string",
+      "mode": "stored",
+      "description": "Name of the sequence",
+      "required": true,
+      "unique": true
+    },
+    {
+      "name": "currentValue",
+      "type": "bigint",
+      "mode": "stored",
+      "description": "Current sequence value",
+      "required": true,
+      "default": 0
+    },
+    {
+      "name": "incrementBy",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Increment value",
+      "default": 1
+    },
+    {
+      "name": "minValue",
+      "type": "bigint",
+      "mode": "stored",
+      "description": "Minimum value",
+      "default": 0
+    },
+    {
+      "name": "maxValue",
+      "type": "bigint",
+      "mode": "stored",
+      "description": "Maximum value",
+      "default": 9223372036854775807
+    },
+    {
+      "name": "isCyclic",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether to cycle when max is reached",
+      "default": false
+    },
+    {
+      "name": "cacheSize",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Number of values to cache",
+      "default": 10
+    },
+    {
+      "name": "lastModifiedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Last modification timestamp",
+      "required": true
+    },
+    {
+      "name": "version",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Version for optimistic locking",
+      "default": 1
+    }
+  ],
+  "indexes": [
+    {
+      "fields": ["sequenceName"],
+      "unique": true
+    }
+  ],
+  "constraints": [
+    {
+      "type": "check",
+      "expression": "currentValue >= minValue AND currentValue <= maxValue"
+    },
+    {
+      "type": "check",
+      "expression": "incrementBy != 0"
+    }
+  ]
+}

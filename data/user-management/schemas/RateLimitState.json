@@ -1,0 +1,108 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "RateLimitState",
+  "description": "Current state of rate limits (for ACID compliance)",
+  "properties": [
+    {
+      "name": "entityType",
+      "type": "string",
+      "mode": "enum",
+      "description": "Type of entity",
+      "enum": ["user", "api_key", "ip_address"],
+      "required": true
+    },
+    {
+      "name": "entityId",
+      "type": "string",
+      "mode": "stored",
+      "description": "Entity identifier",
+      "required": true
+    },
+    {
+      "name": "bucket",
+      "type": "string",
+      "mode": "stored",
+      "description": "Rate limit bucket identifier",
+      "required": true
+    },
+    {
+      "name": "requestCount",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Current request count",
+      "default": 0
+    },
+    {
+      "name": "windowStart",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Start of current window",
+      "required": true
+    },
+    {
+      "name": "windowEnd",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "End of current window",
+      "required": true
+    },
+    {
+      "name": "tokensAvailable",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Tokens available (for token bucket)",
+      "nullable": true
+    },
+    {
+      "name": "lastRefillAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Last token refill time",
+      "nullable": true
+    },
+    {
+      "name": "resetAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When the limit resets",
+      "required": true
+    },
+    {
+      "name": "isThrottled",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether entity is currently throttled",
+      "default": false
+    },
+    {
+      "name": "version",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Version for optimistic locking",
+      "default": 1
+    },
+    {
+      "name": "updatedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Last update timestamp",
+      "required": true
+    }
+  ],
+  "indexes": [
+    {
+      "fields": ["entityType", "entityId", "bucket"],
+      "unique": true
+    },
+    {
+      "fields": ["resetAt"],
+      "name": "idx_reset_time"
+    },
+    {
+      "fields": ["isThrottled"],
+      "name": "idx_throttled",
+      "where": "isThrottled = true"
+    }
+  ]
+}

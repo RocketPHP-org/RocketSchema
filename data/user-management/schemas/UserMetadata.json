@@ -1,0 +1,93 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "UserMetadata",
+  "description": "Key-value metadata for users (normalized from User.metadata)",
+  "properties": [
+    {
+      "name": "userId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "User reference",
+      "required": true
+    },
+    {
+      "name": "metadataKey",
+      "type": "string",
+      "mode": "stored",
+      "description": "Metadata key",
+      "required": true
+    },
+    {
+      "name": "metadataValue",
+      "type": "string",
+      "mode": "stored",
+      "description": "Metadata value (stored as string, can be JSON)",
+      "required": true
+    },
+    {
+      "name": "valueType",
+      "type": "string",
+      "mode": "enum",
+      "description": "Type of value",
+      "enum": ["string", "number", "boolean", "date", "json", "binary"],
+      "default": "string"
+    },
+    {
+      "name": "category",
+      "type": "string",
+      "mode": "stored",
+      "description": "Metadata category",
+      "nullable": true
+    },
+    {
+      "name": "isEncrypted",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether value is encrypted",
+      "default": false
+    },
+    {
+      "name": "isIndexed",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether to index this metadata",
+      "default": false
+    },
+    {
+      "name": "createdAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Creation timestamp",
+      "required": true
+    },
+    {
+      "name": "updatedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Last update timestamp"
+    },
+    {
+      "name": "createdBy",
+      "type": "User",
+      "mode": "stored",
+      "description": "Who created this metadata",
+      "nullable": true
+    }
+  ],
+  "indexes": [
+    {
+      "fields": ["userId", "metadataKey"],
+      "unique": true
+    },
+    {
+      "fields": ["userId", "category"],
+      "name": "idx_user_category"
+    },
+    {
+      "fields": ["metadataKey", "metadataValue"],
+      "name": "idx_key_value",
+      "where": "isIndexed = true"
+    }
+  ]
+}

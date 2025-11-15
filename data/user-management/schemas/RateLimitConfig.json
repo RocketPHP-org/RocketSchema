@@ -1,0 +1,97 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "RateLimitConfig",
+  "description": "Rate limit configuration for users and API keys",
+  "properties": [
+    {
+      "name": "entityType",
+      "type": "string",
+      "mode": "enum",
+      "description": "Type of entity",
+      "enum": ["user", "api_key", "ip_address"],
+      "required": true
+    },
+    {
+      "name": "entityId",
+      "type": "string",
+      "mode": "stored",
+      "description": "Entity identifier",
+      "required": true
+    },
+    {
+      "name": "limitType",
+      "type": "string",
+      "mode": "enum",
+      "description": "Type of rate limit",
+      "enum": ["requests_per_second", "requests_per_minute", "requests_per_hour", "requests_per_day"],
+      "required": true
+    },
+    {
+      "name": "limitValue",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Number of allowed requests",
+      "required": true,
+      "min": 0
+    },
+    {
+      "name": "windowSize",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Time window in seconds",
+      "required": true
+    },
+    {
+      "name": "burstSize",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Allowed burst size",
+      "default": 10
+    },
+    {
+      "name": "scope",
+      "type": "string",
+      "mode": "stored",
+      "description": "Scope of rate limit (endpoint, global, etc.)",
+      "default": "global"
+    },
+    {
+      "name": "priority",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Priority for multiple limits",
+      "default": 0
+    },
+    {
+      "name": "isActive",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether limit is active",
+      "default": true
+    },
+    {
+      "name": "createdAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Creation timestamp",
+      "required": true
+    },
+    {
+      "name": "updatedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Last update timestamp"
+    }
+  ],
+  "indexes": [
+    {
+      "fields": ["entityType", "entityId", "limitType", "scope"],
+      "unique": true
+    },
+    {
+      "fields": ["entityType", "entityId", "isActive"],
+      "name": "idx_entity_active"
+    }
+  ]
+}

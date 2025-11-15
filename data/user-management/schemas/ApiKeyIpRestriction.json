@@ -1,0 +1,70 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "ApiKeyIpRestriction",
+  "description": "IP whitelist/blacklist for API keys (normalized from ApiKey)",
+  "properties": [
+    {
+      "name": "apiKeyId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "Reference to API key",
+      "required": true
+    },
+    {
+      "name": "ipAddress",
+      "type": "string",
+      "mode": "stored",
+      "description": "IP address or CIDR range",
+      "required": true,
+      "example": "192.168.1.0/24"
+    },
+    {
+      "name": "restrictionType",
+      "type": "string",
+      "mode": "enum",
+      "description": "Type of restriction",
+      "enum": ["allow", "deny"],
+      "default": "allow",
+      "required": true
+    },
+    {
+      "name": "description",
+      "type": "string",
+      "mode": "stored",
+      "description": "Description of this restriction",
+      "nullable": true
+    },
+    {
+      "name": "addedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When restriction was added",
+      "required": true
+    },
+    {
+      "name": "addedBy",
+      "type": "User",
+      "mode": "stored",
+      "description": "Who added the restriction",
+      "nullable": true
+    },
+    {
+      "name": "isActive",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether restriction is active",
+      "default": true
+    }
+  ],
+  "indexes": [
+    {
+      "fields": ["apiKeyId", "ipAddress"],
+      "unique": true
+    },
+    {
+      "fields": ["apiKeyId", "restrictionType", "isActive"],
+      "name": "idx_key_restriction_active"
+    }
+  ]
+}

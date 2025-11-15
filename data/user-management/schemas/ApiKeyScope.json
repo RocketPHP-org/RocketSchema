@@ -1,0 +1,70 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "ApiKeyScope",
+  "description": "OAuth-style scopes for API keys (normalized from ApiKey)",
+  "properties": [
+    {
+      "name": "apiKeyId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "Reference to API key",
+      "required": true
+    },
+    {
+      "name": "scope",
+      "type": "string",
+      "mode": "stored",
+      "description": "Scope identifier",
+      "required": true,
+      "example": "read:users"
+    },
+    {
+      "name": "resource",
+      "type": "string",
+      "mode": "stored",
+      "description": "Resource part of scope",
+      "required": true,
+      "example": "users"
+    },
+    {
+      "name": "action",
+      "type": "string",
+      "mode": "stored",
+      "description": "Action part of scope",
+      "required": true,
+      "example": "read"
+    },
+    {
+      "name": "constraints",
+      "type": "string",
+      "mode": "stored",
+      "description": "Additional constraints (JSON)",
+      "nullable": true
+    },
+    {
+      "name": "grantedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When scope was granted",
+      "required": true
+    },
+    {
+      "name": "grantedBy",
+      "type": "User",
+      "mode": "stored",
+      "description": "Who granted the scope",
+      "nullable": true
+    }
+  ],
+  "indexes": [
+    {
+      "fields": ["apiKeyId", "scope"],
+      "unique": true
+    },
+    {
+      "fields": ["apiKeyId", "resource", "action"],
+      "name": "idx_key_resource_action"
+    }
+  ]
+}

@@ -2,11 +2,19 @@
   "@type": "Schema",
   "@context": "https://rocketschema.org/context",
   "name": "TwoFactorAuth",
-  "description": "Two-factor authentication configuration for enhanced security",
+  "description": "Two-factor authentication configuration - NORMALIZED VERSION (3NF compliant)",
   "properties": [
     {
-      "name": "user",
-      "type": "User",
+      "name": "twoFactorAuthId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "Unique 2FA configuration identifier",
+      "required": true,
+      "unique": true
+    },
+    {
+      "name": "userId",
+      "type": "uuid",
       "mode": "stored",
       "description": "User this 2FA configuration belongs to",
       "required": true
@@ -35,10 +43,11 @@
       "default": false
     },
     {
-      "name": "secret",
+      "name": "secretHash",
       "type": "string",
       "mode": "stored",
       "description": "Encrypted secret for TOTP",
+      "nullable": true,
       "private": true
     },
     {
@@ -46,6 +55,7 @@
       "type": "string",
       "mode": "stored",
       "description": "Phone number for SMS-based 2FA",
+      "nullable": true,
       "format": "phone"
     },
     {
@@ -53,39 +63,60 @@
       "type": "string",
       "mode": "stored",
       "description": "Email for email-based 2FA",
+      "nullable": true,
       "format": "email"
     },
     {
-      "name": "deviceInfo",
-      "type": "object",
+      "name": "deviceName",
+      "type": "string",
       "mode": "stored",
-      "description": "Information about hardware key or authenticator device"
+      "description": "Hardware key or authenticator device name",
+      "nullable": true
     },
     {
-      "name": "backupCodes",
-      "type": "string[]",
+      "name": "deviceSerial",
+      "type": "string",
       "mode": "stored",
-      "description": "Encrypted backup codes",
-      "private": true
+      "description": "Hardware device serial number",
+      "nullable": true
     },
     {
-      "name": "usedBackupCodes",
-      "type": "string[]",
+      "name": "algorithm",
+      "type": "string",
+      "mode": "enum",
+      "description": "Algorithm used for TOTP",
+      "enum": ["SHA1", "SHA256", "SHA512"],
+      "default": "SHA256"
+    },
+    {
+      "name": "digits",
+      "type": "integer",
       "mode": "stored",
-      "description": "List of used backup codes",
-      "private": true
+      "description": "Number of digits for TOTP",
+      "default": 6,
+      "min": 6,
+      "max": 8
+    },
+    {
+      "name": "period",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Period in seconds for TOTP",
+      "default": 30
     },
     {
       "name": "verifiedAt",
       "type": "DateTime",
       "mode": "stored",
-      "description": "When the 2FA method was verified"
+      "description": "When the 2FA method was verified",
+      "nullable": true
     },
     {
       "name": "lastUsedAt",
       "type": "DateTime",
       "mode": "stored",
-      "description": "Last time this 2FA method was used"
+      "description": "Last time this 2FA method was used",
+      "nullable": true
     },
     {
       "name": "failedAttempts",
@@ -98,13 +129,22 @@
       "name": "lockedUntil",
       "type": "DateTime",
       "mode": "stored",
-      "description": "2FA locked until this timestamp due to failed attempts"
+      "description": "2FA locked until this timestamp",
+      "nullable": true
     },
     {
-      "name": "trustedDevices",
-      "type": "object[]",
+      "name": "backupCodesGenerated",
+      "type": "integer",
       "mode": "stored",
-      "description": "List of trusted devices that don't require 2FA"
+      "description": "Number of backup codes generated",
+      "default": 0
+    },
+    {
+      "name": "backupCodesRemaining",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Number of unused backup codes",
+      "default": 0
     },
     {
       "name": "createdAt",
@@ -120,31 +160,42 @@
       "description": "Last update timestamp"
     },
     {
-      "name": "metadata",
-      "type": "object",
+      "name": "version",
+      "type": "integer",
       "mode": "stored",
-      "description": "Additional metadata"
+      "description": "Version for optimistic locking",
+      "default": 1
     }
   ],
-  "examples": [
+  "relationships": {
+    "backupCodes": {
+      "type": "one-to-many",
+      "entity": "TwoFactorBackupCode",
+      "foreign_key": "twoFactorAuthId"
+    },
+    "trustedDevices": {
+      "type": "one-to-many",
+      "entity": "TrustedDevice",
+      "foreign_key": "userId"
+    }
+  },
+  "indexes": [
     {
-      "@type": "TwoFactorAuth",
-      "method": "totp",
-      "isEnabled": true,
-      "isPrimary": true,
-      "verifiedAt": "2024-01-15T10:00:00Z",
-      "lastUsedAt": "2024-03-15T14:30:00Z",
-      "failedAttempts": 0,
-      "createdAt": "2024-01-15T10:00:00Z"
+      "fields": ["twoFactorAuthId"],
+      "unique": true
     },
     {
-      "@type": "TwoFactorAuth",
-      "method": "sms",
-      "isEnabled": true,
-      "isPrimary": false,
-      "phoneNumber": "+1234567890",
-      "verifiedAt": "2024-01-20T11:00:00Z",
-      "createdAt": "2024-01-20T11:00:00Z"
+      "fields": ["userId", "method"],
+      "unique": true
+    },
+    {
+      "fields": ["userId", "isPrimary"],
+      "name": "idx_user_primary",
+      "where": "isPrimary = true"
+    },
+    {
+      "fields": ["userId", "isEnabled"],
+      "name": "idx_user_enabled"
     }
   ]
 }

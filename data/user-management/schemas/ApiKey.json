@@ -2,13 +2,21 @@
   "@type": "Schema",
   "@context": "https://rocketschema.org/context",
   "name": "ApiKey",
-  "description": "API key for machine-to-machine authentication and service access",
+  "description": "API key for machine-to-machine authentication - NORMALIZED VERSION (3NF compliant)",
   "properties": [
     {
-      "name": "key",
+      "name": "apiKeyId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "Unique API key identifier",
+      "required": true,
+      "unique": true
+    },
+    {
+      "name": "keyHash",
       "type": "string",
       "mode": "stored",
-      "description": "The API key (should be hashed)",
+      "description": "The API key hash",
       "required": true,
       "unique": true,
       "private": true
@@ -33,7 +41,8 @@
       "name": "description",
       "type": "string",
       "mode": "stored",
-      "description": "Description of the key's purpose"
+      "description": "Description of the key's purpose",
+      "nullable": true
     },
     {
       "name": "type",
@@ -45,63 +54,18 @@
       "example": "secret"
     },
     {
-      "name": "user",
-      "type": "User",
+      "name": "userId",
+      "type": "uuid",
       "mode": "stored",
-      "description": "User who owns this API key"
+      "description": "User who owns this API key",
+      "nullable": true
     },
     {
-      "name": "organization",
-      "type": "Organization",
+      "name": "organizationId",
+      "type": "uuid",
       "mode": "stored",
-      "description": "Organization that owns this API key"
-    },
-    {
-      "name": "permissions",
-      "type": "Permission[]",
-      "mode": "stored",
-      "description": "Specific permissions granted to this API key"
-    },
-    {
-      "name": "scopes",
-      "type": "string[]",
-      "mode": "stored",
-      "description": "OAuth-style scopes for this key",
-      "example": ["read:users", "write:products"]
-    },
-    {
-      "name": "rateLimit",
-      "type": "integer",
-      "mode": "stored",
-      "description": "Requests per hour limit",
-      "default": 1000,
-      "min": 0
-    },
-    {
-      "name": "rateLimitRemaining",
-      "type": "integer",
-      "mode": "stored",
-      "description": "Remaining requests in current window"
-    },
-    {
-      "name": "rateLimitResetsAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "When the rate limit resets"
-    },
-    {
-      "name": "ipWhitelist",
-      "type": "string[]",
-      "mode": "stored",
-      "description": "List of allowed IP addresses/ranges",
-      "example": ["192.168.1.0/24", "10.0.0.1"]
-    },
-    {
-      "name": "allowedOrigins",
-      "type": "string[]",
-      "mode": "stored",
-      "description": "Allowed origins for browser-based requests",
-      "example": ["https://example.com", "https://app.example.com"]
+      "description": "Organization that owns this API key",
+      "nullable": true
     },
     {
       "name": "validFrom",
@@ -114,23 +78,26 @@
       "name": "validUntil",
       "type": "DateTime",
       "mode": "stored",
-      "description": "End of validity period (null for no expiration)"
+      "description": "End of validity period",
+      "nullable": true
     },
     {
       "name": "lastUsedAt",
       "type": "DateTime",
       "mode": "stored",
-      "description": "Last time this key was used"
+      "description": "Last time this key was used",
+      "nullable": true
     },
     {
       "name": "lastUsedIp",
       "type": "string",
       "mode": "stored",
-      "description": "IP address of last use"
+      "description": "IP address of last use",
+      "nullable": true
     },
     {
       "name": "usageCount",
-      "type": "integer",
+      "type": "bigint",
       "mode": "stored",
       "description": "Total number of times used",
       "default": 0,
@@ -147,19 +114,22 @@
       "name": "revokedAt",
       "type": "DateTime",
       "mode": "stored",
-      "description": "When the key was revoked"
+      "description": "When the key was revoked",
+      "nullable": true
     },
     {
       "name": "revokedBy",
-      "type": "User",
+      "type": "uuid",
       "mode": "stored",
-      "description": "User who revoked the key"
+      "description": "User who revoked the key",
+      "nullable": true
     },
     {
       "name": "revokedReason",
       "type": "string",
       "mode": "stored",
-      "description": "Reason for revocation"
+      "description": "Reason for revocation",
+      "nullable": true
     },
     {
       "name": "createdAt",
@@ -170,33 +140,77 @@
     },
     {
       "name": "createdBy",
-      "type": "User",
+      "type": "uuid",
       "mode": "stored",
-      "description": "User who created the key"
+      "description": "User who created the key",
+      "nullable": true
     },
     {
-      "name": "metadata",
-      "type": "object",
+      "name": "updatedAt",
+      "type": "DateTime",
       "mode": "stored",
-      "description": "Additional metadata"
+      "description": "Last update timestamp"
+    },
+    {
+      "name": "version",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Version for optimistic locking",
+      "default": 1
     }
   ],
-  "examples": [
+  "relationships": {
+    "scopes": {
+      "type": "one-to-many",
+      "entity": "ApiKeyScope",
+      "foreign_key": "apiKeyId"
+    },
+    "permissions": {
+      "type": "many-to-many",
+      "entity": "Permission",
+      "junction": "ApiKeyPermission"
+    },
+    "ipRestrictions": {
+      "type": "one-to-many",
+      "entity": "ApiKeyIpRestriction",
+      "foreign_key": "apiKeyId"
+    },
+    "allowedOrigins": {
+      "type": "one-to-many",
+      "entity": "ApiKeyAllowedOrigin",
+      "foreign_key": "apiKeyId"
+    },
+    "rateLimit": {
+      "type": "one-to-many",
+      "entity": "RateLimitConfig",
+      "foreign_key": "entityId",
+      "condition": "entityType = 'api_key'"
+    }
+  },
+  "indexes": [
     {
-      "@type": "ApiKey",
-      "keyPrefix": "sk_live_abc",
-      "name": "Production API Key",
-      "description": "Main production API key for e-commerce integration",
-      "type": "secret",
-      "scopes": ["read:products", "write:orders"],
-      "rateLimit": 5000,
-      "validFrom": "2024-01-01T00:00:00Z",
-      "validUntil": null,
-      "lastUsedAt": "2024-03-15T14:30:00Z",
-      "lastUsedIp": "203.0.113.0",
-      "usageCount": 15420,
-      "isActive": true,
-      "createdAt": "2024-01-01T00:00:00Z"
+      "fields": ["apiKeyId"],
+      "unique": true
+    },
+    {
+      "fields": ["keyHash"],
+      "unique": true
+    },
+    {
+      "fields": ["keyPrefix"],
+      "name": "idx_prefix"
+    },
+    {
+      "fields": ["userId"],
+      "name": "idx_user"
+    },
+    {
+      "fields": ["organizationId"],
+      "name": "idx_organization"
+    },
+    {
+      "fields": ["isActive", "validUntil"],
+      "name": "idx_active_valid"
     }
   ]
 }

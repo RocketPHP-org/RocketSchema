@@ -1,0 +1,156 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "UserActivityLog",
+  "description": "Comprehensive audit log for user activities (ACID compliance)",
+  "properties": [
+    {
+      "name": "logId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "Unique log entry identifier",
+      "required": true,
+      "unique": true
+    },
+    {
+      "name": "userId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "User who performed the action",
+      "required": true
+    },
+    {
+      "name": "activityType",
+      "type": "string",
+      "mode": "enum",
+      "description": "Type of activity",
+      "enum": ["login", "logout", "password_change", "profile_update", "2fa_enable", "2fa_disable", "api_key_created", "api_key_revoked", "account_locked", "account_unlocked", "email_verified", "password_reset"],
+      "required": true
+    },
+    {
+      "name": "timestamp",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When the activity occurred",
+      "required": true
+    },
+    {
+      "name": "ipAddress",
+      "type": "string",
+      "mode": "stored",
+      "description": "IP address of the activity",
+      "nullable": true
+    },
+    {
+      "name": "userAgent",
+      "type": "string",
+      "mode": "stored",
+      "description": "User agent string",
+      "nullable": true
+    },
+    {
+      "name": "deviceId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "Device identifier if known",
+      "nullable": true
+    },
+    {
+      "name": "sessionId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "Session identifier",
+      "nullable": true
+    },
+    {
+      "name": "result",
+      "type": "string",
+      "mode": "enum",
+      "description": "Result of the activity",
+      "enum": ["success", "failure", "partial"],
+      "required": true
+    },
+    {
+      "name": "errorCode",
+      "type": "string",
+      "mode": "stored",
+      "description": "Error code if failed",
+      "nullable": true
+    },
+    {
+      "name": "errorMessage",
+      "type": "string",
+      "mode": "stored",
+      "description": "Error message if failed",
+      "nullable": true
+    },
+    {
+      "name": "changedFields",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON array of changed fields",
+      "nullable": true
+    },
+    {
+      "name": "oldValues",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON of old values (encrypted)",
+      "nullable": true,
+      "private": true
+    },
+    {
+      "name": "newValues",
+      "type": "string",
+      "mode": "stored",
+      "description": "JSON of new values (encrypted)",
+      "nullable": true,
+      "private": true
+    },
+    {
+      "name": "riskScore",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Calculated risk score",
+      "min": 0,
+      "max": 100,
+      "nullable": true
+    },
+    {
+      "name": "location",
+      "type": "string",
+      "mode": "stored",
+      "description": "Approximate location",
+      "nullable": true
+    },
+    {
+      "name": "transactionId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "Related transaction ID",
+      "nullable": true
+    }
+  ],
+  "indexes": [
+    {
+      "fields": ["logId"],
+      "unique": true
+    },
+    {
+      "fields": ["userId", "timestamp"],
+      "name": "idx_user_time"
+    },
+    {
+      "fields": ["activityType", "timestamp"],
+      "name": "idx_activity_time"
+    },
+    {
+      "fields": ["sessionId"],
+      "name": "idx_session"
+    },
+    {
+      "fields": ["timestamp"],
+      "name": "idx_timestamp"
+    }
+  ]
+}

@@ -1,0 +1,71 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "ApiKeyPermission",
+  "description": "Permissions granted to API keys (junction table)",
+  "properties": [
+    {
+      "name": "apiKeyId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "Reference to API key",
+      "required": true
+    },
+    {
+      "name": "permissionId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "Reference to Permission",
+      "required": true
+    },
+    {
+      "name": "grantedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When permission was granted",
+      "required": true
+    },
+    {
+      "name": "grantedBy",
+      "type": "User",
+      "mode": "stored",
+      "description": "Who granted the permission",
+      "nullable": true
+    },
+    {
+      "name": "validFrom",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Start of validity",
+      "nullable": true
+    },
+    {
+      "name": "validUntil",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "End of validity",
+      "nullable": true
+    },
+    {
+      "name": "isActive",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether permission is active",
+      "default": true
+    }
+  ],
+  "indexes": [
+    {
+      "fields": ["apiKeyId", "permissionId"],
+      "unique": true
+    },
+    {
+      "fields": ["permissionId"],
+      "name": "idx_permission"
+    },
+    {
+      "fields": ["apiKeyId", "isActive"],
+      "name": "idx_key_active_perms"
+    }
+  ]
+}

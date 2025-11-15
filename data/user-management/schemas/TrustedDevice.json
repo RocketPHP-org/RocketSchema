@@ -1,0 +1,155 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "TrustedDevice",
+  "description": "Trusted devices that don't require 2FA (normalized from TwoFactorAuth)",
+  "properties": [
+    {
+      "name": "deviceId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "Unique device identifier",
+      "required": true,
+      "unique": true
+    },
+    {
+      "name": "userId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "User who trusts this device",
+      "required": true
+    },
+    {
+      "name": "deviceName",
+      "type": "string",
+      "mode": "stored",
+      "description": "Friendly device name",
+      "required": true
+    },
+    {
+      "name": "deviceType",
+      "type": "string",
+      "mode": "enum",
+      "description": "Type of device",
+      "enum": ["desktop", "laptop", "mobile", "tablet", "browser", "api_client"],
+      "required": true
+    },
+    {
+      "name": "deviceFingerprint",
+      "type": "string",
+      "mode": "stored",
+      "description": "Unique device fingerprint",
+      "required": true,
+      "private": true
+    },
+    {
+      "name": "userAgent",
+      "type": "string",
+      "mode": "stored",
+      "description": "Browser user agent",
+      "nullable": true
+    },
+    {
+      "name": "operatingSystem",
+      "type": "string",
+      "mode": "stored",
+      "description": "Device operating system",
+      "nullable": true
+    },
+    {
+      "name": "browser",
+      "type": "string",
+      "mode": "stored",
+      "description": "Browser name and version",
+      "nullable": true
+    },
+    {
+      "name": "ipAddress",
+      "type": "string",
+      "mode": "stored",
+      "description": "Last known IP address",
+      "nullable": true
+    },
+    {
+      "name": "location",
+      "type": "string",
+      "mode": "stored",
+      "description": "Approximate location",
+      "nullable": true
+    },
+    {
+      "name": "trustedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When device was trusted",
+      "required": true
+    },
+    {
+      "name": "trustedUntil",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Trust expiration",
+      "nullable": true
+    },
+    {
+      "name": "lastUsedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Last device activity",
+      "nullable": true
+    },
+    {
+      "name": "isActive",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether device is still trusted",
+      "default": true
+    },
+    {
+      "name": "revokedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "When trust was revoked",
+      "nullable": true
+    },
+    {
+      "name": "revokedReason",
+      "type": "string",
+      "mode": "stored",
+      "description": "Reason for revocation",
+      "nullable": true
+    },
+    {
+      "name": "createdAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Creation timestamp",
+      "required": true
+    },
+    {
+      "name": "updatedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Last update timestamp"
+    }
+  ],
+  "indexes": [
+    {
+      "fields": ["deviceId"],
+      "unique": true
+    },
+    {
+      "fields": ["userId", "deviceFingerprint"],
+      "unique": true
+    },
+    {
+      "fields": ["userId", "isActive"],
+      "name": "idx_user_active_devices"
+    },
+    {
+      "fields": ["trustedUntil"],
+      "name": "idx_trust_expiration",
+      "where": "trustedUntil IS NOT NULL"
+    }
+  ]
+}

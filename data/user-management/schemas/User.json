@@ -2,8 +2,16 @@
   "@type": "Schema",
   "@context": "https://rocketschema.org/context",
   "name": "User",
-  "description": "A system user account with authentication credentials, profile information, and access control",
+  "description": "A system user account - NORMALIZED VERSION (3NF compliant)",
   "properties": [
+    {
+      "name": "userId",
+      "type": "uuid",
+      "mode": "stored",
+      "description": "Unique user identifier",
+      "required": true,
+      "unique": true
+    },
     {
       "name": "username",
       "type": "string",
@@ -34,41 +42,15 @@
       "name": "emailVerifiedAt",
       "type": "DateTime",
       "mode": "stored",
-      "description": "Timestamp when email was verified"
-    },
-    {
-      "name": "passwordHash",
-      "type": "string",
-      "mode": "stored",
-      "description": "Hashed password (never store plain text)",
-      "required": true,
-      "private": true
-    },
-    {
-      "name": "passwordSalt",
-      "type": "string",
-      "mode": "stored",
-      "description": "Salt used for password hashing",
-      "private": true
-    },
-    {
-      "name": "passwordLastChangedAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "Last password change timestamp"
-    },
-    {
-      "name": "mustChangePassword",
-      "type": "boolean",
-      "mode": "stored",
-      "description": "Flag indicating user must change password on next login",
-      "default": false
+      "description": "Timestamp when email was verified",
+      "nullable": true
     },
     {
       "name": "person",
       "type": "Person",
       "mode": "stored",
-      "description": "Reference to Person entity for demographic information"
+      "description": "Reference to Person entity for demographic information",
+      "nullable": true
     },
     {
       "name": "status",
@@ -83,38 +65,30 @@
       "name": "statusReason",
       "type": "string",
       "mode": "stored",
-      "description": "Reason for current status (e.g., 'Too many failed login attempts')"
+      "description": "Reason for current status",
+      "nullable": true
     },
     {
-      "name": "lastLoginAt",
+      "name": "statusChangedAt",
       "type": "DateTime",
       "mode": "stored",
-      "description": "Last successful login timestamp"
+      "description": "When status was last changed"
     },
     {
-      "name": "lastLoginIp",
+      "name": "locale",
       "type": "string",
       "mode": "stored",
-      "description": "IP address of last successful login"
+      "description": "User's preferred locale",
+      "default": "en-US",
+      "example": "en-US"
     },
     {
-      "name": "lastActivityAt",
-      "type": "DateTime",
+      "name": "timezone",
+      "type": "string",
       "mode": "stored",
-      "description": "Last activity timestamp"
-    },
-    {
-      "name": "failedLoginAttempts",
-      "type": "integer",
-      "mode": "stored",
-      "description": "Number of consecutive failed login attempts",
-      "default": 0
-    },
-    {
-      "name": "lockedUntil",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "Account locked until this timestamp"
+      "description": "User's timezone",
+      "default": "UTC",
+      "example": "America/New_York"
     },
     {
       "name": "registeredAt",
@@ -132,53 +106,106 @@
       "example": "web"
     },
     {
-      "name": "locale",
+      "name": "registrationIp",
       "type": "string",
       "mode": "stored",
-      "description": "User's preferred locale (e.g., en-US, fr-FR)",
-      "example": "en-US"
+      "description": "IP address at registration",
+      "nullable": true
     },
     {
-      "name": "timezone",
-      "type": "string",
+      "name": "activatedAt",
+      "type": "DateTime",
       "mode": "stored",
-      "description": "User's timezone",
-      "example": "America/New_York"
+      "description": "Account activation timestamp",
+      "nullable": true
     },
     {
-      "name": "roles",
-      "type": "UserRole[]",
+      "name": "deactivatedAt",
+      "type": "DateTime",
       "mode": "stored",
-      "description": "User's assigned roles"
+      "description": "Account deactivation timestamp",
+      "nullable": true
     },
     {
-      "name": "groups",
-      "type": "UserGroup[]",
+      "name": "deletedAt",
+      "type": "DateTime",
       "mode": "stored",
-      "description": "Groups the user belongs to"
+      "description": "Soft delete timestamp",
+      "nullable": true
     },
     {
-      "name": "metadata",
-      "type": "object",
+      "name": "version",
+      "type": "integer",
       "mode": "stored",
-      "description": "Additional metadata for extensibility"
+      "description": "Version number for optimistic locking",
+      "default": 1
+    },
+    {
+      "name": "createdAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Creation timestamp",
+      "required": true
+    },
+    {
+      "name": "updatedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Last update timestamp"
     }
   ],
-  "examples": [
+  "relationships": {
+    "authentication": {
+      "type": "one-to-one",
+      "entity": "UserAuthentication",
+      "foreign_key": "userId"
+    },
+    "sessions": {
+      "type": "one-to-many",
+      "entity": "UserSession",
+      "foreign_key": "userId"
+    },
+    "preferences": {
+      "type": "one-to-many",
+      "entity": "UserPreference",
+      "foreign_key": "userId"
+    },
+    "notifications": {
+      "type": "one-to-many",
+      "entity": "UserNotification",
+      "foreign_key": "userId"
+    },
+    "twoFactorMethods": {
+      "type": "one-to-many",
+      "entity": "TwoFactorAuth",
+      "foreign_key": "userId"
+    },
+    "apiKeys": {
+      "type": "one-to-many",
+      "entity": "ApiKey",
+      "foreign_key": "userId"
+    }
+  },
+  "indexes": [
     {
-      "@type": "User",
-      "username": "john.doe",
-      "email": "john.doe@example.com",
-      "emailVerified": true,
-      "emailVerifiedAt": "2024-01-15T10:30:00Z",
-      "status": "active",
-      "lastLoginAt": "2024-03-15T14:30:00Z",
-      "lastLoginIp": "192.168.1.100",
-      "failedLoginAttempts": 0,
-      "registeredAt": "2024-01-01T09:00:00Z",
-      "registrationSource": "web",
-      "locale": "en-US",
-      "timezone": "America/New_York"
+      "fields": ["userId"],
+      "unique": true
+    },
+    {
+      "fields": ["username"],
+      "unique": true
+    },
+    {
+      "fields": ["email"],
+      "unique": true
+    },
+    {
+      "fields": ["status", "registeredAt"],
+      "name": "idx_status_registered"
+    },
+    {
+      "fields": ["deletedAt"],
+      "name": "idx_soft_delete"
     }
   ]
 }
