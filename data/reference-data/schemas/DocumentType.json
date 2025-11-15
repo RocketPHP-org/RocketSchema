@@ -7,6 +7,7 @@
     {
       "name": "code",
       "type": "string",
+      "mode": "stored",
       "description": "Document type code (QUOTE, ORDER, DELIVERY, INVOICE, CREDIT_NOTE, RECEIPT, etc.)",
       "required": true,
       "example": "INVOICE"
@@ -14,6 +15,7 @@
     {
       "name": "label",
       "type": "string",
+      "mode": "stored",
       "description": "Human-readable label",
       "required": true,
       "example": "Invoice"
@@ -21,23 +23,27 @@
     {
       "name": "description",
       "type": "string",
+      "mode": "stored",
       "description": "Detailed description of this document type"
     },
     {
       "name": "isAccountingDocument",
       "type": "boolean",
+      "mode": "stored",
       "description": "Whether this is an accounting/fiscal document",
       "example": true
     },
     {
       "name": "requiresSignature",
       "type": "boolean",
+      "mode": "stored",
       "description": "Whether this document requires signature",
       "example": false
     },
     {
       "name": "hasLegalValue",
       "type": "boolean",
+      "mode": "stored",
       "description": "Whether this document has legal/contractual value",
       "example": true
     }

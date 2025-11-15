@@ -7,6 +7,7 @@
     {
       "name": "code",
       "type": "string",
+      "mode": "stored",
       "description": "ISO 3166-1 alpha-2 country code",
       "required": true,
       "format": "iso-country-code",
@@ -15,6 +16,7 @@
     {
       "name": "code3",
       "type": "string",
+      "mode": "stored",
       "description": "ISO 3166-1 alpha-3 country code",
       "format": "iso-country-code",
       "example": "USA"
@@ -22,12 +24,14 @@
     {
       "name": "numericCode",
       "type": "string",
+      "mode": "stored",
       "description": "ISO 3166-1 numeric country code",
       "example": "840"
     },
     {
       "name": "name",
       "type": "string",
+      "mode": "stored",
       "description": "Official country name",
       "required": true,
       "example": "United States of America"
@@ -35,24 +39,29 @@
     {
       "name": "nativeName",
       "type": "string",
+      "mode": "stored",
       "description": "Country name in native language",
       "example": "United States"
     },
     {
       "name": "region",
       "type": "string",
-      "description": "Geographic region (Europe, Asia, Americas, Africa, Oceania)",
+      "mode": "enum",
+      "description": "Geographic region",
+      "enum": ["Europe", "Asia", "Americas", "Africa", "Oceania"],
       "example": "Americas"
     },
     {
       "name": "subregion",
       "type": "string",
+      "mode": "stored",
       "description": "Geographic subregion",
       "example": "Northern America"
     },
     {
       "name": "demonym",
       "type": "string",
+      "mode": "stored",
       "description": "Nationality/citizenship demonym (Algerian, American, French, British, etc.)",
       "example": "American"
     }

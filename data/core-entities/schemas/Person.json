@@ -7,12 +7,14 @@
     {
       "name": "prefix",
       "type": "string",
+      "mode": "stored",
       "description": "Title or honorific (Mr., Mrs., Ms., Dr., Prof., etc.)",
       "example": "Dr."
     },
     {
       "name": "givenName",
       "type": "string",
+      "mode": "stored",
       "description": "First name or given name",
       "required": true,
       "example": "John"
@@ -20,12 +22,14 @@
     {
       "name": "middleName",
       "type": "string",
+      "mode": "stored",
       "description": "Middle name(s)",
       "example": "Michael"
     },
     {
       "name": "familyName",
       "type": "string",
+      "mode": "stored",
       "description": "Last name or family name",
       "required": true,
       "example": "Doe"
@@ -33,65 +37,78 @@
     {
       "name": "suffix",
       "type": "string",
+      "mode": "stored",
       "description": "Name suffix (Jr., Sr., III, PhD, MD, etc.)",
       "example": "Jr."
     },
     {
       "name": "preferredName",
       "type": "string",
+      "mode": "stored",
       "description": "Name the person prefers to be called",
       "example": "Johnny"
     },
     {
       "name": "status",
       "type": "string",
-      "description": "Current status (active, inactive, deceased)",
+      "mode": "enum",
+      "description": "Current status",
+      "enum": ["active", "inactive", "deceased"],
       "example": "active"
     },
     {
       "name": "gender",
       "type": "Gender",
+      "mode": "stored",
       "description": "Gender identity (reference to Gender entity)"
     },
     {
       "name": "maritalStatus",
       "type": "MaritalStatus",
+      "mode": "stored",
       "description": "Marital status (reference to MaritalStatus entity)"
     },
     {
       "name": "birthDate",
       "type": "Date",
+      "mode": "stored",
       "description": "Date of birth",
       "example": "1990-01-15"
     },
     {
       "name": "nationality",
       "type": "Country[]",
+      "mode": "stored",
       "description": "Nationality or citizenship - supports multiple nationalities (reference to Country entity)"
     },
     {
       "name": "languages",
       "type": "LanguageProficiency[]",
+      "mode": "stored",
       "description": "Languages spoken by the person with proficiency levels"
     },
     {
       "name": "telecoms",
       "type": "ContactPoint[]",
+      "mode": "stored",
       "description": "Contact points - phone numbers, emails, etc."
     },
     {
       "name": "onlinePresence",
       "type": "OnlinePresence[]",
+      "mode": "stored",
       "description": "Online profiles and social media"
     },
     {
       "name": "address",
       "type": "PostalAddress[]",
+      "mode": "stored",
       "description": "Physical addresses"
     },
     {
       "name": "photoUrl",
       "type": "string",
+      "mode": "stored",
       "description": "URL to person's photograph or avatar",
       "format": "uri",
       "example": "https://example.com/photos/person.jpg"
@@ -99,11 +116,13 @@
     {
       "name": "identifier",
       "type": "Identifier[]",
+      "mode": "stored",
       "description": "Official identifiers - national ID, passport, driver's license, etc."
     },
     {
       "name": "metadata",
       "type": "object",
+      "mode": "stored",
       "description": "Additional metadata for extensibility"
     }
   ],

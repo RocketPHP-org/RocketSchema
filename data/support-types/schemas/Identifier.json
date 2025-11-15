@@ -7,6 +7,7 @@
     {
       "name": "system",
       "type": "string",
+      "mode": "stored",
       "description": "Identification system or authority (Organizations: 'SIREN', 'SIRET', 'VAT', 'EIN', 'DUNS', 'LEI' | Persons: 'SSN', 'NIN', 'PASSPORT', 'DRIVERS_LICENSE')",
       "required": true,
       "example": "SIREN"
@@ -14,6 +15,7 @@
     {
       "name": "value",
       "type": "string",
+      "mode": "stored",
       "description": "The actual identifier value",
       "required": true,
       "example": "123456789"
@@ -21,35 +23,43 @@
     {
       "name": "type",
       "type": "string",
-      "description": "Type or category of identifier (e.g., 'tax', 'registration', 'legal', 'financial')",
+      "mode": "enum",
+      "description": "Type or category of identifier",
+      "enum": ["tax", "registration", "legal", "financial", "national-id", "travel-document", "license"],
       "example": "registration"
     },
     {
       "name": "country",
       "type": "Country",
+      "mode": "stored",
       "description": "Country where this identifier is valid (reference to Country entity)"
     },
     {
       "name": "issuer",
       "type": "string",
+      "mode": "stored",
       "description": "Organization or authority that issued the identifier",
       "example": "INSEE France"
     },
     {
       "name": "label",
       "type": "string",
+      "mode": "stored",
       "description": "Human-readable label for this identifier",
       "example": "French Business Registration Number"
     },
     {
       "name": "period",
       "type": "Period",
+      "mode": "stored",
       "description": "Period during which this identifier is valid"
     },
     {
       "name": "use",
       "type": "string",
-      "description": "Purpose of this identifier (official, temp, secondary)",
+      "mode": "enum",
+      "description": "Purpose of this identifier",
+      "enum": ["official", "temp", "secondary"],
       "example": "official"
     }
   ],

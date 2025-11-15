@@ -7,6 +7,7 @@
     {
       "name": "platform",
       "type": "string",
+      "mode": "stored",
       "description": "Platform or service name (website, linkedin, twitter, facebook, instagram, youtube, github, etc.)",
       "required": true,
       "example": "website"
@@ -14,6 +15,7 @@
     {
       "name": "url",
       "type": "string",
+      "mode": "stored",
       "description": "URL to the profile or page",
       "required": true,
       "format": "uri",
@@ -22,24 +24,28 @@
     {
       "name": "handle",
       "type": "string",
+      "mode": "stored",
       "description": "Username or handle on the platform (without @ symbol)",
       "example": "acmecorp"
     },
     {
       "name": "verified",
       "type": "boolean",
+      "mode": "stored",
       "description": "Whether this is a verified/official account",
       "example": true
     },
     {
       "name": "primary",
       "type": "boolean",
+      "mode": "stored",
       "description": "Whether this is the primary online presence",
       "example": true
     },
     {
       "name": "label",
       "type": "string",
+      "mode": "stored",
       "description": "Human-readable label",
       "example": "Official Website"
     }

@@ -7,42 +7,50 @@
     {
       "name": "language",
       "type": "Language",
+      "mode": "stored",
       "description": "Reference to the language",
       "required": true
     },
     {
       "name": "proficiency",
       "type": "string",
-      "description": "Level of proficiency (native, fluent, advanced, intermediate, beginner, basic)",
+      "mode": "enum",
+      "description": "Level of proficiency",
+      "enum": ["native", "fluent", "advanced", "intermediate", "beginner", "basic"],
       "example": "fluent"
     },
     {
       "name": "isPreferred",
       "type": "boolean",
+      "mode": "stored",
       "description": "Whether this is the person's preferred language for communication",
       "example": true
     },
     {
       "name": "isNative",
       "type": "boolean",
+      "mode": "stored",
       "description": "Whether this is a native/mother tongue language",
       "example": false
     },
     {
       "name": "canSpeak",
       "type": "boolean",
+      "mode": "stored",
       "description": "Can speak this language",
       "example": true
     },
     {
       "name": "canRead",
       "type": "boolean",
+      "mode": "stored",
       "description": "Can read this language",
       "example": true
     },
     {
       "name": "canWrite",
       "type": "boolean",
+      "mode": "stored",
       "description": "Can write this language",
       "example": true
     }

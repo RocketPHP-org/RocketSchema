@@ -7,6 +7,7 @@
     {
       "name": "code",
       "type": "string",
+      "mode": "stored",
       "description": "Unit code (UN/CEFACT Recommendation 20 or custom)",
       "required": true,
       "example": "PCE"
@@ -14,12 +15,14 @@
     {
       "name": "symbol",
       "type": "string",
+      "mode": "stored",
       "description": "Unit symbol",
       "example": "pc"
     },
     {
       "name": "name",
       "type": "string",
+      "mode": "stored",
       "description": "Unit name",
       "required": true,
       "example": "Piece"
@@ -27,13 +30,17 @@
     {
       "name": "category",
       "type": "string",
-      "description": "Category of measurement (quantity, length, weight, volume, time, etc.)",
+      "mode": "enum",
+      "description": "Category of measurement",
+      "enum": ["quantity", "length", "weight", "volume", "time", "packaging", "medical", "temperature"],
       "example": "quantity"
     },
     {
       "name": "system",
       "type": "string",
-      "description": "Measurement system (metric, imperial, custom)",
+      "mode": "enum",
+      "description": "Measurement system",
+      "enum": ["metric", "imperial", "custom"],
       "example": "metric"
     }
   ],

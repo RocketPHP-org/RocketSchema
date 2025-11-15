@@ -7,6 +7,7 @@
     {
       "name": "name",
       "type": "string",
+      "mode": "stored",
       "description": "Name of the organization",
       "required": true,
       "example": "Acme Corporation"
@@ -14,6 +15,7 @@
     {
       "name": "alias",
       "type": "string[]",
+      "mode": "stored",
       "description": "Alternate names or trading names for the organization",
       "example": [
         "Acme",
@@ -23,61 +25,73 @@
     {
       "name": "legalName",
       "type": "string",
+      "mode": "stored",
       "description": "Legal registered name of the organization",
       "example": "Acme Corporation Inc."
     },
     {
       "name": "status",
       "type": "string",
-      "description": "Current operational status of the organization (active, inactive, suspended, pending, dissolved)",
+      "mode": "enum",
+      "description": "Current operational status of the organization",
+      "enum": ["active", "inactive", "suspended", "pending", "dissolved"],
       "example": "active"
     },
     {
       "name": "identifier",
       "type": "Identifier[]",
+      "mode": "stored",
       "description": "Official identifiers from various systems - tax IDs (SIREN, SIRET, EIN, VAT), registration numbers (DUNS, LEI), etc. Supports all country-specific identification systems"
     },
     {
       "name": "telecoms",
       "type": "ContactPoint[]",
+      "mode": "stored",
       "description": "Contact points for the organization - phone numbers, emails, fax, etc. Supports multiple contacts with different purposes and priorities"
     },
     {
       "name": "onlinePresence",
       "type": "OnlinePresence[]",
+      "mode": "stored",
       "description": "Online presence - website, social media profiles (LinkedIn, Twitter, Facebook, GitHub, etc.)"
     },
     {
       "name": "address",
       "type": "PostalAddress[]",
+      "mode": "stored",
       "description": "Physical addresses of the organization (headquarters, branches, warehouses, mailing, etc.). Use the 'use' and 'label' fields to distinguish between address types",
       "required": true
     },
     {
       "name": "foundingDate",
       "type": "Date",
+      "mode": "stored",
       "description": "Date when the organization was founded",
       "example": "2010-05-15"
     },
     {
       "name": "numberOfEmployees",
       "type": "number",
+      "mode": "stored",
       "description": "Number of employees",
       "example": 250
     },
     {
       "name": "parentOrganization",
       "type": "Organization",
+      "mode": "stored",
       "description": "Parent organization if this is a subsidiary or division"
     },
     {
       "name": "childOrganizations",
       "type": "Organization[]",
+      "mode": "stored",
       "description": "List of subsidiary or child organizations"
     },
     {
       "name": "logo",
       "type": "string",
+      "mode": "stored",
       "description": "URL to the organization logo",
       "format": "uri",
       "example": "https://example.com/logo.png"
@@ -85,43 +99,51 @@
     {
       "name": "description",
       "type": "string",
+      "mode": "stored",
       "description": "Detailed description of the organization and its activities"
     },
     {
       "name": "shortDescription",
       "type": "string",
+      "mode": "stored",
       "description": "Brief description for summaries and previews"
     },
     {
       "name": "organizationType",
       "type": "string",
+      "mode": "stored",
       "description": "Legal form of organization (Corporation, LLC, SARL, NGO, Association, etc.)",
       "example": "Corporation"
     },
     {
       "name": "activities",
       "type": "BusinessActivity[]",
+      "mode": "stored",
       "description": "Business activities and industry sectors (primary and secondary). Supports multiple activity codes from different classification systems"
     },
     {
       "name": "bankAccounts",
       "type": "BankAccount[]",
+      "mode": "stored",
       "description": "Bank accounts of the organization (main, payroll, international, etc.)"
     },
     {
       "name": "contacts",
       "type": "OrganizationContact[]",
+      "mode": "stored",
       "description": "Professional contacts within the organization (sales representatives, managers, support agents, etc.)"
     },
     {
       "name": "slug",
       "type": "string",
+      "mode": "stored",
       "description": "URL-friendly identifier for the organization",
       "example": "acme-corporation"
     },
     {
       "name": "metadata",
       "type": "object",
+      "mode": "stored",
       "description": "Additional metadata for extensibility and custom fields"
     }
   ],

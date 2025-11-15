@@ -7,18 +7,22 @@
     {
       "name": "code",
       "type": "string",
+      "mode": "stored",
       "description": "Activity classification code (NAICS, SIC, NACE, APE, etc.)",
       "example": "62.01Z"
     },
     {
       "name": "system",
       "type": "string",
-      "description": "Classification system used (NAICS, SIC, NACE, APE, ISIC)",
+      "mode": "enum",
+      "description": "Classification system used",
+      "enum": ["NAICS", "SIC", "NACE", "APE", "ISIC"],
       "example": "APE"
     },
     {
       "name": "label",
       "type": "string",
+      "mode": "stored",
       "description": "Human-readable description of the activity",
       "required": true,
       "example": "Custom software development"
@@ -26,18 +30,21 @@
     {
       "name": "isPrimary",
       "type": "boolean",
+      "mode": "stored",
       "description": "Whether this is the primary/main activity",
       "example": true
     },
     {
       "name": "category",
       "type": "string",
+      "mode": "stored",
       "description": "High-level category (Technology, Healthcare, Retail, Manufacturing, etc.)",
       "example": "Technology"
     },
     {
       "name": "description",
       "type": "string",
+      "mode": "stored",
       "description": "Detailed description of the activity"
     }
   ],

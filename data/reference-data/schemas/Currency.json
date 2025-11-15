@@ -7,6 +7,7 @@
     {
       "name": "code",
       "type": "string",
+      "mode": "stored",
       "description": "ISO 4217 three-letter currency code",
       "required": true,
       "format": "iso-currency-code",
@@ -15,12 +16,14 @@
     {
       "name": "numericCode",
       "type": "string",
+      "mode": "stored",
       "description": "ISO 4217 numeric currency code",
       "example": "840"
     },
     {
       "name": "name",
       "type": "string",
+      "mode": "stored",
       "description": "Currency name",
       "required": true,
       "example": "United States Dollar"
@@ -28,18 +31,21 @@
     {
       "name": "symbol",
       "type": "string",
+      "mode": "stored",
       "description": "Currency symbol",
       "example": "$"
     },
     {
       "name": "decimalDigits",
       "type": "number",
+      "mode": "stored",
       "description": "Number of decimal places typically used",
       "example": 2
     },
     {
       "name": "countries",
       "type": "Country[]",
+      "mode": "stored",
       "description": "Countries that use this currency"
     }
   ],

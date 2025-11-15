@@ -7,13 +7,16 @@
     {
       "name": "code",
       "type": "string",
-      "description": "Marital status code (S, M, D, W, P for Single, Married, Divorced, Widowed, Partnered)",
+      "mode": "enum",
+      "description": "Marital status code",
+      "enum": ["S", "M", "D", "W", "P", "U"],
       "required": true,
       "example": "M"
     },
     {
       "name": "label",
       "type": "string",
+      "mode": "stored",
       "description": "Human-readable label",
       "required": true,
       "example": "Married"
@@ -21,6 +24,7 @@
     {
       "name": "description",
       "type": "string",
+      "mode": "stored",
       "description": "Detailed description"
     }
   ],
