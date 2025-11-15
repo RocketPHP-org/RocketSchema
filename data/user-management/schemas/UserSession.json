@@ -5,14 +5,6 @@
   "description": "Represents an active user session in the system. When a user logs in successfully, a session is created to track their activity and maintain their authenticated state. Sessions are the bridge between a user's login credentials and their ability to access protected resources. Each session has a unique token, tracks the device and location information, and has an expiration time for security. Multiple sessions can exist for the same user (like being logged in on phone and laptop simultaneously). Sessions are essential for features like 'remember me', activity tracking, and the ability to remotely log out devices. When a user logs out or their session expires, it gets marked as inactive.",
   "properties": [
     {
-      "name": "sessionId",
-      "type": "string",
-      "mode": "stored",
-      "description": "Unique identifier for this session",
-      "required": true,
-      "unique": true
-    },
-    {
       "name": "user",
       "type": "User",
       "mode": "stored",
@@ -52,29 +44,28 @@
       "type": "string",
       "mode": "enum",
       "description": "Type of device used for this session",
-      "enum": ["desktop", "mobile", "tablet", "api", "unknown"],
+      "enum": [
+        "desktop",
+        "mobile",
+        "tablet",
+        "api",
+        "unknown"
+      ],
       "example": "desktop"
     },
     {
       "name": "deviceInfo",
-      "type": "object",
+      "type": "string",
       "mode": "stored",
       "description": "Additional device details like OS version, browser version",
       "nullable": true
     },
     {
       "name": "location",
-      "type": "object",
+      "type": "string",
       "mode": "stored",
       "description": "Geographic location based on IP if available",
       "nullable": true
-    },
-    {
-      "name": "createdAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "When the session was created (login time)",
-      "required": true
     },
     {
       "name": "lastActivityAt",
@@ -109,12 +100,18 @@
       "type": "string",
       "mode": "enum",
       "description": "Why the session ended",
-      "enum": ["logout", "timeout", "revoked", "expired", "security"],
+      "enum": [
+        "logout",
+        "timeout",
+        "revoked",
+        "expired",
+        "security"
+      ],
       "example": "logout"
     },
     {
       "name": "metadata",
-      "type": "object",
+      "type": "string",
       "mode": "stored",
       "description": "Additional session data like feature flags or permissions cache"
     }
@@ -122,7 +119,6 @@
   "examples": [
     {
       "@type": "UserSession",
-      "sessionId": "sess_abc123xyz789",
       "ipAddress": "192.168.1.100",
       "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
       "deviceType": "desktop",
@@ -136,14 +132,12 @@
         "city": "San Francisco",
         "region": "California"
       },
-      "createdAt": "2024-03-15T10:00:00Z",
       "lastActivityAt": "2024-03-15T10:30:00Z",
       "expiresAt": "2024-03-15T22:00:00Z",
       "isActive": true
     },
     {
       "@type": "UserSession",
-      "sessionId": "sess_mobile_456def",
       "ipAddress": "172.58.12.34",
       "userAgent": "MyApp/2.1.0 (iPhone; iOS 17.0)",
       "deviceType": "mobile",
@@ -152,7 +146,6 @@
         "version": "17.0",
         "model": "iPhone 14 Pro"
       },
-      "createdAt": "2024-03-14T08:00:00Z",
       "lastActivityAt": "2024-03-14T18:45:00Z",
       "expiresAt": "2024-03-21T08:00:00Z",
       "isActive": false,

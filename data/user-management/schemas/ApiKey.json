@@ -5,14 +5,6 @@
   "description": "Represents an API key for programmatic access to the system. API keys allow applications, scripts, or services to authenticate without using username/password combinations. They're essential for machine-to-machine communication, continuous integration, automated scripts, and third-party integrations. Each API key has a unique identifier, can be restricted by IP address or domain, has configurable permissions, and includes rate limiting to prevent abuse. API keys can be revoked instantly if compromised, and their usage is tracked for security auditing. Unlike user sessions, API keys don't expire automatically but can have validity periods set. They're typically used in HTTP headers or query parameters for authentication.",
   "properties": [
     {
-      "name": "apiKeyId",
-      "type": "uuid",
-      "mode": "stored",
-      "description": "Unique identifier for this API key",
-      "required": true,
-      "unique": true
-    },
-    {
       "name": "keyHash",
       "type": "string",
       "mode": "stored",
@@ -49,20 +41,25 @@
       "type": "string",
       "mode": "enum",
       "description": "Classification of the API key",
-      "enum": ["public", "secret", "restricted", "test"],
+      "enum": [
+        "public",
+        "secret",
+        "restricted",
+        "test"
+      ],
       "default": "secret",
       "example": "secret"
     },
     {
-      "name": "userId",
-      "type": "uuid",
+      "name": "user",
+      "type": "User",
       "mode": "stored",
       "description": "User who created and owns this key",
       "nullable": true
     },
     {
-      "name": "organizationId",
-      "type": "uuid",
+      "name": "organization",
+      "type": "Organization",
       "mode": "stored",
       "description": "Organization that owns this key",
       "nullable": true
@@ -119,7 +116,7 @@
     },
     {
       "name": "revokedBy",
-      "type": "uuid",
+      "type": "User",
       "mode": "stored",
       "description": "User who revoked the key",
       "nullable": true
@@ -130,47 +127,29 @@
       "mode": "stored",
       "description": "Explanation for why the key was revoked",
       "nullable": true
-    },
-    {
-      "name": "createdAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "When the key was generated",
-      "required": true
-    },
-    {
-      "name": "createdBy",
-      "type": "uuid",
-      "mode": "stored",
-      "description": "User who created the key",
-      "nullable": true
     }
   ],
   "examples": [
     {
       "@type": "ApiKey",
-      "apiKeyId": "key_550e8400",
       "keyPrefix": "sk_live_4Xb9",
       "name": "Production E-commerce Integration",
       "description": "Used by our e-commerce platform to sync inventory and process orders",
       "type": "secret",
-      "userId": "user_123",
       "validFrom": "2024-01-01T00:00:00Z",
       "validUntil": null,
       "lastUsedAt": "2024-03-15T14:30:00Z",
       "lastUsedIp": "203.0.113.42",
       "usageCount": 15420,
       "isActive": true,
-      "createdAt": "2024-01-01T00:00:00Z"
+      "user": "user_123"
     },
     {
       "@type": "ApiKey",
-      "apiKeyId": "key_test_999",
       "keyPrefix": "sk_test_7Yz2",
       "name": "Development Testing Key",
       "description": "Temporary key for integration testing",
       "type": "test",
-      "userId": "developer_456",
       "validFrom": "2024-03-01T00:00:00Z",
       "validUntil": "2024-04-01T00:00:00Z",
       "lastUsedAt": "2024-03-14T10:00:00Z",
@@ -180,7 +159,7 @@
       "revokedAt": "2024-03-15T00:00:00Z",
       "revokedBy": "admin_789",
       "revokedReason": "Key was accidentally committed to public repository",
-      "createdAt": "2024-03-01T00:00:00Z"
+      "user": "developer_456"
     }
   ]
 }

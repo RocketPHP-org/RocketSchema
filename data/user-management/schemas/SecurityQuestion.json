@@ -12,14 +12,6 @@
       "required": true
     },
     {
-      "name": "questionId",
-      "type": "string",
-      "mode": "stored",
-      "description": "Unique identifier for the question",
-      "required": true,
-      "example": "sq_mother_maiden"
-    },
-    {
       "name": "question",
       "type": "string",
       "mode": "stored",
@@ -32,7 +24,10 @@
       "type": "string",
       "mode": "enum",
       "description": "Whether this is a system-provided or user-created question",
-      "enum": ["predefined", "custom"],
+      "enum": [
+        "predefined",
+        "custom"
+      ],
       "default": "predefined",
       "example": "predefined"
     },
@@ -63,7 +58,12 @@
       "type": "string",
       "mode": "enum",
       "description": "Expected format of the answer for validation",
-      "enum": ["text", "date", "number", "email"],
+      "enum": [
+        "text",
+        "date",
+        "number",
+        "email"
+      ],
       "default": "text"
     },
     {
@@ -128,13 +128,6 @@
       "description": "When this security question expires and must be updated"
     },
     {
-      "name": "createdAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "When this security question was set up",
-      "required": true
-    },
-    {
       "name": "updatedAt",
       "type": "DateTime",
       "mode": "stored",
@@ -144,7 +137,6 @@
   "examples": [
     {
       "@type": "SecurityQuestion",
-      "questionId": "sq_first_pet",
       "question": "What was the name of your first pet?",
       "questionType": "predefined",
       "category": "personal",
@@ -157,12 +149,10 @@
       "lastUsedAt": "2024-02-20T10:30:00Z",
       "failedAttempts": 0,
       "priority": 1,
-      "createdAt": "2024-01-01T12:00:00Z",
       "updatedAt": "2024-01-01T12:00:00Z"
     },
     {
       "@type": "SecurityQuestion",
-      "questionId": "sq_custom_001",
       "question": "What is the name of the street where you lived in 2010?",
       "questionType": "custom",
       "category": "location",
@@ -175,7 +165,6 @@
       "failedAttempts": 2,
       "priority": 2,
       "expiresAt": "2025-01-01T00:00:00Z",
-      "createdAt": "2024-01-15T09:00:00Z",
       "updatedAt": "2024-03-10T14:00:00Z"
     }
   ]

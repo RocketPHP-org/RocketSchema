@@ -5,16 +5,8 @@
   "description": "Manages devices that users have marked as trusted to bypass two-factor authentication requirements. When a user successfully logs in with 2FA from a device, they can choose to 'Remember this device' or 'Trust this device for 30 days', which creates a trusted device record. This significantly improves user experience by not requiring 2FA on every login from frequently-used devices like their personal laptop or phone, while still maintaining security on unknown devices. The system creates a unique fingerprint for each device using various characteristics like browser type, operating system, screen resolution, and installed plugins - making it difficult for attackers to impersonate a trusted device. Trust can be time-limited (expires after 30 days) or revoked manually by the user or automatically if suspicious activity is detected. Users can view and manage all their trusted devices from their security settings, seeing details like when each device was last used and from what location. This feature balances security with usability, similar to how banks remember your computer but still require extra verification from new devices.",
   "properties": [
     {
-      "name": "deviceId",
-      "type": "uuid",
-      "mode": "stored",
-      "description": "Unique identifier for this trusted device",
-      "required": true,
-      "unique": true
-    },
-    {
-      "name": "userId",
-      "type": "uuid",
+      "name": "user",
+      "type": "User",
       "mode": "stored",
       "description": "User who has trusted this device",
       "required": true
@@ -32,7 +24,16 @@
       "type": "string",
       "mode": "enum",
       "description": "Category of the trusted device",
-      "enum": ["desktop", "laptop", "mobile", "tablet", "browser", "api_client", "smart_tv", "wearable"],
+      "enum": [
+        "desktop",
+        "laptop",
+        "mobile",
+        "tablet",
+        "browser",
+        "api_client",
+        "smart_tv",
+        "wearable"
+      ],
       "required": true
     },
     {
@@ -147,29 +148,14 @@
     },
     {
       "name": "metadata",
-      "type": "object",
+      "type": "string",
       "mode": "stored",
       "description": "Additional device characteristics and flags"
-    },
-    {
-      "name": "createdAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "When this record was created",
-      "required": true
-    },
-    {
-      "name": "updatedAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "Last modification of this record"
     }
   ],
   "examples": [
     {
       "@type": "TrustedDevice",
-      "deviceId": "dev_550e8400",
-      "userId": "user_123456",
       "deviceName": "Sarah's Work Laptop",
       "deviceType": "laptop",
       "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
@@ -190,13 +176,10 @@
         "timezone": "America/New_York",
         "language": "en-US"
       },
-      "createdAt": "2024-01-15T10:00:00Z",
-      "updatedAt": "2024-03-15T08:30:00Z"
+      "user": "user_123456"
     },
     {
       "@type": "TrustedDevice",
-      "deviceId": "dev_mobile_789",
-      "userId": "user_456789",
       "deviceName": "iPhone 14 Pro",
       "deviceType": "mobile",
       "userAgent": "MyApp/2.5.0 (iPhone; iOS 17.3)",
@@ -219,8 +202,7 @@
         "biometricEnabled": true,
         "jailbroken": false
       },
-      "createdAt": "2024-02-01T14:00:00Z",
-      "updatedAt": "2024-03-15T09:00:00Z"
+      "user": "user_456789"
     }
   ]
 }

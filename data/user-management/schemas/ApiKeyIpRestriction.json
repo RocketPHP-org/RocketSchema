@@ -5,8 +5,8 @@
   "description": "Controls network access for API keys by defining IP address whitelists and blacklists. This security layer ensures that even if an API key is compromised, it can only be used from pre-approved network locations. Organizations use this to restrict API access to their office networks, data centers, or specific cloud services. The entity supports both individual IP addresses and CIDR notation for entire network ranges, making it flexible enough for various network architectures. Restrictions can be set as 'allow' (whitelist) or 'deny' (blacklist), with the ability to combine both for complex access policies. For example, you might allow an entire corporate network range but deny specific compromised machines within it. This is particularly important for high-privilege API keys that can modify critical data. The system typically checks these restrictions on every API request, comparing the source IP against all active rules for that key. Cloud services often require this feature to ensure customer API keys can only be used from their documented IP ranges, preventing unauthorized access even if credentials leak.",
   "properties": [
     {
-      "name": "apiKeyId",
-      "type": "uuid",
+      "name": "apiKey",
+      "type": "ApiKey",
       "mode": "stored",
       "description": "The API key these IP restrictions apply to",
       "required": true
@@ -24,7 +24,10 @@
       "type": "string",
       "mode": "enum",
       "description": "Whether this IP is allowed or denied",
-      "enum": ["allow", "deny"],
+      "enum": [
+        "allow",
+        "deny"
+      ],
       "default": "allow",
       "required": true
     },
@@ -96,7 +99,6 @@
   "examples": [
     {
       "@type": "ApiKeyIpRestriction",
-      "apiKeyId": "key_550e8400",
       "ipAddress": "10.0.0.0/8",
       "restrictionType": "allow",
       "description": "Internal corporate network - all offices",
@@ -106,11 +108,11 @@
       "addedBy": "admin_123",
       "lastMatchedAt": "2024-03-15T14:30:00Z",
       "matchCount": 5823,
-      "isActive": true
+      "isActive": true,
+      "apiKey": "key_550e8400"
     },
     {
       "@type": "ApiKeyIpRestriction",
-      "apiKeyId": "key_prod_789",
       "ipAddress": "203.0.113.45",
       "restrictionType": "deny",
       "description": "Blocked due to suspicious activity detected from this IP",
@@ -121,7 +123,8 @@
       "addedBy": "security_bot",
       "lastMatchedAt": "2024-03-15T16:30:00Z",
       "matchCount": 47,
-      "isActive": true
+      "isActive": true,
+      "apiKey": "key_prod_789"
     }
   ]
 }

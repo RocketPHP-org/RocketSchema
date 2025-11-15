@@ -5,8 +5,8 @@
   "description": "Manages Cross-Origin Resource Sharing (CORS) settings for API keys used in web browsers. When JavaScript running on a website tries to call your API, browsers enforce the same-origin policy for security - requests are blocked unless explicitly allowed. This entity defines which websites can use each API key from browser-based JavaScript, preventing unauthorized sites from making API calls even if they somehow obtain a valid key. Each origin entry includes the protocol, domain, and port (like https://app.example.com) that's permitted to use the API key. The entity also configures which HTTP methods are allowed, what headers can be sent, and how long browsers should cache these permissions. This is critical for public API keys that are embedded in client-side code, as they're visible to anyone viewing the page source. By restricting origins, you ensure that even exposed keys can only be used from your authorized domains. The system can allow all subdomains with a single rule, making it easier to manage multi-tenant applications. CORS preflight responses use this data to tell browsers whether to allow the actual API request.",
   "properties": [
     {
-      "name": "apiKeyId",
-      "type": "uuid",
+      "name": "apiKey",
+      "type": "ApiKey",
       "mode": "stored",
       "description": "The API key these CORS settings apply to",
       "required": true
@@ -77,7 +77,12 @@
       "type": "string",
       "mode": "enum",
       "description": "Which environment this origin is for",
-      "enum": ["development", "staging", "production", "all"],
+      "enum": [
+        "development",
+        "staging",
+        "production",
+        "all"
+      ],
       "default": "production"
     },
     {
@@ -112,7 +117,6 @@
   "examples": [
     {
       "@type": "ApiKeyAllowedOrigin",
-      "apiKeyId": "key_public_123",
       "origin": "https://www.myapp.com",
       "allowSubdomains": true,
       "allowedMethods": "GET,POST,PUT,DELETE",
@@ -125,11 +129,11 @@
       "addedAt": "2024-01-01T00:00:00Z",
       "lastUsedAt": "2024-03-15T14:30:00Z",
       "requestCount": 1847293,
-      "isActive": true
+      "isActive": true,
+      "apiKey": "key_public_123"
     },
     {
       "@type": "ApiKeyAllowedOrigin",
-      "apiKeyId": "key_dev_456",
       "origin": "http://localhost:3000",
       "allowSubdomains": false,
       "allowedMethods": "GET,POST",
@@ -141,7 +145,8 @@
       "addedAt": "2024-02-15T10:00:00Z",
       "lastUsedAt": "2024-03-15T16:45:00Z",
       "requestCount": 8234,
-      "isActive": true
+      "isActive": true,
+      "apiKey": "key_dev_456"
     }
   ]
 }

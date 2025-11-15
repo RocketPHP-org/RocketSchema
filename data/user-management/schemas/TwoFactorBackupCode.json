@@ -5,8 +5,8 @@
   "description": "Stores emergency backup codes that users can use to access their account when their primary two-factor authentication method is unavailable. These are typically 8-10 digit codes generated when 2FA is first enabled, and users are instructed to print or save them somewhere safe. Each code can only be used once - after being used, it's permanently invalidated to prevent reuse. Backup codes are the safety net for 2FA, preventing users from being permanently locked out if they lose their phone, authenticator app breaks, or hardware key is damaged. They're particularly critical for traveling users who might not have SMS access, or during phone number changes. The system typically generates 10-20 codes at once, and users can regenerate a new set if they run low. Each code is stored as a hash for security, and the system tracks which codes have been used, when, and from what IP address. This helps detect if backup codes have been compromised. Some systems alert users when backup codes are running low or have been used, as usage often indicates the primary 2FA method has failed.",
   "properties": [
     {
-      "name": "twoFactorAuthId",
-      "type": "uuid",
+      "name": "twoFactorAuth",
+      "type": "TwoFactorAuth",
       "mode": "stored",
       "description": "Links to the 2FA configuration these backup codes belong to",
       "required": true
@@ -69,13 +69,6 @@
       "default": 8
     },
     {
-      "name": "createdAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "When this backup code was generated",
-      "required": true
-    },
-    {
       "name": "expiresAt",
       "type": "DateTime",
       "mode": "stored",
@@ -93,17 +86,15 @@
   "examples": [
     {
       "@type": "TwoFactorBackupCode",
-      "twoFactorAuthId": "2fa_auth123",
       "codeSequence": 1,
       "isUsed": false,
       "codeLength": 8,
-      "createdAt": "2024-01-15T10:00:00Z",
       "expiresAt": "2025-01-15T10:00:00Z",
-      "notificationSent": false
+      "notificationSent": false,
+      "twoFactorAuth": "2fa_auth123"
     },
     {
       "@type": "TwoFactorBackupCode",
-      "twoFactorAuthId": "2fa_auth123",
       "codeSequence": 3,
       "isUsed": true,
       "usedAt": "2024-03-10T14:30:00Z",
@@ -111,9 +102,9 @@
       "usedUserAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)",
       "usedLocation": "San Francisco, CA, USA",
       "codeLength": 8,
-      "createdAt": "2024-01-15T10:00:00Z",
       "expiresAt": "2025-01-15T10:00:00Z",
-      "notificationSent": true
+      "notificationSent": true,
+      "twoFactorAuth": "2fa_auth123"
     }
   ]
 }

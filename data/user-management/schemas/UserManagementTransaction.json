@@ -5,19 +5,22 @@
   "description": "Manages complex, multi-step operations in user management as atomic transactions, ensuring data consistency and enabling rollback capabilities. Many user operations involve multiple related changes - for example, user registration might create a user record, set up authentication, send verification emails, create default preferences, and assign initial roles. This entity wraps all these steps into a single transaction that either completely succeeds or completely fails, preventing partial states that could leave the system inconsistent. Each transaction records its type (registration, password change, account deletion), current state (pending, in progress, committed, rolled back), and all operations performed. The checkpoint data allows the system to rollback changes if something fails midway through. This is particularly important for operations that interact with external systems - if sending a welcome email fails, the entire registration can be rolled back. The entity supports different isolation levels for concurrent operations and includes retry logic for transient failures. It provides an audit trail of complex operations and helps diagnose issues when multi-step processes fail. This transactional approach is essential for maintaining data integrity in distributed systems where operations might span multiple services or databases.",
   "properties": [
     {
-      "name": "transactionId",
-      "type": "uuid",
-      "mode": "stored",
-      "description": "Unique identifier for this transaction",
-      "required": true,
-      "unique": true
-    },
-    {
       "name": "transactionType",
       "type": "string",
       "mode": "enum",
       "description": "Category of operation being performed",
-      "enum": ["user_registration", "password_change", "authentication", "profile_update", "2fa_setup", "api_key_creation", "bulk_operation", "account_deletion", "role_assignment", "permission_update"],
+      "enum": [
+        "user_registration",
+        "password_change",
+        "authentication",
+        "profile_update",
+        "2fa_setup",
+        "api_key_creation",
+        "bulk_operation",
+        "account_deletion",
+        "role_assignment",
+        "permission_update"
+      ],
       "required": true
     },
     {
@@ -25,7 +28,14 @@
       "type": "string",
       "mode": "enum",
       "description": "Current status of the transaction",
-      "enum": ["pending", "in_progress", "committed", "rolled_back", "failed", "partially_committed"],
+      "enum": [
+        "pending",
+        "in_progress",
+        "committed",
+        "rolled_back",
+        "failed",
+        "partially_committed"
+      ],
       "required": true,
       "default": "pending"
     },
@@ -34,7 +44,12 @@
       "type": "string",
       "mode": "enum",
       "description": "Database isolation level for concurrent operations",
-      "enum": ["read_uncommitted", "read_committed", "repeatable_read", "serializable"],
+      "enum": [
+        "read_uncommitted",
+        "read_committed",
+        "repeatable_read",
+        "serializable"
+      ],
       "default": "read_committed"
     },
     {
@@ -45,8 +60,8 @@
       "nullable": true
     },
     {
-      "name": "affectedUserId",
-      "type": "uuid",
+      "name": "affectedUser",
+      "type": "User",
       "mode": "stored",
       "description": "Primary user affected by this transaction",
       "required": true
@@ -156,27 +171,24 @@
   "examples": [
     {
       "@type": "UserManagementTransaction",
-      "transactionId": "txn_abc123",
       "transactionType": "user_registration",
       "state": "committed",
       "isolationLevel": "read_committed",
-      "affectedUserId": "user_new_789",
       "operations": "[{\"operation\":\"create_user\",\"status\":\"completed\",\"timestamp\":\"2024-03-15T10:00:00Z\"},{\"operation\":\"create_authentication\",\"status\":\"completed\",\"timestamp\":\"2024-03-15T10:00:01Z\"},{\"operation\":\"send_verification_email\",\"status\":\"completed\",\"timestamp\":\"2024-03-15T10:00:02Z\"},{\"operation\":\"assign_default_role\",\"status\":\"completed\",\"timestamp\":\"2024-03-15T10:00:03Z\"}]",
       "startedAt": "2024-03-15T10:00:00Z",
       "committedAt": "2024-03-15T10:00:03Z",
       "completedAt": "2024-03-15T10:00:03Z",
       "retryCount": 0,
       "metadata": "{\"registration_source\":\"web\",\"ip_address\":\"192.168.1.100\"}",
-      "version": 2
+      "version": 2,
+      "affectedUser": "user_new_789"
     },
     {
       "@type": "UserManagementTransaction",
-      "transactionId": "txn_failed_456",
       "transactionType": "bulk_operation",
       "state": "rolled_back",
       "isolationLevel": "serializable",
       "initiator": "admin_123",
-      "affectedUserId": "batch_operation",
       "affectedUserIds": "[\"user_001\",\"user_002\",\"user_003\",\"user_004\",\"user_005\"]",
       "operations": "[{\"operation\":\"update_role\",\"status\":\"completed\",\"users\":[\"user_001\",\"user_002\",\"user_003\"]},{\"operation\":\"update_permissions\",\"status\":\"failed\",\"error\":\"Permission not found\"}]",
       "startedAt": "2024-03-15T14:00:00Z",
@@ -187,7 +199,8 @@
       "checkpointData": "{\"original_roles\":{\"user_001\":\"basic\",\"user_002\":\"basic\",\"user_003\":\"premium\"}}",
       "retryCount": 2,
       "maxRetries": 3,
-      "version": 4
+      "version": 4,
+      "affectedUser": "batch_operation"
     }
   ]
 }

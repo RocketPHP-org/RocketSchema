@@ -5,8 +5,8 @@
   "description": "Provides a flexible key-value storage system for user-specific data that doesn't fit into the standard user schema. This entity acts as an extension mechanism, allowing applications to store custom attributes, feature flags, integration data, or any additional information about users without modifying the core database schema. It's particularly useful for storing data from third-party integrations (like CRM IDs, external system references), A/B testing flags, user-specific feature toggles, custom profile fields that vary by deployment, or temporary data during migrations. Each metadata entry can be typed (string, number, boolean, JSON) to ensure proper handling, encrypted for sensitive data, and indexed for searchability. The category field helps organize related metadata, making it easier to retrieve all settings for a specific feature or integration. This pattern provides unlimited extensibility while maintaining database performance, as only frequently accessed metadata needs to be indexed. It's commonly used for multi-tenant applications where different customers need different user attributes, or for gradually rolling out features by storing beta access flags.",
   "properties": [
     {
-      "name": "userId",
-      "type": "uuid",
+      "name": "user",
+      "type": "User",
       "mode": "stored",
       "description": "The user this metadata belongs to",
       "required": true
@@ -32,7 +32,14 @@
       "type": "string",
       "mode": "enum",
       "description": "Data type for proper parsing and validation",
-      "enum": ["string", "number", "boolean", "date", "json", "binary"],
+      "enum": [
+        "string",
+        "number",
+        "boolean",
+        "date",
+        "json",
+        "binary"
+      ],
       "default": "string"
     },
     {
@@ -98,39 +105,11 @@
       "mode": "stored",
       "description": "When this metadata expires",
       "nullable": true
-    },
-    {
-      "name": "createdAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "When this metadata was first created",
-      "required": true
-    },
-    {
-      "name": "updatedAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "Last time this metadata was modified"
-    },
-    {
-      "name": "createdBy",
-      "type": "User",
-      "mode": "stored",
-      "description": "Who created this metadata entry",
-      "nullable": true
-    },
-    {
-      "name": "updatedBy",
-      "type": "User",
-      "mode": "stored",
-      "description": "Who last modified this metadata",
-      "nullable": true
     }
   ],
   "examples": [
     {
       "@type": "UserMetadata",
-      "userId": "user_123456",
       "metadataKey": "feature_flags.new_dashboard",
       "metadataValue": "true",
       "valueType": "boolean",
@@ -143,12 +122,10 @@
       "isEditable": false,
       "validFrom": "2024-03-01T00:00:00Z",
       "validUntil": "2024-06-01T00:00:00Z",
-      "createdAt": "2024-03-01T10:00:00Z",
-      "createdBy": "admin_789"
+      "user": "user_123456"
     },
     {
       "@type": "UserMetadata",
-      "userId": "user_789012",
       "metadataKey": "integrations.stripe.customerId",
       "metadataValue": "cus_P0K9mNbVcXyZ123",
       "valueType": "string",
@@ -159,8 +136,7 @@
       "isIndexed": true,
       "isPublic": false,
       "isEditable": false,
-      "createdAt": "2024-01-15T14:30:00Z",
-      "updatedAt": "2024-03-10T09:00:00Z"
+      "user": "user_789012"
     }
   ]
 }

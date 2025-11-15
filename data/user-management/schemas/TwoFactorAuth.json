@@ -5,16 +5,8 @@
   "description": "Manages two-factor authentication (2FA) methods for enhanced account security. This entity stores configuration for various 2FA methods like SMS codes, authenticator apps (Google Authenticator, Authy), email codes, or hardware keys. Each user can have multiple 2FA methods configured, with one marked as primary. When 2FA is enabled, users must provide both their password and a second factor to log in. This dramatically increases account security by requiring something the user knows (password) and something they have (phone, hardware key). The entity tracks verification status, failed attempts, and can temporarily lock 2FA after too many failures to prevent brute force attacks.",
   "properties": [
     {
-      "name": "twoFactorAuthId",
-      "type": "uuid",
-      "mode": "stored",
-      "description": "Unique identifier for this 2FA configuration",
-      "required": true,
-      "unique": true
-    },
-    {
-      "name": "userId",
-      "type": "uuid",
+      "name": "user",
+      "type": "User",
       "mode": "stored",
       "description": "The user who owns this 2FA method",
       "required": true
@@ -24,7 +16,15 @@
       "type": "string",
       "mode": "enum",
       "description": "Type of 2FA method being used",
-      "enum": ["totp", "sms", "email", "authenticator", "hardware_key", "biometric", "backup_codes"],
+      "enum": [
+        "totp",
+        "sms",
+        "email",
+        "authenticator",
+        "hardware_key",
+        "biometric",
+        "backup_codes"
+      ],
       "required": true,
       "example": "totp"
     },
@@ -85,7 +85,11 @@
       "type": "string",
       "mode": "enum",
       "description": "Cryptographic algorithm for TOTP",
-      "enum": ["SHA1", "SHA256", "SHA512"],
+      "enum": [
+        "SHA1",
+        "SHA256",
+        "SHA512"
+      ],
       "default": "SHA256"
     },
     {
@@ -145,26 +149,11 @@
       "mode": "stored",
       "description": "How many unused backup codes are left",
       "default": 0
-    },
-    {
-      "name": "createdAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "When this 2FA method was added",
-      "required": true
-    },
-    {
-      "name": "updatedAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "Last modification timestamp"
     }
   ],
   "examples": [
     {
       "@type": "TwoFactorAuth",
-      "twoFactorAuthId": "2fa_auth123",
-      "userId": "550e8400-e29b-41d4-a716-446655440000",
       "method": "totp",
       "isEnabled": true,
       "isPrimary": true,
@@ -177,12 +166,10 @@
       "failedAttempts": 0,
       "backupCodesGenerated": 10,
       "backupCodesRemaining": 8,
-      "createdAt": "2024-01-15T10:00:00Z"
+      "user": "550e8400-e29b-41d4-a716-446655440000"
     },
     {
       "@type": "TwoFactorAuth",
-      "twoFactorAuthId": "2fa_sms456",
-      "userId": "6ba7b810-9dad-11d1-80b4-00c04fd430c8",
       "method": "sms",
       "isEnabled": true,
       "isPrimary": false,
@@ -192,7 +179,7 @@
       "failedAttempts": 2,
       "backupCodesGenerated": 0,
       "backupCodesRemaining": 0,
-      "createdAt": "2024-01-20T11:00:00Z"
+      "user": "6ba7b810-9dad-11d1-80b4-00c04fd430c8"
     }
   ]
 }

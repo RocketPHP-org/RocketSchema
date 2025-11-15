@@ -26,7 +26,13 @@
       "type": "string",
       "mode": "enum",
       "description": "Category of authentication provider",
-      "enum": ["oauth2", "saml", "oidc", "ldap", "custom"],
+      "enum": [
+        "oauth2",
+        "saml",
+        "oidc",
+        "ldap",
+        "custom"
+      ],
       "default": "oauth2",
       "example": "oauth2"
     },
@@ -77,7 +83,11 @@
       "type": "string[]",
       "mode": "stored",
       "description": "Permissions requested from the provider",
-      "example": ["openid", "email", "profile"]
+      "example": [
+        "openid",
+        "email",
+        "profile"
+      ]
     },
     {
       "name": "redirectUri",
@@ -139,16 +149,9 @@
     },
     {
       "name": "metadata",
-      "type": "object",
+      "type": "string",
       "mode": "stored",
       "description": "Additional provider-specific configuration"
-    },
-    {
-      "name": "createdAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "When this provider was configured",
-      "required": true
     }
   ],
   "examples": [
@@ -161,7 +164,11 @@
       "authorizationUrl": "https://accounts.google.com/o/oauth2/v2/auth",
       "tokenUrl": "https://oauth2.googleapis.com/token",
       "userInfoUrl": "https://www.googleapis.com/oauth2/v2/userinfo",
-      "scopes": ["openid", "email", "profile"],
+      "scopes": [
+        "openid",
+        "email",
+        "profile"
+      ],
       "redirectUri": "https://myapp.com/auth/google/callback",
       "iconUrl": "https://myapp.com/icons/google.svg",
       "buttonColor": "#4285F4",
@@ -179,8 +186,7 @@
       "metadata": {
         "accessType": "offline",
         "prompt": "consent"
-      },
-      "createdAt": "2024-01-01T00:00:00Z"
+      }
     },
     {
       "@type": "OAuthProvider",
@@ -191,7 +197,12 @@
       "authorizationUrl": "https://login.microsoftonline.com/tenant-id/oauth2/v2.0/authorize",
       "tokenUrl": "https://login.microsoftonline.com/tenant-id/oauth2/v2.0/token",
       "userInfoUrl": "https://graph.microsoft.com/v1.0/me",
-      "scopes": ["openid", "email", "profile", "User.Read"],
+      "scopes": [
+        "openid",
+        "email",
+        "profile",
+        "User.Read"
+      ],
       "redirectUri": "https://enterprise.app/auth/azure/callback",
       "iconUrl": "https://enterprise.app/icons/microsoft.svg",
       "buttonColor": "#0078D4",
@@ -208,10 +219,12 @@
       },
       "metadata": {
         "tenant": "organizations",
-        "allowedDomains": ["company.com", "subsidiary.com"],
+        "allowedDomains": [
+          "company.com",
+          "subsidiary.com"
+        ],
         "groupClaimsEnabled": true
-      },
-      "createdAt": "2024-01-15T10:00:00Z"
+      }
     }
   ]
 }

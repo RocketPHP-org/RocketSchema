@@ -9,7 +9,12 @@
       "type": "string",
       "mode": "enum",
       "description": "What type of entity this limit applies to",
-      "enum": ["user", "api_key", "ip_address", "organization"],
+      "enum": [
+        "user",
+        "api_key",
+        "ip_address",
+        "organization"
+      ],
       "required": true
     },
     {
@@ -32,7 +37,13 @@
       "type": "string",
       "mode": "enum",
       "description": "Time window for the rate limit",
-      "enum": ["requests_per_second", "requests_per_minute", "requests_per_hour", "requests_per_day", "requests_per_month"],
+      "enum": [
+        "requests_per_second",
+        "requests_per_minute",
+        "requests_per_hour",
+        "requests_per_day",
+        "requests_per_month"
+      ],
       "required": true
     },
     {
@@ -64,7 +75,12 @@
       "type": "string",
       "mode": "enum",
       "description": "Rate limiting algorithm to use",
-      "enum": ["token_bucket", "sliding_window", "fixed_window", "leaky_bucket"],
+      "enum": [
+        "token_bucket",
+        "sliding_window",
+        "fixed_window",
+        "leaky_bucket"
+      ],
       "default": "token_bucket"
     },
     {
@@ -80,7 +96,12 @@
       "type": "string",
       "mode": "enum",
       "description": "Service tier this limit applies to",
-      "enum": ["free", "basic", "premium", "enterprise"],
+      "enum": [
+        "free",
+        "basic",
+        "premium",
+        "enterprise"
+      ],
       "nullable": true
     },
     {
@@ -102,7 +123,12 @@
       "type": "string",
       "mode": "enum",
       "description": "What happens when limit is exceeded",
-      "enum": ["reject", "throttle", "queue", "log_only"],
+      "enum": [
+        "reject",
+        "throttle",
+        "queue",
+        "log_only"
+      ],
       "default": "reject"
     },
     {
@@ -119,19 +145,6 @@
       "description": "Special tokens that bypass this limit",
       "nullable": true,
       "private": true
-    },
-    {
-      "name": "createdAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "When this rate limit was configured",
-      "required": true
-    },
-    {
-      "name": "updatedAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "Last modification to this configuration"
     }
   ],
   "examples": [
@@ -150,9 +163,7 @@
       "priority": 50,
       "responseHeaders": true,
       "exceedAction": "reject",
-      "isActive": true,
-      "createdAt": "2024-01-01T00:00:00Z",
-      "updatedAt": "2024-03-01T10:00:00Z"
+      "isActive": true
     },
     {
       "@type": "RateLimitConfig",
@@ -168,8 +179,7 @@
       "priority": 100,
       "responseHeaders": false,
       "exceedAction": "throttle",
-      "isActive": true,
-      "createdAt": "2024-03-15T14:00:00Z"
+      "isActive": true
     }
   ]
 }

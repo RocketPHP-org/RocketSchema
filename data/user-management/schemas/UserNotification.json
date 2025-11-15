@@ -16,7 +16,14 @@
       "type": "string",
       "mode": "enum",
       "description": "Category of notification for filtering and display",
-      "enum": ["info", "warning", "error", "success", "security", "system"],
+      "enum": [
+        "info",
+        "warning",
+        "error",
+        "success",
+        "security",
+        "system"
+      ],
       "required": true,
       "example": "info"
     },
@@ -48,7 +55,12 @@
       "type": "string",
       "mode": "enum",
       "description": "Urgency level determining display order and delivery method",
-      "enum": ["low", "medium", "high", "urgent"],
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "urgent"
+      ],
       "default": "medium",
       "example": "high"
     },
@@ -57,7 +69,13 @@
       "type": "string",
       "mode": "enum",
       "description": "How the notification is delivered",
-      "enum": ["in_app", "email", "sms", "push", "webhook"],
+      "enum": [
+        "in_app",
+        "email",
+        "sms",
+        "push",
+        "webhook"
+      ],
       "default": "in_app",
       "example": "in_app"
     },
@@ -66,7 +84,14 @@
       "type": "string",
       "mode": "enum",
       "description": "Current state of the notification",
-      "enum": ["pending", "sent", "delivered", "read", "failed", "dismissed"],
+      "enum": [
+        "pending",
+        "sent",
+        "delivered",
+        "read",
+        "failed",
+        "dismissed"
+      ],
       "default": "pending",
       "example": "sent"
     },
@@ -133,13 +158,6 @@
       "type": "string",
       "mode": "stored",
       "description": "Why the notification failed to deliver"
-    },
-    {
-      "name": "createdAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "When the notification was created",
-      "required": true
     }
   ],
   "examples": [
@@ -161,8 +179,7 @@
         "deviceType": "Chrome on Windows",
         "location": "San Francisco, CA",
         "ipAddress": "203.0.113.42"
-      },
-      "createdAt": "2024-03-15T10:00:00Z"
+      }
     },
     {
       "@type": "UserNotification",
@@ -182,8 +199,7 @@
         "invoiceId": "INV-2024-03-001",
         "amount": 99.99,
         "dueDate": "2024-04-01"
-      },
-      "createdAt": "2024-03-25T09:00:00Z"
+      }
     }
   ]
 }

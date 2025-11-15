@@ -36,7 +36,15 @@
       "type": "string",
       "mode": "enum",
       "description": "Specific reason why the login failed",
-      "enum": ["invalid_credentials", "account_locked", "account_suspended", "account_inactive", "mfa_required", "mfa_failed", "password_expired"],
+      "enum": [
+        "invalid_credentials",
+        "account_locked",
+        "account_suspended",
+        "account_inactive",
+        "mfa_required",
+        "mfa_failed",
+        "password_expired"
+      ],
       "example": "invalid_credentials"
     },
     {
@@ -44,7 +52,15 @@
       "type": "string",
       "mode": "enum",
       "description": "Authentication method used for this attempt",
-      "enum": ["password", "oauth", "saml", "ldap", "mfa", "biometric", "api_key"],
+      "enum": [
+        "password",
+        "oauth",
+        "saml",
+        "ldap",
+        "mfa",
+        "biometric",
+        "api_key"
+      ],
       "default": "password",
       "example": "password"
     },
@@ -86,17 +102,20 @@
       "type": "string[]",
       "mode": "stored",
       "description": "Specific risk indicators detected",
-      "example": ["new_device", "unusual_location"]
+      "example": [
+        "new_device",
+        "unusual_location"
+      ]
     },
     {
-      "name": "sessionId",
-      "type": "string",
+      "name": "session",
+      "type": "UserSession",
       "mode": "stored",
       "description": "Session ID created if login was successful"
     },
     {
       "name": "metadata",
-      "type": "object",
+      "type": "string",
       "mode": "stored",
       "description": "Additional context about the login attempt"
     }
@@ -116,16 +135,16 @@
         "city": "New York",
         "coordinates": {
           "lat": 40.7128,
-          "lon": -74.0060
+          "lon": -74.006
         }
       },
       "riskScore": 5,
       "riskFactors": [],
-      "sessionId": "sess_xyz789",
       "metadata": {
         "loginPage": "/login",
         "referrer": "/home"
-      }
+      },
+      "session": "sess_xyz789"
     },
     {
       "@type": "LoginHistory",
@@ -141,7 +160,12 @@
         "city": "Beijing"
       },
       "riskScore": 85,
-      "riskFactors": ["unusual_location", "vpn_detected", "multiple_failed_attempts", "impossible_travel"],
+      "riskFactors": [
+        "unusual_location",
+        "vpn_detected",
+        "multiple_failed_attempts",
+        "impossible_travel"
+      ],
       "metadata": {
         "vpnProvider": "NordVPN",
         "attemptNumber": 3,

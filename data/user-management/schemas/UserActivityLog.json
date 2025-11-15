@@ -5,16 +5,8 @@
   "description": "Comprehensive audit trail that records every significant action performed by users in the system. This entity serves as the forensic backbone for security monitoring, compliance reporting, and user behavior analysis. It captures not just what happened, but the full context - who did it, when, from where, what changed, and whether it succeeded or failed. Every login attempt, password change, profile update, permission modification, and data access is logged with enough detail to reconstruct events during security incidents. The log includes both successful and failed actions, which is crucial for detecting attack patterns like credential stuffing or privilege escalation attempts. Risk scoring helps identify suspicious activities automatically, while the preserved old and new values enable rollback capabilities. This audit trail is essential for compliance with regulations like GDPR, HIPAA, and SOX that require detailed activity logs. It's also valuable for user support, helping administrators understand what a user did before encountering an issue. The logs are typically retained for extended periods (years for compliance) and can be analyzed to detect insider threats, unusual access patterns, or systemic security issues.",
   "properties": [
     {
-      "name": "logId",
-      "type": "uuid",
-      "mode": "stored",
-      "description": "Unique identifier for this log entry",
-      "required": true,
-      "unique": true
-    },
-    {
-      "name": "userId",
-      "type": "uuid",
+      "name": "user",
+      "type": "User",
       "mode": "stored",
       "description": "User who performed the action",
       "required": true
@@ -24,7 +16,23 @@
       "type": "string",
       "mode": "enum",
       "description": "Category of activity performed",
-      "enum": ["login", "logout", "password_change", "profile_update", "2fa_enable", "2fa_disable", "api_key_created", "api_key_revoked", "account_locked", "account_unlocked", "email_verified", "password_reset", "permission_changed", "data_export", "data_delete"],
+      "enum": [
+        "login",
+        "logout",
+        "password_change",
+        "profile_update",
+        "2fa_enable",
+        "2fa_disable",
+        "api_key_created",
+        "api_key_revoked",
+        "account_locked",
+        "account_unlocked",
+        "email_verified",
+        "password_reset",
+        "permission_changed",
+        "data_export",
+        "data_delete"
+      ],
       "required": true
     },
     {
@@ -56,8 +64,8 @@
       "nullable": true
     },
     {
-      "name": "sessionId",
-      "type": "uuid",
+      "name": "session",
+      "type": "UserSession",
       "mode": "stored",
       "description": "Session during which this activity occurred",
       "nullable": true
@@ -67,7 +75,12 @@
       "type": "string",
       "mode": "enum",
       "description": "Outcome of the activity",
-      "enum": ["success", "failure", "partial", "pending"],
+      "enum": [
+        "success",
+        "failure",
+        "partial",
+        "pending"
+      ],
       "required": true
     },
     {
@@ -148,24 +161,21 @@
   "examples": [
     {
       "@type": "UserActivityLog",
-      "logId": "log_abc123",
-      "userId": "user_550e8400",
       "activityType": "password_change",
       "timestamp": "2024-03-15T14:30:00Z",
       "ipAddress": "192.168.1.100",
       "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/121.0",
-      "sessionId": "sess_xyz789",
       "result": "success",
       "changedFields": "[\"passwordHash\", \"passwordLastChangedAt\"]",
       "riskScore": 5,
       "riskFactors": "[\"known_device\", \"usual_location\"]",
       "location": "New York, NY, USA",
-      "metadata": "{\"passwordStrength\": 85, \"method\": \"user_initiated\"}"
+      "metadata": "{\"passwordStrength\": 85, \"method\": \"user_initiated\"}",
+      "user": "user_550e8400",
+      "session": "sess_xyz789"
     },
     {
       "@type": "UserActivityLog",
-      "logId": "log_def456",
-      "userId": "user_6ba7b810",
       "activityType": "login",
       "timestamp": "2024-03-15T09:00:00Z",
       "ipAddress": "203.0.113.45",
@@ -177,7 +187,8 @@
       "riskScore": 75,
       "riskFactors": "[\"multiple_failures\", \"new_location\", \"vpn_detected\"]",
       "location": "Singapore",
-      "metadata": "{\"attemptNumber\": 6, \"vpnProvider\": \"NordVPN\"}"
+      "metadata": "{\"attemptNumber\": 6, \"vpnProvider\": \"NordVPN\"}",
+      "user": "user_6ba7b810"
     }
   ]
 }
