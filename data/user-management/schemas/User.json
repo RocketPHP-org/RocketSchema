@@ -2,13 +2,13 @@
   "@type": "Schema",
   "@context": "https://rocketschema.org/context",
   "name": "User",
-  "description": "A system user account - NORMALIZED VERSION (3NF compliant)",
+  "description": "Represents a user account in the system. This is the central entity that uniquely identifies every person who has access to the application. It stores basic identity information like username and email, along with language and timezone preferences. Sensitive information like passwords are stored separately in UserAuthentication for security reasons. Each user can have multiple active sessions, multiple two-factor authentication methods, and can create API keys for programmatic access. The user entity tracks the lifecycle of an account from registration through activation, suspension, and eventual deletion. It's the main reference point for all user-related operations in the system.",
   "properties": [
     {
       "name": "userId",
       "type": "uuid",
       "mode": "stored",
-      "description": "Unique user identifier",
+      "description": "Unique universal identifier for the user",
       "required": true,
       "unique": true
     },
@@ -16,7 +16,7 @@
       "name": "username",
       "type": "string",
       "mode": "stored",
-      "description": "Unique username for authentication",
+      "description": "Unique username for login, cannot be changed once set",
       "required": true,
       "unique": true,
       "example": "john.doe"
@@ -25,7 +25,7 @@
       "name": "email",
       "type": "string",
       "mode": "stored",
-      "description": "Primary email address",
+      "description": "Primary email address used for account recovery and notifications",
       "required": true,
       "unique": true,
       "format": "email",
@@ -35,28 +35,28 @@
       "name": "emailVerified",
       "type": "boolean",
       "mode": "stored",
-      "description": "Whether the email address has been verified",
+      "description": "Whether the email address has been verified through confirmation link",
       "default": false
     },
     {
       "name": "emailVerifiedAt",
       "type": "DateTime",
       "mode": "stored",
-      "description": "Timestamp when email was verified",
+      "description": "Timestamp when the email was verified",
       "nullable": true
     },
     {
       "name": "person",
       "type": "Person",
       "mode": "stored",
-      "description": "Reference to Person entity for demographic information",
+      "description": "Reference to personal information (name, date of birth, address, etc.)",
       "nullable": true
     },
     {
       "name": "status",
       "type": "string",
       "mode": "enum",
-      "description": "Account status",
+      "description": "Current status of the user account",
       "enum": ["active", "inactive", "suspended", "locked", "pending"],
       "default": "pending",
       "example": "active"
@@ -65,43 +65,43 @@
       "name": "statusReason",
       "type": "string",
       "mode": "stored",
-      "description": "Reason for current status",
+      "description": "Human-readable explanation for the current status",
       "nullable": true
     },
     {
       "name": "statusChangedAt",
       "type": "DateTime",
       "mode": "stored",
-      "description": "When status was last changed"
+      "description": "When the status was last changed"
     },
     {
       "name": "locale",
       "type": "string",
       "mode": "stored",
-      "description": "User's preferred locale",
+      "description": "User's preferred language and region for UI display",
       "default": "en-US",
-      "example": "en-US"
+      "example": "fr-FR"
     },
     {
       "name": "timezone",
       "type": "string",
       "mode": "stored",
-      "description": "User's timezone",
+      "description": "User's timezone for displaying dates and scheduling",
       "default": "UTC",
-      "example": "America/New_York"
+      "example": "Europe/Paris"
     },
     {
       "name": "registeredAt",
       "type": "DateTime",
       "mode": "stored",
-      "description": "Registration timestamp",
+      "description": "When the user first signed up",
       "required": true
     },
     {
       "name": "registrationSource",
       "type": "string",
       "mode": "enum",
-      "description": "How the user registered",
+      "description": "How the user account was created",
       "enum": ["web", "mobile", "api", "admin", "import", "social"],
       "example": "web"
     },
@@ -109,103 +109,84 @@
       "name": "registrationIp",
       "type": "string",
       "mode": "stored",
-      "description": "IP address at registration",
+      "description": "IP address used during registration for security tracking",
       "nullable": true
     },
     {
       "name": "activatedAt",
       "type": "DateTime",
       "mode": "stored",
-      "description": "Account activation timestamp",
+      "description": "When the account was activated and became usable",
       "nullable": true
     },
     {
       "name": "deactivatedAt",
       "type": "DateTime",
       "mode": "stored",
-      "description": "Account deactivation timestamp",
+      "description": "When the account was deactivated",
       "nullable": true
     },
     {
       "name": "deletedAt",
       "type": "DateTime",
       "mode": "stored",
-      "description": "Soft delete timestamp",
+      "description": "Soft delete timestamp - account is hidden but not removed from database",
       "nullable": true
     },
     {
       "name": "version",
       "type": "integer",
       "mode": "stored",
-      "description": "Version number for optimistic locking",
+      "description": "Version number to prevent concurrent update conflicts",
       "default": 1
     },
     {
       "name": "createdAt",
       "type": "DateTime",
       "mode": "stored",
-      "description": "Creation timestamp",
+      "description": "When this record was created in the database",
       "required": true
     },
     {
       "name": "updatedAt",
       "type": "DateTime",
       "mode": "stored",
-      "description": "Last update timestamp"
+      "description": "When this record was last modified"
     }
   ],
-  "relationships": {
-    "authentication": {
-      "type": "one-to-one",
-      "entity": "UserAuthentication",
-      "foreign_key": "userId"
-    },
-    "sessions": {
-      "type": "one-to-many",
-      "entity": "UserSession",
-      "foreign_key": "userId"
-    },
-    "preferences": {
-      "type": "one-to-many",
-      "entity": "UserPreference",
-      "foreign_key": "userId"
-    },
-    "notifications": {
-      "type": "one-to-many",
-      "entity": "UserNotification",
-      "foreign_key": "userId"
-    },
-    "twoFactorMethods": {
-      "type": "one-to-many",
-      "entity": "TwoFactorAuth",
-      "foreign_key": "userId"
-    },
-    "apiKeys": {
-      "type": "one-to-many",
-      "entity": "ApiKey",
-      "foreign_key": "userId"
-    }
-  },
-  "indexes": [
+  "examples": [
     {
-      "fields": ["userId"],
-      "unique": true
+      "@type": "User",
+      "userId": "550e8400-e29b-41d4-a716-446655440000",
+      "username": "sarah.johnson",
+      "email": "sarah.johnson@techcorp.com",
+      "emailVerified": true,
+      "emailVerifiedAt": "2024-01-15T10:30:00Z",
+      "status": "active",
+      "statusReason": null,
+      "locale": "en-US",
+      "timezone": "America/Los_Angeles",
+      "registeredAt": "2024-01-15T09:00:00Z",
+      "registrationSource": "web",
+      "registrationIp": "192.168.1.100",
+      "activatedAt": "2024-01-15T10:30:00Z"
     },
     {
-      "fields": ["username"],
-      "unique": true
-    },
-    {
-      "fields": ["email"],
-      "unique": true
-    },
-    {
-      "fields": ["status", "registeredAt"],
-      "name": "idx_status_registered"
-    },
-    {
-      "fields": ["deletedAt"],
-      "name": "idx_soft_delete"
+      "@type": "User",
+      "userId": "6ba7b810-9dad-11d1-80b4-00c04fd430c8",
+      "username": "admin.system",
+      "email": "admin@company.com",
+      "emailVerified": true,
+      "emailVerifiedAt": "2023-06-01T08:00:00Z",
+      "status": "locked",
+      "statusReason": "Too many failed login attempts from unknown location",
+      "statusChangedAt": "2024-03-15T14:22:00Z",
+      "locale": "en-GB",
+      "timezone": "Europe/London",
+      "registeredAt": "2023-06-01T08:00:00Z",
+      "registrationSource": "admin",
+      "registrationIp": "10.0.0.50",
+      "activatedAt": "2023-06-01T08:00:00Z"
     }
   ]
 }

@@ -2,13 +2,13 @@
   "@type": "Schema",
   "@context": "https://rocketschema.org/context",
   "name": "Role",
-  "description": "A role in the system that groups permissions and can be assigned to users",
+  "description": "Defines a role within the system's access control framework. Roles are collections of permissions that can be assigned to users, making it easier to manage access rights for groups of people with similar responsibilities. Instead of assigning individual permissions to each user, you create roles like 'Admin', 'Manager', or 'Viewer' and assign the appropriate permissions to these roles. Users then inherit all permissions from their assigned roles. Roles can be hierarchical, where child roles inherit permissions from parent roles. They can be system-defined (built-in and protected) or custom-created for specific organizational needs. This is the foundation of Role-Based Access Control (RBAC), simplifying permission management at scale.",
   "properties": [
     {
       "name": "code",
       "type": "string",
       "mode": "stored",
-      "description": "Unique role code/identifier",
+      "description": "Unique identifier code for the role, used in code and configurations",
       "required": true,
       "unique": true,
       "example": "ADMIN"
@@ -17,7 +17,7 @@
       "name": "name",
       "type": "string",
       "mode": "stored",
-      "description": "Human-readable role name",
+      "description": "Human-friendly display name for the role",
       "required": true,
       "example": "Administrator"
     },
@@ -25,14 +25,14 @@
       "name": "description",
       "type": "string",
       "mode": "stored",
-      "description": "Detailed description of the role's purpose",
-      "example": "Full system administration privileges"
+      "description": "Detailed explanation of the role's purpose and responsibilities",
+      "example": "Full system administration privileges with complete access to all features"
     },
     {
       "name": "type",
       "type": "string",
       "mode": "enum",
-      "description": "Type of role",
+      "description": "Classification of the role",
       "enum": ["system", "organization", "custom"],
       "default": "custom",
       "example": "system"
@@ -41,47 +41,47 @@
       "name": "isSystem",
       "type": "boolean",
       "mode": "stored",
-      "description": "Whether this is a protected system role that cannot be modified",
+      "description": "Whether this is a built-in role that cannot be modified or deleted",
       "default": false
     },
     {
       "name": "isDefault",
       "type": "boolean",
       "mode": "stored",
-      "description": "Whether this role is assigned by default to new users",
+      "description": "Whether new users automatically get this role",
       "default": false
     },
     {
       "name": "priority",
       "type": "integer",
       "mode": "stored",
-      "description": "Role priority for conflict resolution (higher number = higher priority)",
+      "description": "Priority level for permission conflict resolution (higher wins)",
       "default": 0
     },
     {
       "name": "permissions",
       "type": "RolePermission[]",
       "mode": "stored",
-      "description": "Permissions assigned to this role"
+      "description": "List of permissions granted to this role"
     },
     {
       "name": "parentRole",
       "type": "Role",
       "mode": "stored",
-      "description": "Parent role for inheritance hierarchy"
+      "description": "Parent role from which permissions are inherited"
     },
     {
       "name": "isActive",
       "type": "boolean",
       "mode": "stored",
-      "description": "Whether the role is active and can be assigned",
+      "description": "Whether the role is currently active and can be assigned",
       "default": true
     },
     {
       "name": "createdAt",
       "type": "DateTime",
       "mode": "stored",
-      "description": "Creation timestamp",
+      "description": "When the role was created",
       "required": true
     },
     {
@@ -94,33 +94,44 @@
       "name": "metadata",
       "type": "object",
       "mode": "stored",
-      "description": "Additional metadata for extensibility"
+      "description": "Additional configuration or custom attributes"
     }
   ],
   "examples": [
     {
       "@type": "Role",
-      "code": "ADMIN",
-      "name": "Administrator",
-      "description": "Full system administration privileges",
+      "code": "SUPER_ADMIN",
+      "name": "Super Administrator",
+      "description": "Unrestricted access to all system features including user management, billing, and system configuration",
       "type": "system",
       "isSystem": true,
       "isDefault": false,
       "priority": 100,
       "isActive": true,
-      "createdAt": "2024-01-01T00:00:00Z"
+      "createdAt": "2024-01-01T00:00:00Z",
+      "metadata": {
+        "color": "#FF0000",
+        "icon": "shield-check",
+        "requiresMFA": true
+      }
     },
     {
       "@type": "Role",
-      "code": "USER",
-      "name": "Standard User",
-      "description": "Basic user access",
-      "type": "system",
-      "isSystem": true,
-      "isDefault": true,
-      "priority": 10,
+      "code": "CONTENT_EDITOR",
+      "name": "Content Editor",
+      "description": "Can create, edit, and publish content but cannot access system settings or user management",
+      "type": "custom",
+      "isSystem": false,
+      "isDefault": false,
+      "priority": 30,
+      "parentRole": "VIEWER",
       "isActive": true,
-      "createdAt": "2024-01-01T00:00:00Z"
+      "createdAt": "2024-02-15T10:00:00Z",
+      "metadata": {
+        "color": "#00AA00",
+        "icon": "pencil",
+        "department": "Marketing"
+      }
     }
   ]
 }

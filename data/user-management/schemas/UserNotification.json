@@ -2,20 +2,20 @@
   "@type": "Schema",
   "@context": "https://rocketschema.org/context",
   "name": "UserNotification",
-  "description": "Notifications and alerts for users",
+  "description": "Manages notifications and alerts sent to users within the application. This entity handles all types of user communications including system alerts, security warnings, updates about their account, and activity notifications. Notifications can be delivered through multiple channels (in-app, email, SMS, push) and have different priority levels. They track whether a user has read or dismissed them, support action buttons for quick responses, and can expire after a certain time. This is essential for keeping users informed about important events, required actions, or changes that affect them. The system uses this to ensure users never miss critical information while avoiding notification fatigue.",
   "properties": [
     {
       "name": "user",
       "type": "User",
       "mode": "stored",
-      "description": "User who receives this notification",
+      "description": "The user who will receive this notification",
       "required": true
     },
     {
       "name": "type",
       "type": "string",
       "mode": "enum",
-      "description": "Type of notification",
+      "description": "Category of notification for filtering and display",
       "enum": ["info", "warning", "error", "success", "security", "system"],
       "required": true,
       "example": "info"
@@ -24,7 +24,7 @@
       "name": "category",
       "type": "string",
       "mode": "stored",
-      "description": "Notification category",
+      "description": "Specific category for grouping similar notifications",
       "required": true,
       "example": "account"
     },
@@ -32,22 +32,22 @@
       "name": "title",
       "type": "string",
       "mode": "stored",
-      "description": "Notification title",
+      "description": "Short headline that appears in notification lists",
       "required": true,
-      "example": "Password Changed"
+      "example": "Password Changed Successfully"
     },
     {
       "name": "message",
       "type": "string",
       "mode": "stored",
-      "description": "Notification message content",
+      "description": "Full notification content with details",
       "required": true
     },
     {
       "name": "priority",
       "type": "string",
       "mode": "enum",
-      "description": "Notification priority",
+      "description": "Urgency level determining display order and delivery method",
       "enum": ["low", "medium", "high", "urgent"],
       "default": "medium",
       "example": "high"
@@ -56,7 +56,7 @@
       "name": "channel",
       "type": "string",
       "mode": "enum",
-      "description": "Delivery channel",
+      "description": "How the notification is delivered",
       "enum": ["in_app", "email", "sms", "push", "webhook"],
       "default": "in_app",
       "example": "in_app"
@@ -65,7 +65,7 @@
       "name": "status",
       "type": "string",
       "mode": "enum",
-      "description": "Notification status",
+      "description": "Current state of the notification",
       "enum": ["pending", "sent", "delivered", "read", "failed", "dismissed"],
       "default": "pending",
       "example": "sent"
@@ -80,57 +80,51 @@
       "name": "deliveredAt",
       "type": "DateTime",
       "mode": "stored",
-      "description": "When the notification was delivered"
+      "description": "When the notification reached the user"
     },
     {
       "name": "readAt",
       "type": "DateTime",
       "mode": "stored",
-      "description": "When the notification was read"
+      "description": "When the user opened/read the notification"
     },
     {
       "name": "dismissedAt",
       "type": "DateTime",
       "mode": "stored",
-      "description": "When the notification was dismissed"
+      "description": "When the user dismissed without reading"
     },
     {
       "name": "expiresAt",
       "type": "DateTime",
       "mode": "stored",
-      "description": "When the notification expires"
+      "description": "When the notification becomes irrelevant and should be hidden"
     },
     {
       "name": "actionUrl",
       "type": "string",
       "mode": "stored",
-      "description": "URL for notification action",
+      "description": "Link to related page or action",
       "format": "uri"
     },
     {
       "name": "actionLabel",
       "type": "string",
       "mode": "stored",
-      "description": "Label for action button",
+      "description": "Text for the action button",
       "example": "View Details"
     },
     {
       "name": "data",
       "type": "object",
       "mode": "stored",
-      "description": "Additional notification data"
-    },
-    {
-      "name": "relatedEntity",
-      "type": "object",
-      "mode": "stored",
-      "description": "Related entity reference"
+      "description": "Additional structured data for the notification"
     },
     {
       "name": "retryCount",
       "type": "integer",
       "mode": "stored",
-      "description": "Number of delivery retry attempts",
+      "description": "Number of delivery attempts made",
       "default": 0,
       "min": 0
     },
@@ -138,26 +132,14 @@
       "name": "failureReason",
       "type": "string",
       "mode": "stored",
-      "description": "Reason for delivery failure"
+      "description": "Why the notification failed to deliver"
     },
     {
       "name": "createdAt",
       "type": "DateTime",
       "mode": "stored",
-      "description": "Creation timestamp",
+      "description": "When the notification was created",
       "required": true
-    },
-    {
-      "name": "createdBy",
-      "type": "User",
-      "mode": "stored",
-      "description": "User or system that created the notification"
-    },
-    {
-      "name": "metadata",
-      "type": "object",
-      "mode": "stored",
-      "description": "Additional metadata"
     }
   ],
   "examples": [
@@ -165,29 +147,43 @@
       "@type": "UserNotification",
       "type": "security",
       "category": "account",
-      "title": "New Login Detected",
-      "message": "A new login was detected from an unrecognized device",
+      "title": "New Login from Unknown Device",
+      "message": "We detected a login to your account from a new device in San Francisco, CA. If this wasn't you, please secure your account immediately.",
       "priority": "high",
       "channel": "in_app",
-      "status": "sent",
+      "status": "read",
       "sentAt": "2024-03-15T10:00:00Z",
+      "deliveredAt": "2024-03-15T10:00:01Z",
+      "readAt": "2024-03-15T10:05:00Z",
       "actionUrl": "/security/recent-activity",
       "actionLabel": "Review Activity",
+      "data": {
+        "deviceType": "Chrome on Windows",
+        "location": "San Francisco, CA",
+        "ipAddress": "203.0.113.42"
+      },
       "createdAt": "2024-03-15T10:00:00Z"
     },
     {
       "@type": "UserNotification",
       "type": "info",
-      "category": "system",
-      "title": "System Maintenance",
-      "message": "System will be under maintenance on March 20, 2024 from 2:00 AM to 4:00 AM",
+      "category": "billing",
+      "title": "Your Monthly Invoice is Ready",
+      "message": "Your invoice for March 2024 totaling $99.99 is now available for download. Payment will be automatically processed on April 1st.",
       "priority": "medium",
       "channel": "email",
       "status": "delivered",
-      "sentAt": "2024-03-10T09:00:00Z",
-      "deliveredAt": "2024-03-10T09:01:00Z",
-      "expiresAt": "2024-03-20T06:00:00Z",
-      "createdAt": "2024-03-10T09:00:00Z"
+      "sentAt": "2024-03-25T09:00:00Z",
+      "deliveredAt": "2024-03-25T09:00:05Z",
+      "expiresAt": "2024-04-25T00:00:00Z",
+      "actionUrl": "/billing/invoices/2024-03",
+      "actionLabel": "View Invoice",
+      "data": {
+        "invoiceId": "INV-2024-03-001",
+        "amount": 99.99,
+        "dueDate": "2024-04-01"
+      },
+      "createdAt": "2024-03-25T09:00:00Z"
     }
   ]
 }

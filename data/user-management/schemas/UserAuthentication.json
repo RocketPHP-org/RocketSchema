@@ -2,13 +2,13 @@
   "@type": "Schema",
   "@context": "https://rocketschema.org/context",
   "name": "UserAuthentication",
-  "description": "User authentication credentials - separated for security (normalized from User)",
+  "description": "Gère toutes les informations d'authentification et de sécurité pour un utilisateur. Cette entité stocke le mot de passe hashé de façon sécurisée, suit les tentatives de connexion échouées, gère le verrouillage du compte après trop d'échecs, et maintient l'historique des connexions. Elle est séparée de l'entité User pour des raisons de sécurité : cela permet de protéger les données sensibles d'authentification et de les gérer avec des permissions spéciales. Cette entité est mise à jour à chaque connexion, changement de mot de passe, ou tentative d'accès.",
   "properties": [
     {
       "name": "userId",
       "type": "uuid",
       "mode": "stored",
-      "description": "User reference",
+      "description": "Référence vers l'utilisateur concerné",
       "required": true,
       "unique": true
     },
@@ -16,7 +16,7 @@
       "name": "passwordHash",
       "type": "string",
       "mode": "stored",
-      "description": "Hashed password (bcrypt/argon2)",
+      "description": "Mot de passe hashé de manière sécurisée (jamais stocké en clair)",
       "required": true,
       "private": true
     },
@@ -24,14 +24,14 @@
       "name": "passwordSalt",
       "type": "string",
       "mode": "stored",
-      "description": "Salt used for password hashing",
+      "description": "Sel cryptographique utilisé pour le hashage du mot de passe",
       "private": true
     },
     {
       "name": "passwordAlgorithm",
       "type": "string",
       "mode": "enum",
-      "description": "Hashing algorithm used",
+      "description": "Algorithme de hashage utilisé pour sécuriser le mot de passe",
       "enum": ["bcrypt", "argon2id", "scrypt", "pbkdf2"],
       "default": "argon2id"
     },
@@ -39,114 +39,126 @@
       "name": "passwordLastChangedAt",
       "type": "DateTime",
       "mode": "stored",
-      "description": "Last password change timestamp",
+      "description": "Date et heure du dernier changement de mot de passe",
       "required": true
     },
     {
       "name": "passwordExpiresAt",
       "type": "DateTime",
       "mode": "stored",
-      "description": "When password expires",
+      "description": "Date d'expiration du mot de passe (si politique d'expiration activée)",
       "nullable": true
     },
     {
       "name": "mustChangePassword",
       "type": "boolean",
       "mode": "stored",
-      "description": "Flag indicating user must change password on next login",
+      "description": "Indique si l'utilisateur doit changer son mot de passe à la prochaine connexion",
       "default": false
     },
     {
       "name": "passwordHistory",
       "type": "integer",
       "mode": "stored",
-      "description": "Number of password history entries to keep",
+      "description": "Nombre de mots de passe précédents à conserver pour éviter la réutilisation",
       "default": 5
     },
     {
       "name": "failedLoginAttempts",
       "type": "integer",
       "mode": "stored",
-      "description": "Number of consecutive failed login attempts",
+      "description": "Nombre de tentatives de connexion échouées consécutives",
       "default": 0
     },
     {
       "name": "failedLoginResetAt",
       "type": "DateTime",
       "mode": "stored",
-      "description": "When failed attempts counter was reset",
+      "description": "Date de réinitialisation du compteur d'échecs",
       "nullable": true
     },
     {
       "name": "lockedUntil",
       "type": "DateTime",
       "mode": "stored",
-      "description": "Account locked until this timestamp",
+      "description": "Date et heure jusqu'à laquelle le compte est verrouillé",
       "nullable": true
     },
     {
       "name": "lastLoginAt",
       "type": "DateTime",
       "mode": "stored",
-      "description": "Last successful login timestamp",
+      "description": "Date et heure de la dernière connexion réussie",
       "nullable": true
     },
     {
       "name": "lastLoginIp",
       "type": "string",
       "mode": "stored",
-      "description": "IP address of last successful login",
+      "description": "Adresse IP de la dernière connexion réussie",
       "nullable": true
     },
     {
       "name": "lastActivityAt",
       "type": "DateTime",
       "mode": "stored",
-      "description": "Last activity timestamp",
+      "description": "Date et heure de la dernière activité de l'utilisateur",
       "nullable": true
     },
     {
       "name": "passwordPolicy",
       "type": "PasswordPolicy",
       "mode": "stored",
-      "description": "Applied password policy",
+      "description": "Politique de mot de passe appliquée à cet utilisateur",
       "nullable": true
     },
     {
       "name": "version",
       "type": "integer",
       "mode": "stored",
-      "description": "Version for optimistic locking",
+      "description": "Version pour éviter les conflits lors des mises à jour simultanées",
       "default": 1
     },
     {
       "name": "createdAt",
       "type": "DateTime",
       "mode": "stored",
-      "description": "Creation timestamp",
+      "description": "Date de création de l'enregistrement",
       "required": true
     },
     {
       "name": "updatedAt",
       "type": "DateTime",
       "mode": "stored",
-      "description": "Last update timestamp"
+      "description": "Date de dernière modification"
     }
   ],
-  "indexes": [
+  "examples": [
     {
-      "fields": ["userId"],
-      "unique": true
+      "@type": "UserAuthentication",
+      "userId": "550e8400-e29b-41d4-a716-446655440000",
+      "passwordAlgorithm": "argon2id",
+      "passwordLastChangedAt": "2024-03-01T14:00:00Z",
+      "passwordExpiresAt": "2024-06-01T14:00:00Z",
+      "mustChangePassword": false,
+      "passwordHistory": 5,
+      "failedLoginAttempts": 0,
+      "lastLoginAt": "2024-03-15T09:30:00Z",
+      "lastLoginIp": "192.168.1.100",
+      "lastActivityAt": "2024-03-15T10:45:00Z"
     },
     {
-      "fields": ["lockedUntil"],
-      "name": "idx_locked",
-      "where": "lockedUntil IS NOT NULL"
-    },
-    {
-      "fields": ["passwordExpiresAt"],
-      "name": "idx_password_expires",
-      "where": "passwordExpiresAt IS NOT NULL"
+      "@type": "UserAuthentication",
+      "userId": "6ba7b810-9dad-11d1-80b4-00c04fd430c8",
+      "passwordAlgorithm": "bcrypt",
+      "passwordLastChangedAt": "2024-01-01T00:00:00Z",
+      "mustChangePassword": true,
+      "passwordHistory": 10,
+      "failedLoginAttempts": 5,
+      "failedLoginResetAt": "2024-03-15T08:00:00Z",
+      "lockedUntil": "2024-03-15T12:00:00Z",
+      "lastLoginAt": "2024-03-14T16:00:00Z",
+      "lastLoginIp": "203.0.113.42"
     }
   ]
 }
