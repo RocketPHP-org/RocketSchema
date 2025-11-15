@@ -5,8 +5,8 @@
   "description": "Records decisions made on access requests, permission changes, and policy exceptions, capturing the complete decision-making process including approver rationale, conditions, and stipulations. This entity goes beyond simple approve/deny to document the nuanced decisions made in complex authorization scenarios - conditional approvals with restrictions, time-limited grants with review requirements, or partial approvals for subset of requested permissions. Each decision captures the approver's identity, their authority level, the basis for their decision (policy compliance, business need, risk assessment), and any concerns or observations. Decisions can include stipulations like 'approved for 30 days pending security training' or 'denied but can resubmit with manager endorsement'. The entity supports multi-stage approval workflows where each approver adds their decision to build consensus, escalation paths where initial denials can be overridden, and delegation where approvers pass decisions to others. It maintains decision history for audit trails, precedent analysis for consistency, and machine learning to improve future decision-making. Decisions can trigger automated actions like permission provisioning, notification sending, or follow-up scheduling. This comprehensive decision recording is essential for regulatory compliance, demonstrating due diligence in access control, and continuous improvement of authorization processes through decision analytics.",
   "properties": [
     {
-      "name": "requestId",
-      "type": "uuid",
+      "name": "request",
+      "type": "AccessRequest",
       "mode": "stored",
       "description": "The access request being decided on",
       "required": true
@@ -231,7 +231,7 @@
     },
     {
       "name": "metadata",
-      "type": "object",
+      "type": "string",
       "mode": "stored",
       "description": "Additional decision data"
     }
@@ -239,7 +239,6 @@
   "examples": [
     {
       "@type": "ApprovalDecision",
-      "requestId": "req_access_001",
       "decision": "conditional",
       "decisionDate": "2024-03-15T14:30:00Z",
       "rationale": "Approved for limited production access based on urgent operational need, with restrictions due to contractor status",
@@ -261,11 +260,11 @@
       "metadata": {
         "ticket": "OPS-2024-1234",
         "approval_chain": "complete"
-      }
+      },
+      "request": "req_access_001"
     },
     {
       "@type": "ApprovalDecision",
-      "requestId": "req_role_002",
       "decision": "denied",
       "decisionDate": "2024-03-15T10:00:00Z",
       "rationale": "Denied due to insufficient justification and availability of alternative solutions that don't require elevated privileges",
@@ -281,7 +280,8 @@
       "metadata": {
         "alternative_suggested": true,
         "can_appeal": true
-      }
+      },
+      "request": "req_role_002"
     }
   ]
 }

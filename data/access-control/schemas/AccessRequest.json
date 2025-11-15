@@ -281,15 +281,15 @@
       "default": true
     },
     {
-      "name": "parentRequestId",
-      "type": "uuid",
+      "name": "parentRequest",
+      "type": "AccessRequest",
       "mode": "stored",
       "description": "Original request if this is a renewal",
       "nullable": true
     },
     {
       "name": "metadata",
-      "type": "object",
+      "type": "string",
       "mode": "stored",
       "description": "Additional request data"
     }

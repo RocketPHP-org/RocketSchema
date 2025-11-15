@@ -113,8 +113,8 @@
       "default": "none"
     },
     {
-      "name": "parentTagId",
-      "type": "uuid",
+      "name": "parentTag",
+      "type": "ResourceTag",
       "mode": "stored",
       "description": "Parent tag this was inherited from",
       "nullable": true
@@ -245,7 +245,7 @@
     },
     {
       "name": "metadata",
-      "type": "object",
+      "type": "string",
       "mode": "stored",
       "description": "Additional tag data"
     }

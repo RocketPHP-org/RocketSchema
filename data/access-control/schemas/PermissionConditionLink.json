@@ -121,8 +121,8 @@
       "nullable": true
     },
     {
-      "name": "fallbackConditionId",
-      "type": "uuid",
+      "name": "fallbackCondition",
+      "type": "PermissionCondition",
       "mode": "stored",
       "description": "Alternative condition if primary fails",
       "nullable": true
@@ -192,7 +192,7 @@
     },
     {
       "name": "metadata",
-      "type": "object",
+      "type": "string",
       "mode": "stored",
       "description": "Additional link configuration"
     }
@@ -235,7 +235,6 @@
       "mandatory": true,
       "parameters": "{\"max_amount\":50000,\"currency\":\"USD\",\"check_budget\":true}",
       "overrideValues": "{\"escalation_threshold\":40000}",
-      "fallbackConditionId": "cond_request_approval",
       "negateResult": false,
       "validFrom": "2024-01-01T00:00:00Z",
       "validUntil": "2024-12-31T23:59:59Z",
@@ -248,7 +247,8 @@
         "annual_review_required": true,
         "auto_adjust_for_inflation": true
       },
-      "condition": "cond_amount_limit"
+      "condition": "cond_amount_limit",
+      "fallbackCondition": "cond_request_approval"
     }
   ]
 }

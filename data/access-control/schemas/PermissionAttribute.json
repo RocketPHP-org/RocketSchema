@@ -5,8 +5,8 @@
   "description": "Defines metadata and properties associated with permissions that influence their behavior, evaluation, and management within the access control system. Permission attributes are key-value pairs that enrich permissions with additional context beyond simple grant/deny - they specify quality of service parameters, risk indicators, compliance tags, and operational constraints. These attributes enable fine-tuning of permission behavior: setting expiration dates, defining usage quotas, specifying required authentication strength, or marking permissions as high-risk. Attributes support permission classification for governance (marking permissions as 'financial', 'personal_data', 'system_critical'), automated policy application (all 'financial' permissions require MFA), and compliance mapping (permissions tagged 'gdpr_relevant' need special handling). They enable permission lifecycle management with attributes like 'deprecated', 'experimental', or 'migration_required'. The entity handles inherited attributes from parent permissions, computed attributes derived from usage patterns, and dynamic attributes that change based on context. Attributes influence runtime behavior - a permission with 'require_justification' attribute prompts users for reasons, while 'notify_on_use' triggers alerts. This metadata layer transforms simple permissions into rich, self-describing capabilities that adapt to organizational needs, support automated governance, and enable sophisticated permission analytics.",
   "properties": [
     {
-      "name": "permissionId",
-      "type": "uuid",
+      "name": "permission",
+      "type": "Permission",
       "mode": "stored",
       "description": "Permission this attribute belongs to",
       "required": true
@@ -74,7 +74,7 @@
     },
     {
       "name": "inheritedFrom",
-      "type": "uuid",
+      "type": "Permission",
       "mode": "stored",
       "description": "Parent permission this was inherited from",
       "nullable": true
@@ -211,7 +211,7 @@
     },
     {
       "name": "metadata",
-      "type": "object",
+      "type": "string",
       "mode": "stored",
       "description": "Additional attribute configuration"
     }
@@ -219,7 +219,6 @@
   "examples": [
     {
       "@type": "PermissionAttribute",
-      "permissionId": "perm_delete_user",
       "attributeName": "risk_level",
       "attributeValue": "critical",
       "valueType": "string",
@@ -242,11 +241,11 @@
       "metadata": {
         "compliance_impact": "high",
         "require_justification": true
-      }
+      },
+      "permission": "perm_delete_user"
     },
     {
       "@type": "PermissionAttribute",
-      "permissionId": "perm_export_data",
       "attributeName": "usage_quota",
       "attributeValue": "100",
       "valueType": "number",
@@ -269,7 +268,8 @@
         "reset_period": "monthly",
         "quota_type": "rolling",
         "alert_threshold": 0.8
-      }
+      },
+      "permission": "perm_export_data"
     }
   ]
 }

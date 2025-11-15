@@ -5,8 +5,8 @@
   "description": "Defines mandatory actions that must be performed when a policy decision is made, ensuring that access control decisions are accompanied by necessary security, compliance, or operational activities. Obligations are the 'must-do' requirements triggered by policy evaluation - when access is granted, specific actions like logging, encryption, notification, or data masking must occur. Unlike the access decision itself (permit/deny), obligations are post-decision requirements that enforce additional controls. For example, accessing sensitive data might obligate the system to create detailed audit logs, send notifications to data owners, or apply encryption to responses. Obligations can be conditional based on the decision outcome - different obligations for permit versus deny. They support compliance requirements like GDPR's notification obligations for data breaches or HIPAA's audit requirements for patient record access. The entity tracks obligation fulfillment to ensure all required actions complete successfully - if an obligation fails, the entire access might be revoked. Obligations can be chained (one triggering another), time-bound (must complete within X seconds), or compensating (alternative actions if primary fails). This mechanism transforms simple yes/no access decisions into complex, auditable, compliant operations that meet regulatory and business requirements while maintaining security posture.",
   "properties": [
     {
-      "name": "policyId",
-      "type": "uuid",
+      "name": "policy",
+      "type": "AccessPolicy",
       "mode": "stored",
       "description": "Policy that defines this obligation",
       "required": true
@@ -123,7 +123,7 @@
     },
     {
       "name": "fallbackObligation",
-      "type": "uuid",
+      "type": "PolicyObligation",
       "mode": "stored",
       "description": "Alternative obligation if this one fails",
       "nullable": true
@@ -180,7 +180,7 @@
     },
     {
       "name": "metadata",
-      "type": "object",
+      "type": "string",
       "mode": "stored",
       "description": "Additional obligation configuration"
     }
@@ -188,7 +188,6 @@
   "examples": [
     {
       "@type": "PolicyObligation",
-      "policyId": "pol_sensitive_data",
       "obligationCode": "OBL_AUDIT_SENSITIVE",
       "name": "Sensitive Data Access Audit",
       "description": "Create detailed audit log for all sensitive data access including full context and data accessed",
@@ -209,11 +208,11 @@
       "metadata": {
         "alert_security_team": true,
         "real_time_monitoring": true
-      }
+      },
+      "policy": "pol_sensitive_data"
     },
     {
       "@type": "PolicyObligation",
-      "policyId": "pol_data_export",
       "obligationCode": "OBL_ENCRYPT_EXPORT",
       "name": "Export Data Encryption",
       "description": "Apply AES-256 encryption to all data exports before transmission",
@@ -237,7 +236,8 @@
           "company_policy"
         ],
         "key_rotation_days": 90
-      }
+      },
+      "policy": "pol_data_export"
     }
   ]
 }

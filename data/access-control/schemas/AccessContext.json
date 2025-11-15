@@ -226,15 +226,15 @@
       "default": false
     },
     {
-      "name": "parentContextId",
-      "type": "uuid",
+      "name": "parentContext",
+      "type": "AccessContext",
       "mode": "stored",
       "description": "Previous context in session chain",
       "nullable": true
     },
     {
       "name": "metadata",
-      "type": "object",
+      "type": "string",
       "mode": "stored",
       "description": "Additional context data"
     }

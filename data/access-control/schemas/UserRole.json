@@ -95,7 +95,12 @@
       "type": "string",
       "mode": "enum",
       "description": "Approval state if role requires approval",
-      "enum": ["pending", "approved", "rejected", "expired"],
+      "enum": [
+        "pending",
+        "approved",
+        "rejected",
+        "expired"
+      ],
       "nullable": true
     },
     {
@@ -178,7 +183,7 @@
     },
     {
       "name": "metadata",
-      "type": "object",
+      "type": "string",
       "mode": "stored",
       "description": "Additional assignment-specific data"
     }

@@ -146,15 +146,15 @@
       "nullable": true
     },
     {
-      "name": "contextId",
-      "type": "uuid",
+      "name": "context",
+      "type": "AccessContext",
       "mode": "stored",
       "description": "Access context this sequence relates to",
       "nullable": true
     },
     {
-      "name": "userId",
-      "type": "uuid",
+      "name": "user",
+      "type": "User",
       "mode": "stored",
       "description": "User this sequence is executing for",
       "required": true
@@ -230,15 +230,15 @@
       "default": false
     },
     {
-      "name": "templateId",
-      "type": "uuid",
+      "name": "template",
+      "type": "AccessControlSequence",
       "mode": "stored",
       "description": "Template this was created from",
       "nullable": true
     },
     {
       "name": "metadata",
-      "type": "object",
+      "type": "string",
       "mode": "stored",
       "description": "Additional sequence configuration"
     }
@@ -260,7 +260,6 @@
       "rollbackStrategy": "full",
       "requiredApprovals": 2,
       "collectedApprovals": "[{\"approver\":\"security_officer_001\",\"timestamp\":\"2024-03-15T14:00:00Z\",\"decision\":\"approved\"}]",
-      "userId": "user_analyst_001",
       "resourceId": "doc_classified_report_2024",
       "startedAt": "2024-03-15T13:45:00Z",
       "pausedAt": "2024-03-15T14:00:00Z",
@@ -269,7 +268,8 @@
       "metadata": {
         "classification": "secret",
         "compliance_framework": "NIST_800-53"
-      }
+      },
+      "user": "user_analyst_001"
     },
     {
       "@type": "AccessControlSequence",
@@ -284,14 +284,14 @@
       "stepResults": "[{\"step\":1,\"result\":\"pass\"},{\"step\":2,\"result\":\"warning\",\"risk_score\":78},{\"step\":3,\"result\":\"pass\"},{\"step\":4,\"result\":\"pass\",\"permissions_granted\":[\"prod_read\",\"logs_access\"]}]",
       "rollbackStrategy": "compensating",
       "rollbackActions": "[{\"action\":\"revoke_permissions\",\"delay\":3600},{\"action\":\"comprehensive_audit\"}]",
-      "userId": "user_sre_002",
       "startedAt": "2024-03-15T02:00:00Z",
       "completedAt": "2024-03-15T02:02:00Z",
       "finalOutcome": "granted",
       "metadata": {
         "incident_priority": "P1",
         "bypass_reason": "critical_outage"
-      }
+      },
+      "user": "user_sre_002"
     }
   ]
 }

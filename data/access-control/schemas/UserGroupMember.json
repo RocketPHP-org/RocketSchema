@@ -23,7 +23,14 @@
       "type": "string",
       "mode": "enum",
       "description": "User's role within this specific group",
-      "enum": ["owner", "admin", "moderator", "member", "guest", "observer"],
+      "enum": [
+        "owner",
+        "admin",
+        "moderator",
+        "member",
+        "guest",
+        "observer"
+      ],
       "default": "member"
     },
     {
@@ -38,7 +45,14 @@
       "type": "string",
       "mode": "enum",
       "description": "How the user became a member",
-      "enum": ["invited", "requested", "assigned", "automatic", "inherited", "migrated"],
+      "enum": [
+        "invited",
+        "requested",
+        "assigned",
+        "automatic",
+        "inherited",
+        "migrated"
+      ],
       "required": true,
       "example": "invited"
     },
@@ -68,7 +82,13 @@
       "type": "string",
       "mode": "enum",
       "description": "Current membership status",
-      "enum": ["pending", "active", "suspended", "expired", "removed"],
+      "enum": [
+        "pending",
+        "active",
+        "suspended",
+        "expired",
+        "removed"
+      ],
       "default": "active",
       "required": true
     },
@@ -169,7 +189,14 @@
       "type": "string",
       "mode": "enum",
       "description": "Why membership ended",
-      "enum": ["voluntary", "removed", "expired", "group_deleted", "policy", "inactive"],
+      "enum": [
+        "voluntary",
+        "removed",
+        "expired",
+        "group_deleted",
+        "policy",
+        "inactive"
+      ],
       "nullable": true
     },
     {
@@ -188,7 +215,7 @@
     },
     {
       "name": "metadata",
-      "type": "object",
+      "type": "string",
       "mode": "stored",
       "description": "Additional membership-specific data"
     }

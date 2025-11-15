@@ -23,7 +23,11 @@
       "type": "string",
       "mode": "enum",
       "description": "Whether permission is granted or explicitly denied",
-      "enum": ["grant", "deny", "conditional"],
+      "enum": [
+        "grant",
+        "deny",
+        "conditional"
+      ],
       "default": "grant",
       "required": true
     },
@@ -134,7 +138,12 @@
       "type": "string",
       "mode": "enum",
       "description": "Level of auditing for this permission usage",
-      "enum": ["none", "basic", "detailed", "full"],
+      "enum": [
+        "none",
+        "basic",
+        "detailed",
+        "full"
+      ],
       "default": "basic"
     },
     {
@@ -195,7 +204,7 @@
     },
     {
       "name": "metadata",
-      "type": "object",
+      "type": "string",
       "mode": "stored",
       "description": "Additional permission configuration"
     }
