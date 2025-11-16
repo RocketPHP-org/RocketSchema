@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://rocketschema.org/meta/entity-schema",
+  "$id": "https://rocketschema.org/schemas/entity-schema.json",
   "title": "RocketSchema Entity Definition",
   "description": "Validator for RocketSchema Entity definitions (like Patient, Person, Organization, etc.)",
 
@@ -19,7 +19,7 @@
         },
         "type": {
           "type": "string",
-          "description": "Type of the property (primitive or reference, optionally with [] for arrays). Examples: 'string', 'number', 'boolean', 'object', 'Date', 'Person', 'Identifier[]'",
+          "description": "Type of the property (primitive or reference, optionally with [] for arrays). Examples: 'string', 'number', 'integer', 'boolean', 'object', 'Date', 'DateTime', 'Person', 'Identifier[]'",
           "minLength": 1
         },
         "description": {
@@ -28,8 +28,8 @@
         },
         "mode": {
           "type": "string",
-          "description": "Storage/semantic mode of the property (e.g. 'stored', 'enum')",
-          "enum": ["stored", "enum"],
+          "description": "Storage/semantic mode of the property: 'stored' for persisted data, 'computed' for derived/calculated values, 'enum' for enumerated types",
+          "enum": ["stored", "computed", "enum"],
           "default": "stored"
         },
         "required": {
@@ -37,9 +37,26 @@
           "description": "Whether this field is required on instances",
           "default": false
         },
+        "nullable": {
+          "type": "boolean",
+          "description": "Whether this property can be null",
+          "default": false
+        },
+        "default": {
+          "description": "Default value for this property (can be any type matching the property type)"
+        },
         "enum": {
           "type": "array",
           "description": "Allowed values when this property is an enum",
+          "items": {
+            "type": ["string", "number", "boolean"]
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "allowedValues": {
+          "type": "array",
+          "description": "Alias for 'enum' - allowed values when this property is an enum (deprecated, use 'enum' instead)",
           "items": {
             "type": ["string", "number", "boolean"]
           },
@@ -51,8 +68,12 @@
           "description": "String format hint (uri, email, date, date-time, etc.)"
         },
         "example": {
-          "description": "Example value for this property",
-          "nullable": true
+          "description": "Example value for this property"
+        },
+        "properties": {
+          "type": "object",
+          "description": "Nested properties definition for object types (used when type is 'object'). Keys are property names, values can be type strings or property schemas.",
+          "additionalProperties": true
         }
       },
       "required": ["name", "type", "description"]
