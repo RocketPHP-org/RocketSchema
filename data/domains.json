@@ -14,7 +14,22 @@
       "audit"
     ],
     "icon": "lock",
-    "order": 2
+    "order": 3
+  },
+  {
+    "name": "api-management",
+    "label": "API Management",
+    "description": "API key management, rate limiting, origin restrictions, and API access control - API keys, scopes, permissions, consumption tracking, and security policies",
+    "tags": [
+      "api",
+      "api-keys",
+      "rate-limiting",
+      "throttling",
+      "api-security",
+      "access-control"
+    ],
+    "icon": "code",
+    "order": 1
   },
   {
     "name": "user-management",
@@ -29,7 +44,7 @@
       "oauth"
     ],
     "icon": "shield",
-    "order": 1
+    "order": 2
   },
   {
     "name": "support-types",
@@ -42,7 +57,7 @@
       "helpers"
     ],
     "icon": "wrench",
-    "order": 3
+    "order": 4
   },
   {
     "name": "reference-data",
@@ -55,7 +70,7 @@
       "enums"
     ],
     "icon": "database",
-    "order": 4
+    "order": 5
   },
   {
     "name": "core-entities",
@@ -68,7 +83,7 @@
       "organizations"
     ],
     "icon": "users",
-    "order": 5
+    "order": 6
   },
   {
     "name": "transverse",
@@ -82,7 +97,7 @@
       "integrations"
     ],
     "icon": "git-branch",
-    "order": 6
+    "order": 7
   },
   {
     "name": "crm",
@@ -97,7 +112,7 @@
       "gdpr"
     ],
     "icon": "user-heart",
-    "order": 7
+    "order": 8
   },
   {
     "name": "e-commerce",
@@ -111,7 +126,7 @@
       "products"
     ],
     "icon": "shopping-cart",
-    "order": 8
+    "order": 9
   },
   {
     "name": "financial",
@@ -124,7 +139,7 @@
       "payments"
     ],
     "icon": "dollar-sign",
-    "order": 9
+    "order": 10
   },
   {
     "name": "tax",
@@ -139,7 +154,7 @@
       "fiscal"
     ],
     "icon": "receipt",
-    "order": 10
+    "order": 11
   },
   {
     "name": "human-resources",
@@ -153,7 +168,7 @@
       "performance"
     ],
     "icon": "user-check",
-    "order": 11
+    "order": 12
   },
   {
     "name": "patient-management",
@@ -166,7 +181,7 @@
       "contacts"
     ],
     "icon": "user-round",
-    "order": 12
+    "order": 13
   },
   {
     "name": "clinical-care",
@@ -180,7 +195,7 @@
       "encounters"
     ],
     "icon": "stethoscope",
-    "order": 13
+    "order": 14
   },
   {
     "name": "medical-providers",
@@ -194,7 +209,7 @@
       "clinics"
     ],
     "icon": "hospital",
-    "order": 14
+    "order": 15
   },
   {
     "name": "pharmacy",
@@ -207,7 +222,7 @@
       "drugs"
     ],
     "icon": "pill",
-    "order": 15
+    "order": 16
   },
   {
     "name": "medical-records",
@@ -221,7 +236,7 @@
       "lab-tests"
     ],
     "icon": "file-text",
-    "order": 16
+    "order": 17
   },
   {
     "name": "nursing-care",
@@ -235,7 +250,7 @@
       "care-team"
     ],
     "icon": "heart-handshake",
-    "order": 17
+    "order": 18
   },
   {
     "name": "healthcare-admin",
@@ -248,7 +263,7 @@
       "scheduling"
     ],
     "icon": "calendar-check",
-    "order": 18
+    "order": 19
   },
   {
     "name": "fleet",
@@ -261,7 +276,7 @@
       "logistics"
     ],
     "icon": "truck",
-    "order": 19
+    "order": 20
   },
   {
     "name": "knowledge",
@@ -274,6 +289,6 @@
       "content"
     ],
     "icon": "book-open",
-    "order": 20
+    "order": 21
   }
 ]
