@@ -1,0 +1,77 @@
+name: Tagging
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  create-tag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: main
+
+      - name: Configure Git user
+        run: |
+          git config user.name "rocket-bot"
+          git config user.email "actions@users.noreply.github.com"
+
+      - name: Determine tag name
+        id: tag
+        run: |
+          latest=$(git tag --list 'v*' --sort=-version:refname | head -n 1)
+
+          if [ -z "$latest" ]; then
+            tag="v1.0.0"
+          else
+            if [[ "$latest" =~ ^v([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
+              major=${BASH_REMATCH[1]}
+              minor=${BASH_REMATCH[2]}
+              patch=${BASH_REMATCH[3]}
+
+              patch=$((patch + 1))
+              tag="v${major}.${minor}.${patch}"
+            else
+              echo "Latest tag $latest does not follow vMAJOR.MINOR.PATCH. Skipping." >&2
+              echo "created=false" >> "$GITHUB_OUTPUT"
+              echo "tag=$latest" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+          fi
+
+          if git rev-parse "$tag" >/dev/null 2>&1; then
+            echo "Tag $tag already exists. Skipping creation."
+            echo "created=false" >> "$GITHUB_OUTPUT"
+            echo "tag=$tag" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "created=true" >> "$GITHUB_OUTPUT"
+
+      - name: Create and push tag
+        if: ${{ steps.tag.outputs.created == 'true' }}
+        env:
+          TAG_NAME: ${{ steps.tag.outputs.tag }}
+        run: |
+          git tag -a "$TAG_NAME" -m "Automated release $TAG_NAME"
+          git push origin "$TAG_NAME"
+
+      - name: Workflow summary
+        env:
+          TAG_NAME: ${{ steps.tag.outputs.tag }}
+          CREATED: ${{ steps.tag.outputs.created }}
+        run: |
+          if [ "$CREATED" = "true" ]; then
+            echo "Created tag $TAG_NAME" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "No tag created. $TAG_NAME already exists." >> "$GITHUB_STEP_SUMMARY"
+          fi
