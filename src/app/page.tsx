@@ -24,7 +24,7 @@ export default function Home() {
                 🚀 RocketSchema
               </h1>
               <p className="mt-1 text-sm text-muted-foreground">
-                A schema standard for business applications
+                A modern approach to business data modeling
               </p>
             </div>
             <div className="flex items-center gap-2">
@@ -49,28 +49,44 @@ export default function Home() {
         <div className="text-center space-y-8">
           <div className="space-y-4">
             <h2 className="text-4xl font-extrabold tracking-tight sm:text-5xl">
-              Standardized Business Schemas
+              Stop Reinventing the Wheel.<br />
+              Start Building on Proven Foundations.
             </h2>
             <p className="max-w-2xl mx-auto text-xl text-muted-foreground">
-              A universal standard for business application data models. Stop reinventing the wheel - capitalize on proven, reusable schemas for CRM, ERP, e-commerce, and any business solution.
+              A comprehensive library of battle-tested entity schemas for building modern business applications. Rather than a rigid standard, RocketSchema is a flexible proposal — a curated collection you can adopt, adapt, or use as inspiration.
             </p>
           </div>
 
           {/* Stats */}
           <div className="flex justify-center gap-8 pt-2">
             <div className="text-center">
+              <div className="text-3xl font-bold text-primary">100+</div>
+              <div className="text-sm text-muted-foreground">Entities</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-primary">21</div>
+              <div className="text-sm text-muted-foreground">Domains</div>
+            </div>
+            <div className="text-center">
               <div className="text-3xl font-bold text-primary">
                 {solutions.length}
               </div>
-              <div className="text-sm text-muted-foreground">Solutions</div>
+              <div className="text-sm text-muted-foreground">Examples</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-primary">0</div>
+              <div className="text-sm text-muted-foreground">Vendor Lock-in</div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Solutions Grid */}
+      {/* Examples Grid */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
-        <h3 className="text-2xl font-bold mb-8 text-center">Choose Your Solution</h3>
+        <h3 className="text-2xl font-bold mb-8 text-center">🎁 Ready-Made Examples</h3>
+        <p className="text-center text-muted-foreground mb-8 max-w-2xl mx-auto">
+          Pre-configured bundles combining multiple domains for specific use cases. Start with an example that matches your needs.
+        </p>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {solutions.map((solution) => (
             <Link key={solution.name} href={`/solutions/${solution.name}`}>
@@ -123,7 +139,7 @@ export default function Home() {
       <footer className="border-t mt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <p className="text-center text-muted-foreground text-sm">
-            MIT License - Free to use for all commercial and open source projects
+            Made with ❤️ by developers, for developers • MIT License - Free to use for all commercial and open source projects
           </p>
         </div>
       </footer>
