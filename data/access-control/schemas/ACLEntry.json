@@ -5,14 +5,6 @@
   "description": "Defines access control list entries that specify precise permissions for principals on specific resources, implementing discretionary access control (DAC) at the most granular level. ACL entries are the building blocks of resource-centric security, where each resource (file, folder, database, API endpoint) maintains a list of who can do what with it. Unlike role-based permissions that apply broadly, ACL entries provide fine-grained control for specific resource instances. Each entry defines a principal (user, group, or service), the resource they can access, and exactly what operations are allowed or denied. This is essential for implementing ownership models where resource creators control access, handling exceptions to broader policies, and managing shared resources with complex permission requirements. ACL entries support inheritance from parent resources (folders passing permissions to files), explicit deny rules that override allows, and conditional access based on resource state or context. They can specify different permissions for different aspects of a resource - for example, allowing read of metadata but not content, or permitting updates to certain fields only. The system evaluates ACL entries in a specific order, considering inheritance, explicit entries, and deny-before-allow rules. This granular control is crucial for compliance scenarios requiring proof of exactly who had access to specific data at specific times.",
   "properties": [
     {
-      "name": "aclId",
-      "type": "uuid",
-      "mode": "stored",
-      "description": "Unique identifier for this ACL entry",
-      "required": true,
-      "unique": true
-    },
-    {
       "name": "resourceType",
       "type": "string",
       "mode": "stored",
@@ -33,7 +25,15 @@
       "type": "string",
       "mode": "enum",
       "description": "Type of principal being granted access",
-      "enum": ["user", "group", "role", "service", "everyone", "authenticated", "anonymous"],
+      "enum": [
+        "user",
+        "group",
+        "role",
+        "service",
+        "everyone",
+        "authenticated",
+        "anonymous"
+      ],
       "required": true
     },
     {
@@ -56,7 +56,10 @@
       "type": "string",
       "mode": "enum",
       "description": "Whether permissions are granted or denied",
-      "enum": ["allow", "deny"],
+      "enum": [
+        "allow",
+        "deny"
+      ],
       "default": "allow",
       "required": true
     },
@@ -65,7 +68,12 @@
       "type": "string",
       "mode": "enum",
       "description": "Scope of the ACL entry",
-      "enum": ["resource_only", "resource_and_children", "children_only", "recursive"],
+      "enum": [
+        "resource_only",
+        "resource_and_children",
+        "children_only",
+        "recursive"
+      ],
       "default": "resource_only"
     },
     {
@@ -73,7 +81,11 @@
       "type": "string",
       "mode": "enum",
       "description": "How this ACL interacts with inherited permissions",
-      "enum": ["override", "merge", "block_inheritance"],
+      "enum": [
+        "override",
+        "merge",
+        "block_inheritance"
+      ],
       "default": "merge"
     },
     {
@@ -188,7 +200,12 @@
       "type": "string",
       "mode": "enum",
       "description": "Level of auditing for access via this ACL",
-      "enum": ["none", "basic", "detailed", "full"],
+      "enum": [
+        "none",
+        "basic",
+        "detailed",
+        "full"
+      ],
       "default": "basic"
     },
     {
@@ -221,7 +238,7 @@
     },
     {
       "name": "metadata",
-      "type": "object",
+      "type": "string",
       "mode": "stored",
       "description": "Additional ACL configuration"
     }
@@ -229,7 +246,6 @@
   "examples": [
     {
       "@type": "ACLEntry",
-      "aclId": "acl_doc_001",
       "resourceType": "document",
       "resourceId": "doc_annual_report_2024",
       "principalType": "group",
@@ -261,7 +277,6 @@
     },
     {
       "@type": "ACLEntry",
-      "aclId": "acl_folder_002",
       "resourceType": "folder",
       "resourceId": "folder_customer_data",
       "principalType": "user",

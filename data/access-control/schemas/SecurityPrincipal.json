@@ -5,19 +5,19 @@
   "description": "Represents any entity that can be authenticated and authorized in the system, providing a unified abstraction for users, service accounts, API clients, and automated systems. A security principal is anything that can have permissions and make requests - it could be a human user, a microservice, an IoT device, a scheduled job, or an external system. This abstraction allows the access control system to treat all these entities consistently while maintaining their unique characteristics. Each principal has credentials for authentication (passwords, certificates, keys), attributes for authorization decisions (clearance level, department, trust score), and a security context that defines their capabilities. Service principals enable machine-to-machine authentication without user involvement, essential for automated workflows and microservices. System principals represent internal components that need controlled access to resources. External principals handle third-party integrations with limited, scoped access. The entity tracks the principal's lifecycle from creation through various trust states to eventual deactivation. It maintains security posture information like last security review, compliance status, and risk assessments. This unified approach simplifies access control policies - a single policy can apply to users, services, and systems without separate implementations. It's fundamental for zero-trust architectures where every request must be authenticated and authorized regardless of source.",
   "properties": [
     {
-      "name": "principalId",
-      "type": "uuid",
-      "mode": "stored",
-      "description": "Unique identifier for this security principal",
-      "required": true,
-      "unique": true
-    },
-    {
       "name": "principalType",
       "type": "string",
       "mode": "enum",
       "description": "Category of security principal",
-      "enum": ["user", "service", "application", "device", "system", "external", "federated"],
+      "enum": [
+        "user",
+        "service",
+        "application",
+        "device",
+        "system",
+        "external",
+        "federated"
+      ],
       "required": true
     },
     {
@@ -49,7 +49,16 @@
       "type": "string",
       "mode": "enum",
       "description": "How this principal authenticates",
-      "enum": ["password", "certificate", "api_key", "oauth", "saml", "kerberos", "biometric", "hardware_token"],
+      "enum": [
+        "password",
+        "certificate",
+        "api_key",
+        "oauth",
+        "saml",
+        "kerberos",
+        "biometric",
+        "hardware_token"
+      ],
       "required": true
     },
     {
@@ -153,7 +162,14 @@
       "type": "string",
       "mode": "enum",
       "description": "Current status of the principal",
-      "enum": ["active", "inactive", "suspended", "locked", "expired", "pending_approval"],
+      "enum": [
+        "active",
+        "inactive",
+        "suspended",
+        "locked",
+        "expired",
+        "pending_approval"
+      ],
       "default": "pending_approval"
     },
     {
@@ -211,7 +227,8 @@
       "mode": "stored",
       "description": "Current risk assessment score",
       "min": 0,
-      "max": 100
+      "max": 100,
+      "nullable": true
     },
     {
       "name": "isSystem",
@@ -235,22 +252,8 @@
       "nullable": true
     },
     {
-      "name": "createdAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "When principal was created",
-      "required": true
-    },
-    {
-      "name": "createdBy",
-      "type": "User",
-      "mode": "stored",
-      "description": "Who created this principal",
-      "nullable": true
-    },
-    {
       "name": "metadata",
-      "type": "object",
+      "type": "string",
       "mode": "stored",
       "description": "Additional principal configuration"
     }
@@ -258,7 +261,6 @@
   "examples": [
     {
       "@type": "SecurityPrincipal",
-      "principalId": "prin_svc_001",
       "principalType": "service",
       "principalName": "svc_data_pipeline",
       "displayName": "Data Pipeline Service",
@@ -286,7 +288,6 @@
       "isSystem": false,
       "canImpersonate": false,
       "tags": "[\"production\",\"critical\",\"data_processor\",\"gdpr_scope\"]",
-      "createdAt": "2024-01-01T00:00:00Z",
       "metadata": {
         "kubernetes_namespace": "data-services",
         "service_account": "data-pipeline-sa"
@@ -294,7 +295,6 @@
     },
     {
       "@type": "SecurityPrincipal",
-      "principalId": "prin_ext_002",
       "principalType": "external",
       "principalName": "ext_partner_api",
       "displayName": "Partner Integration - TechCorp",
@@ -320,7 +320,6 @@
       "isSystem": false,
       "canImpersonate": false,
       "tags": "[\"partner\",\"external\",\"limited_access\",\"inventory_only\"]",
-      "createdAt": "2024-02-01T00:00:00Z",
       "metadata": {
         "contract_id": "CONTRACT_2024_001",
         "data_sharing_agreement": "DSA_2024_TC"

@@ -1,0 +1,148 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "QuestionTemplate",
+  "description": "Defines a reusable challenge question template that can be used across multiple authentication and identity verification scenarios. Question templates provide standardized prompts for knowledge-based authentication, such as 'What was your first pet's name?' or 'In which city were you born?' These templates serve as a library of common personal questions that users can select when configuring security challenges for their accounts. By centralizing question definitions, this entity ensures consistency across the system, prevents duplication, and enables efficient management of the question catalog. Templates can be predefined by the system administrator based on security best practices, or they can be contributed by users as custom patterns that others might find useful. Each template includes metadata about the question's category, suggested use cases, and display properties. This separation of the question definition from its actual usage allows the same template to be reused by millions of users without data redundancy. Templates can be organized into categories like personal history, preferences, family information, or educational background to help users quickly find relevant questions. The template library can evolve over time as administrators retire weak questions that are easily guessable through social engineering and introduce stronger alternatives that balance security with memorability.",
+  "properties": [
+    {
+      "name": "questionText",
+      "type": "string",
+      "mode": "stored",
+      "description": "The actual question prompt displayed to users when selecting or answering this challenge",
+      "required": true,
+      "example": "What was the name of your first pet?"
+    },
+    {
+      "name": "category",
+      "type": "string",
+      "mode": "enum",
+      "description": "Thematic grouping to help users browse and select questions relevant to their personal experiences",
+      "enum": [
+        "personal",
+        "family",
+        "education",
+        "location",
+        "preferences",
+        "history",
+        "custom"
+      ],
+      "required": true,
+      "default": "personal",
+      "example": "personal"
+    },
+    {
+      "name": "locale",
+      "type": "string",
+      "mode": "stored",
+      "description": "Language and regional variant for which this question template is written, enabling localized question libraries",
+      "required": false,
+      "nullable": true,
+      "default": "en-US",
+      "example": "fr-FR"
+    },
+    {
+      "name": "strength",
+      "type": "string",
+      "mode": "enum",
+      "description": "Assessment of how resistant this question is to guessing or social engineering attacks",
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "required": false,
+      "nullable": true,
+      "default": "medium",
+      "example": "high"
+    },
+    {
+      "name": "isPublic",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether this template is available in the shared library for all users or restricted to specific contexts",
+      "required": false,
+      "default": true,
+      "example": true
+    },
+    {
+      "name": "usageCount",
+      "type": "integer",
+      "mode": "computed",
+      "description": "Total number of users who have selected this template for their security questions, computed from SecurityQuestion references",
+      "required": false,
+      "nullable": true,
+      "example": 15420
+    },
+    {
+      "name": "displayOrder",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Suggested position when presenting templates in a list, allowing administrators to prioritize stronger or more common questions",
+      "required": false,
+      "nullable": true,
+      "default": 0,
+      "example": 5
+    },
+    {
+      "name": "status",
+      "type": "string",
+      "mode": "enum",
+      "description": "Lifecycle state of this template indicating whether it can be newly selected by users",
+      "enum": [
+        "active",
+        "deprecated",
+        "retired"
+      ],
+      "required": true,
+      "default": "active",
+      "example": "active"
+    },
+    {
+      "name": "publishedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Timestamp when this template was first made available to users in the question library",
+      "required": false,
+      "nullable": true,
+      "example": "2023-06-01T00:00:00Z"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "QuestionTemplate",
+      "questionText": "What was the name of your first pet?",
+      "category": "personal",
+      "locale": "en-US",
+      "strength": "medium",
+      "isPublic": true,
+      "usageCount": 25340,
+      "displayOrder": 1,
+      "status": "active",
+      "publishedAt": "2023-01-01T00:00:00Z"
+    },
+    {
+      "@type": "QuestionTemplate",
+      "questionText": "In what city was your mother born?",
+      "category": "family",
+      "locale": "en-US",
+      "strength": "high",
+      "isPublic": true,
+      "usageCount": 18920,
+      "displayOrder": 2,
+      "status": "active",
+      "publishedAt": "2023-01-01T00:00:00Z"
+    },
+    {
+      "@type": "QuestionTemplate",
+      "questionText": "What was your childhood nickname?",
+      "category": "personal",
+      "locale": "en-US",
+      "strength": "low",
+      "isPublic": true,
+      "usageCount": 5430,
+      "displayOrder": 15,
+      "status": "deprecated",
+      "publishedAt": "2023-01-01T00:00:00Z"
+    }
+  ]
+}

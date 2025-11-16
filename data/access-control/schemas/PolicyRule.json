@@ -5,16 +5,8 @@
   "description": "Represents individual rules within an access policy, providing granular conditions and actions that compose complex policy logic. While an AccessPolicy defines the overall security requirement, PolicyRules are the building blocks that implement specific checks and decisions. Each rule evaluates a specific condition (like 'user is contractor' or 'time is outside business hours') and specifies what should happen when that condition is met. Rules can be combined using boolean logic (AND, OR, NOT) to create sophisticated policies. For example, a policy preventing data exfiltration might have rules checking data volume, destination, time of day, and user history. Rules support various evaluation methods including simple comparisons, regex patterns, mathematical operations, and even external service calls for dynamic decisions. They can trigger multiple actions like logging, notifications, step-up authentication, or access denial. The entity includes rule versioning to track changes, testing capabilities to validate logic, and performance metrics to identify slow-evaluating rules. Rules can be shared across policies for consistency and can be temporarily disabled for troubleshooting. This granular approach allows security teams to build precise, maintainable policies that can adapt to evolving threats and compliance requirements without complete rewrites.",
   "properties": [
     {
-      "name": "ruleId",
-      "type": "uuid",
-      "mode": "stored",
-      "description": "Unique identifier for this rule",
-      "required": true,
-      "unique": true
-    },
-    {
-      "name": "policyId",
-      "type": "uuid",
+      "name": "policy",
+      "type": "AccessPolicy",
       "mode": "stored",
       "description": "Parent policy this rule belongs to",
       "required": true
@@ -47,7 +39,13 @@
       "type": "string",
       "mode": "enum",
       "description": "Type of rule evaluation",
-      "enum": ["condition", "action", "obligation", "advice", "target"],
+      "enum": [
+        "condition",
+        "action",
+        "obligation",
+        "advice",
+        "target"
+      ],
       "required": true
     },
     {
@@ -55,7 +53,13 @@
       "type": "string",
       "mode": "enum",
       "description": "How the rule is evaluated",
-      "enum": ["simple", "complex", "script", "external", "machine_learning"],
+      "enum": [
+        "simple",
+        "complex",
+        "script",
+        "external",
+        "machine_learning"
+      ],
       "default": "simple"
     },
     {
@@ -70,7 +74,18 @@
       "type": "string",
       "mode": "enum",
       "description": "Comparison operator",
-      "enum": ["equals", "not_equals", "greater_than", "less_than", "in", "not_in", "contains", "regex", "between", "exists"],
+      "enum": [
+        "equals",
+        "not_equals",
+        "greater_than",
+        "less_than",
+        "in",
+        "not_in",
+        "contains",
+        "regex",
+        "between",
+        "exists"
+      ],
       "example": "equals"
     },
     {
@@ -108,7 +123,13 @@
       "type": "string",
       "mode": "enum",
       "description": "How to combine with previous rule",
-      "enum": ["AND", "OR", "AND_NOT", "OR_NOT", "XOR"],
+      "enum": [
+        "AND",
+        "OR",
+        "AND_NOT",
+        "OR_NOT",
+        "XOR"
+      ],
       "nullable": true
     },
     {
@@ -123,7 +144,13 @@
       "type": "string",
       "mode": "enum",
       "description": "Action when rule matches",
-      "enum": ["permit", "deny", "continue", "skip_remaining", "goto_rule"],
+      "enum": [
+        "permit",
+        "deny",
+        "continue",
+        "skip_remaining",
+        "goto_rule"
+      ],
       "default": "continue"
     },
     {
@@ -131,7 +158,13 @@
       "type": "string",
       "mode": "enum",
       "description": "Action when rule doesn't match",
-      "enum": ["permit", "deny", "continue", "skip_remaining", "goto_rule"],
+      "enum": [
+        "permit",
+        "deny",
+        "continue",
+        "skip_remaining",
+        "goto_rule"
+      ],
       "default": "continue"
     },
     {
@@ -168,7 +201,12 @@
       "type": "string",
       "mode": "enum",
       "description": "Expected performance impact",
-      "enum": ["negligible", "low", "medium", "high"],
+      "enum": [
+        "negligible",
+        "low",
+        "medium",
+        "high"
+      ],
       "default": "low"
     },
     {
@@ -176,7 +214,12 @@
       "type": "string",
       "mode": "enum",
       "description": "What to do if rule evaluation fails",
-      "enum": ["deny", "permit", "skip", "use_default"],
+      "enum": [
+        "deny",
+        "permit",
+        "skip",
+        "use_default"
+      ],
       "default": "deny"
     },
     {
@@ -208,21 +251,8 @@
       "default": 1
     },
     {
-      "name": "createdAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "When rule was created",
-      "required": true
-    },
-    {
-      "name": "createdBy",
-      "type": "User",
-      "mode": "stored",
-      "description": "Who created this rule"
-    },
-    {
       "name": "metadata",
-      "type": "object",
+      "type": "string",
       "mode": "stored",
       "description": "Additional rule configuration"
     }
@@ -230,8 +260,7 @@
   "examples": [
     {
       "@type": "PolicyRule",
-      "ruleId": "rule_contractor_check",
-      "policyId": "pol_data_access",
+      "policy": "pol_data_access",
       "ruleName": "Contractor PII Access Check",
       "description": "Prevents contractors from accessing customer PII unless explicitly authorized",
       "ruleOrder": 1,
@@ -252,7 +281,6 @@
       "errorMessage": "Access denied: Contractors cannot access customer PII without explicit authorization",
       "statistics": "{\"evaluations\":15234,\"matches\":89,\"avg_time_ms\":12}",
       "version": 2,
-      "createdAt": "2024-01-15T10:00:00Z",
       "metadata": {
         "compliance_ref": "privacy_policy_3.2",
         "risk_score": 8
@@ -260,8 +288,7 @@
     },
     {
       "@type": "PolicyRule",
-      "ruleId": "rule_time_window",
-      "policyId": "pol_maintenance_window",
+      "policy": "pol_maintenance_window",
       "ruleName": "Business Hours Check",
       "description": "Allows sensitive operations only during business hours unless emergency flag is set",
       "ruleOrder": 2,
@@ -280,7 +307,6 @@
       "timeout": 50,
       "errorMessage": "This operation is only allowed during business hours (Mon-Fri 9AM-5PM) unless emergency access is granted",
       "version": 1,
-      "createdAt": "2024-02-01T09:00:00Z",
       "metadata": {
         "timezone": "America/New_York",
         "holidays_api": "https://api.company.com/holidays"

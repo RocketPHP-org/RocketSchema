@@ -1,0 +1,143 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "ApiKeyPermission",
+  "description": "Junction entity implementing the many-to-many relationship between API keys and permissions, enabling fine-grained access control for programmatic access. This entity bridges the gap between broad access scopes (defined at the API key level) and specific granular permissions within the system. Each grant represents a single permission assigned to a single API key, with temporal validity and full audit trail. The temporal attributes enable time-bound access scenarios such as contractor access during project duration, trial period elevated permissions, or scheduled batch processing windows. The grant and revocation tracking provides accountability by recording who authorized each permission change and why, essential for compliance and security audits. When evaluating authorization, systems check both the API key's base scopes and its specifically granted permissions, combining them to determine final access rights. This dual-layer model balances ease of use for common scenarios with flexibility for complex authorization requirements. Revocation is explicit and auditable rather than deletion, maintaining historical records of permission changes. This pattern is universal across systems requiring programmatic access control, from SaaS platforms and internal tools to partner integrations and mobile app backends.",
+  "properties": [
+    {
+      "name": "apiKey",
+      "type": "ApiKey",
+      "mode": "stored",
+      "description": "The API key receiving the permission grant",
+      "required": true
+    },
+    {
+      "name": "permission",
+      "type": "Permission",
+      "mode": "stored",
+      "description": "The specific permission being granted to the API key",
+      "required": true
+    },
+    {
+      "name": "grantedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Timestamp when this permission was granted to the API key",
+      "required": true
+    },
+    {
+      "name": "grantedBy",
+      "type": "User",
+      "mode": "stored",
+      "description": "User or administrator who authorized this permission grant",
+      "nullable": true
+    },
+    {
+      "name": "grantReason",
+      "type": "string",
+      "mode": "stored",
+      "description": "Business justification or explanation for granting this permission",
+      "nullable": true,
+      "example": "Required for quarterly data synchronization project"
+    },
+    {
+      "name": "effectiveFrom",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Timestamp when this permission grant becomes active and enforceable",
+      "nullable": true
+    },
+    {
+      "name": "effectiveUntil",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Timestamp when this permission grant expires and becomes inactive",
+      "nullable": true
+    },
+    {
+      "name": "revokedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Timestamp when this permission grant was explicitly revoked before expiration",
+      "nullable": true
+    },
+    {
+      "name": "revokedBy",
+      "type": "User",
+      "mode": "stored",
+      "description": "User or administrator who revoked this permission grant",
+      "nullable": true
+    },
+    {
+      "name": "revocationReason",
+      "type": "string",
+      "mode": "stored",
+      "description": "Explanation for why this permission was revoked early",
+      "nullable": true,
+      "example": "Project completed ahead of schedule"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "ApiKeyPermission",
+      "apiKey": {
+        "@type": "ApiKey",
+        "keyPrefix": "ak_live_prod_export"
+      },
+      "permission": {
+        "@type": "Permission",
+        "name": "data:export"
+      },
+      "grantedAt": "2024-03-01T10:00:00Z",
+      "grantedBy": {
+        "@type": "User",
+        "email": "security.admin@example.com"
+      },
+      "grantReason": "Monthly analytics data export for business intelligence team",
+      "effectiveFrom": "2024-03-01T00:00:00Z",
+      "effectiveUntil": "2024-03-31T23:59:59Z"
+    },
+    {
+      "@type": "ApiKeyPermission",
+      "apiKey": {
+        "@type": "ApiKey",
+        "keyPrefix": "ak_temp_contractor_cleanup"
+      },
+      "permission": {
+        "@type": "Permission",
+        "name": "records:delete"
+      },
+      "grantedAt": "2024-02-15T14:00:00Z",
+      "grantedBy": {
+        "@type": "User",
+        "email": "project.manager@example.com"
+      },
+      "grantReason": "Temporary elevated access for data cleanup project",
+      "effectiveFrom": "2024-02-15T14:00:00Z",
+      "effectiveUntil": "2024-02-20T18:00:00Z",
+      "revokedAt": "2024-02-19T16:30:00Z",
+      "revokedBy": {
+        "@type": "User",
+        "email": "project.manager@example.com"
+      },
+      "revocationReason": "Project completed ahead of schedule, access no longer needed"
+    },
+    {
+      "@type": "ApiKeyPermission",
+      "apiKey": {
+        "@type": "ApiKey",
+        "keyPrefix": "ak_partner_integration"
+      },
+      "permission": {
+        "@type": "Permission",
+        "name": "webhooks:manage"
+      },
+      "grantedAt": "2024-01-10T09:30:00Z",
+      "grantedBy": {
+        "@type": "User",
+        "email": "integration.lead@example.com"
+      },
+      "grantReason": "Enable partner system to configure webhook endpoints for event notifications"
+    }
+  ]
+}

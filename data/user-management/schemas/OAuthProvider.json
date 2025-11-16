@@ -2,216 +2,247 @@
   "@type": "Schema",
   "@context": "https://rocketschema.org/context",
   "name": "OAuthProvider",
-  "description": "Manages third-party authentication providers that allow users to sign in using their existing accounts from services like Google, Facebook, GitHub, or corporate systems like Active Directory. OAuth providers eliminate the need for users to create and remember yet another password by leveraging their existing trusted accounts. This entity stores the configuration needed to connect to each provider, including client credentials, endpoints, and permission scopes. It handles the complex OAuth flow, storing tokens securely and managing token refresh when they expire. Each provider can be configured with specific permissions (scopes) that determine what information the application can access from the user's third-party account. This is essential for 'Sign in with Google' buttons, enterprise Single Sign-On (SSO), and social login features that reduce friction during user registration and improve security by delegating authentication to established providers.",
+  "description": "Represents an external authentication provider configuration that enables delegated authentication flows. This entity manages the technical integration points and security credentials required to establish trust relationships with third-party identity providers, allowing end-users to authenticate using credentials managed by external systems rather than creating separate credentials. The provider configuration includes protocol-specific endpoints, client credentials, permission scopes, and flow control settings. Common use cases span social authentication flows where users leverage existing accounts from public identity providers, enterprise single sign-on scenarios where organizations centralize authentication through corporate identity systems, federated identity architectures connecting multiple autonomous systems, partner integrations requiring secure cross-boundary authentication, and multi-tenant platforms supporting customer-specific identity providers. The entity supports multiple authentication protocols including OAuth 2.0, OpenID Connect, SAML, and directory services, enabling organizations to offer flexible authentication options while maintaining security and user experience standards across diverse integration requirements.",
   "properties": [
     {
-      "name": "providerName",
+      "name": "identifier",
       "type": "string",
       "mode": "stored",
-      "description": "Unique identifier for the OAuth provider",
+      "description": "Unique machine-readable identifier for the authentication provider configuration, used internally for routing and referencing",
       "required": true,
       "unique": true,
-      "example": "google"
+      "example": "enterprise-sso-primary"
     },
     {
-      "name": "displayName",
+      "name": "label",
       "type": "string",
       "mode": "stored",
-      "description": "User-friendly name shown on login buttons",
+      "description": "Human-readable name for the authentication provider displayed in user interfaces and administrative tools",
       "required": true,
-      "example": "Google"
+      "example": "Enterprise Authentication"
     },
     {
-      "name": "providerType",
+      "name": "protocolType",
       "type": "string",
       "mode": "enum",
-      "description": "Category of authentication provider",
-      "enum": ["oauth2", "saml", "oidc", "ldap", "custom"],
-      "default": "oauth2",
-      "example": "oauth2"
-    },
-    {
-      "name": "clientId",
-      "type": "string",
-      "mode": "stored",
-      "description": "Application's unique identifier registered with the provider",
+      "description": "Authentication protocol used by the provider for credential exchange and identity verification",
+      "enum": [
+        "oauth2",
+        "oidc",
+        "saml2",
+        "ldap",
+        "custom"
+      ],
       "required": true,
-      "example": "1234567890-abc.apps.googleusercontent.com"
+      "example": "oidc"
     },
     {
-      "name": "clientSecret",
+      "name": "clientIdentifier",
       "type": "string",
       "mode": "stored",
-      "description": "Secret key for authenticating with the provider (encrypted)",
+      "description": "Application identifier registered with the authentication provider, uniquely identifying this client in provider's system",
+      "required": true,
+      "example": "app-f47ac10b-58cc-4372-a567-0e02b2c3d479"
+    },
+    {
+      "name": "clientCredential",
+      "type": "string",
+      "mode": "stored",
+      "description": "Secret credential used to authenticate this application with the provider, must be encrypted at rest and never exposed in client-side code",
       "required": true,
       "private": true
     },
     {
-      "name": "authorizationUrl",
+      "name": "authorizationEndpoint",
       "type": "string",
       "mode": "stored",
-      "description": "URL where users are sent to grant permissions",
+      "description": "URL where users are redirected to initiate the authentication flow and grant permissions to the requesting application",
       "required": true,
       "format": "uri",
-      "example": "https://accounts.google.com/o/oauth2/v2/auth"
+      "example": "https://auth.provider.example/protocol/authorize"
     },
     {
-      "name": "tokenUrl",
+      "name": "tokenEndpoint",
       "type": "string",
       "mode": "stored",
-      "description": "URL for exchanging authorization codes for access tokens",
+      "description": "URL used for server-to-server communication to exchange authorization codes for access tokens and refresh expired tokens",
       "required": true,
       "format": "uri",
-      "example": "https://oauth2.googleapis.com/token"
+      "example": "https://auth.provider.example/protocol/token"
     },
     {
-      "name": "userInfoUrl",
+      "name": "userInfoEndpoint",
       "type": "string",
       "mode": "stored",
-      "description": "URL to fetch user profile information",
+      "description": "URL to retrieve authenticated user profile information and claims after successful authentication",
+      "nullable": true,
       "format": "uri",
-      "example": "https://www.googleapis.com/oauth2/v2/userinfo"
+      "example": "https://auth.provider.example/protocol/userinfo"
     },
     {
-      "name": "scopes",
+      "name": "discoveryEndpoint",
+      "type": "string",
+      "mode": "stored",
+      "description": "URL providing provider metadata and configuration details, commonly used in OpenID Connect for automatic endpoint discovery",
+      "nullable": true,
+      "format": "uri",
+      "example": "https://auth.provider.example/.well-known/openid-configuration"
+    },
+    {
+      "name": "requestedScopes",
       "type": "string[]",
       "mode": "stored",
-      "description": "Permissions requested from the provider",
-      "example": ["openid", "email", "profile"]
+      "description": "List of permission scopes requested from the provider, defining what user data and capabilities the application can access",
+      "example": [
+        "openid",
+        "email",
+        "profile"
+      ]
     },
     {
-      "name": "redirectUri",
+      "name": "callbackEndpoint",
       "type": "string",
       "mode": "stored",
-      "description": "URL where provider sends users after authentication",
+      "description": "URL where the provider redirects users after authentication, must be registered with the provider to prevent redirect attacks",
       "required": true,
       "format": "uri",
-      "example": "https://myapp.com/auth/google/callback"
+      "example": "https://application.example/auth/callback"
     },
     {
-      "name": "iconUrl",
-      "type": "string",
-      "mode": "stored",
-      "description": "Provider's logo for display on login page",
-      "format": "uri",
-      "example": "https://myapp.com/icons/google.svg"
-    },
-    {
-      "name": "buttonColor",
-      "type": "string",
-      "mode": "stored",
-      "description": "Brand color for the login button",
-      "example": "#4285F4"
-    },
-    {
-      "name": "isEnabled",
+      "name": "enabled",
       "type": "boolean",
       "mode": "stored",
-      "description": "Whether this provider is available for login",
+      "description": "Controls whether this provider is currently available for authentication flows, allowing temporary disabling without deletion",
       "default": true
     },
     {
-      "name": "isDefault",
+      "name": "defaultProvider",
       "type": "boolean",
       "mode": "stored",
-      "description": "Whether this is the preferred login method",
+      "description": "Indicates whether this provider should be presented as the primary authentication option in user interfaces",
       "default": false
     },
     {
-      "name": "allowSignup",
+      "name": "allowAccountCreation",
       "type": "boolean",
       "mode": "stored",
-      "description": "Whether new users can register via this provider",
+      "description": "Determines whether successful authentication from unknown users should automatically create new accounts in the system",
       "default": true
     },
     {
-      "name": "autoLinkAccounts",
+      "name": "automaticAccountAssociation",
       "type": "boolean",
       "mode": "stored",
-      "description": "Automatically link accounts with matching email addresses",
+      "description": "Controls whether accounts should be automatically linked when matching identity attributes are detected across providers",
       "default": false
     },
     {
-      "name": "userFieldMapping",
-      "type": "object",
+      "name": "associationAttributeName",
+      "type": "string",
       "mode": "stored",
-      "description": "Maps provider fields to application user fields"
+      "description": "Name of the user attribute used for automatic account association when automaticAccountAssociation is enabled",
+      "nullable": true,
+      "example": "email"
     },
     {
-      "name": "metadata",
-      "type": "object",
+      "name": "tokenExpirationSeconds",
+      "type": "integer",
       "mode": "stored",
-      "description": "Additional provider-specific configuration"
+      "description": "Default lifetime in seconds for access tokens issued by this provider, used for token refresh logic",
+      "nullable": true,
+      "example": 3600
     },
     {
-      "name": "createdAt",
-      "type": "DateTime",
+      "name": "supportsPKCE",
+      "type": "boolean",
       "mode": "stored",
-      "description": "When this provider was configured",
-      "required": true
+      "description": "Indicates whether the provider supports Proof Key for Code Exchange extension for enhanced security in authorization code flows",
+      "default": false
+    },
+    {
+      "name": "requiresState",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Controls whether state parameter must be included in authorization requests to prevent cross-site request forgery attacks",
+      "default": true
+    },
+    {
+      "name": "displayOrder",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Numeric value determining the relative position of this provider when multiple options are presented to users",
+      "nullable": true,
+      "example": 1
     }
   ],
   "examples": [
     {
       "@type": "OAuthProvider",
-      "providerName": "google",
-      "displayName": "Google",
-      "providerType": "oauth2",
-      "clientId": "1234567890-abcdefg.apps.googleusercontent.com",
-      "authorizationUrl": "https://accounts.google.com/o/oauth2/v2/auth",
-      "tokenUrl": "https://oauth2.googleapis.com/token",
-      "userInfoUrl": "https://www.googleapis.com/oauth2/v2/userinfo",
-      "scopes": ["openid", "email", "profile"],
-      "redirectUri": "https://myapp.com/auth/google/callback",
-      "iconUrl": "https://myapp.com/icons/google.svg",
-      "buttonColor": "#4285F4",
-      "isEnabled": true,
-      "isDefault": true,
-      "allowSignup": true,
-      "autoLinkAccounts": true,
-      "userFieldMapping": {
-        "id": "sub",
-        "email": "email",
-        "name": "name",
-        "picture": "picture",
-        "emailVerified": "email_verified"
-      },
-      "metadata": {
-        "accessType": "offline",
-        "prompt": "consent"
-      },
-      "createdAt": "2024-01-01T00:00:00Z"
+      "identifier": "social-auth-primary",
+      "label": "Social Authentication",
+      "protocolType": "oauth2",
+      "clientIdentifier": "app-1234567890abcdef",
+      "authorizationEndpoint": "https://identity.socialprovider.example/oauth2/authorize",
+      "tokenEndpoint": "https://identity.socialprovider.example/oauth2/token",
+      "userInfoEndpoint": "https://identity.socialprovider.example/oauth2/userinfo",
+      "requestedScopes": [
+        "openid",
+        "email",
+        "profile"
+      ],
+      "callbackEndpoint": "https://myapplication.example/auth/social/callback",
+      "enabled": true,
+      "defaultProvider": true,
+      "allowAccountCreation": true,
+      "automaticAccountAssociation": true,
+      "associationAttributeName": "email",
+      "tokenExpirationSeconds": 3600,
+      "supportsPKCE": true,
+      "requiresState": true,
+      "displayOrder": 1
     },
     {
       "@type": "OAuthProvider",
-      "providerName": "azure-ad",
-      "displayName": "Microsoft Work Account",
-      "providerType": "oidc",
-      "clientId": "98765432-wxyz-1234-5678-fedcba987654",
-      "authorizationUrl": "https://login.microsoftonline.com/tenant-id/oauth2/v2.0/authorize",
-      "tokenUrl": "https://login.microsoftonline.com/tenant-id/oauth2/v2.0/token",
-      "userInfoUrl": "https://graph.microsoft.com/v1.0/me",
-      "scopes": ["openid", "email", "profile", "User.Read"],
-      "redirectUri": "https://enterprise.app/auth/azure/callback",
-      "iconUrl": "https://enterprise.app/icons/microsoft.svg",
-      "buttonColor": "#0078D4",
-      "isEnabled": true,
-      "isDefault": false,
-      "allowSignup": false,
-      "autoLinkAccounts": false,
-      "userFieldMapping": {
-        "id": "id",
-        "email": "userPrincipalName",
-        "name": "displayName",
-        "firstName": "givenName",
-        "lastName": "surname"
-      },
-      "metadata": {
-        "tenant": "organizations",
-        "allowedDomains": ["company.com", "subsidiary.com"],
-        "groupClaimsEnabled": true
-      },
-      "createdAt": "2024-01-15T10:00:00Z"
+      "identifier": "enterprise-sso-main",
+      "label": "Corporate Identity System",
+      "protocolType": "oidc",
+      "clientIdentifier": "client-98765432-wxyz-abcd-efgh-fedcba987654",
+      "authorizationEndpoint": "https://directory.enterprise.example/auth/protocol/openid-connect/auth",
+      "tokenEndpoint": "https://directory.enterprise.example/auth/protocol/openid-connect/token",
+      "userInfoEndpoint": "https://directory.enterprise.example/auth/protocol/openid-connect/userinfo",
+      "discoveryEndpoint": "https://directory.enterprise.example/auth/.well-known/openid-configuration",
+      "requestedScopes": [
+        "openid",
+        "email",
+        "profile",
+        "groups"
+      ],
+      "callbackEndpoint": "https://intranet.company.example/auth/enterprise/callback",
+      "enabled": true,
+      "defaultProvider": false,
+      "allowAccountCreation": false,
+      "automaticAccountAssociation": false,
+      "tokenExpirationSeconds": 7200,
+      "supportsPKCE": true,
+      "requiresState": true,
+      "displayOrder": 2
+    },
+    {
+      "@type": "OAuthProvider",
+      "identifier": "partner-federation",
+      "label": "Partner Authentication Bridge",
+      "protocolType": "saml2",
+      "clientIdentifier": "sp-entity-f47ac10b-58cc-4372-a567-0e02b2c3d479",
+      "authorizationEndpoint": "https://federation.partner.example/saml2/sso",
+      "tokenEndpoint": "https://federation.partner.example/saml2/token",
+      "callbackEndpoint": "https://platform.example/auth/partner/callback",
+      "enabled": true,
+      "defaultProvider": false,
+      "allowAccountCreation": true,
+      "automaticAccountAssociation": true,
+      "associationAttributeName": "federatedIdentifier",
+      "requiresState": true,
+      "displayOrder": 3
     }
   ]
 }

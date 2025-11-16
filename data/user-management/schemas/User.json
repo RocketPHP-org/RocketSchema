@@ -2,16 +2,8 @@
   "@type": "Schema",
   "@context": "https://rocketschema.org/context",
   "name": "User",
-  "description": "Represents a user account in the system. This is the central entity that uniquely identifies every person who has access to the application. It stores basic identity information like username and email, along with language and timezone preferences. Sensitive information like passwords are stored separately in UserAuthentication for security reasons. Each user can have multiple active sessions, multiple two-factor authentication methods, and can create API keys for programmatic access. The user entity tracks the lifecycle of an account from registration through activation, suspension, and eventual deletion. It's the main reference point for all user-related operations in the system.",
+  "description": "Represents a user account that provides authenticated access to a system or application. A User is the fundamental entity that uniquely identifies any individual or service account with access privileges, distinct from Person which represents human identity. User accounts exist across virtually all software systems - from enterprise applications to public websites, from healthcare portals to educational platforms. The entity captures core authentication identifiers (username, email) and system-level preferences (locale, timezone) that control the user's interaction experience. Each User may reference a Person entity for biographical data, separating system access from personal identity. Users progress through a standard lifecycle: registration, email verification, activation, and potential suspension or deactivation. The account status and timestamps track this lifecycle without storing sensitive credentials, which belong in separate authentication entities. User serves as the central reference point for relationships to sessions, permissions, roles, activities, preferences, and notifications. By maintaining a clean separation between system access (User) and personal identity (Person), the model supports scenarios where one person has multiple user accounts or where service accounts exist without a corresponding person.",
   "properties": [
-    {
-      "name": "userId",
-      "type": "uuid",
-      "mode": "stored",
-      "description": "Unique universal identifier for the user",
-      "required": true,
-      "unique": true
-    },
     {
       "name": "username",
       "type": "string",
@@ -34,30 +26,36 @@
     {
       "name": "emailVerified",
       "type": "boolean",
-      "mode": "stored",
-      "description": "Whether the email address has been verified through confirmation link",
-      "default": false
+      "mode": "computed",
+      "description": "Whether the email address has been verified, computed from emailVerifiedAt being non-null",
+      "computation": "emailVerifiedAt != null"
     },
     {
       "name": "emailVerifiedAt",
       "type": "DateTime",
       "mode": "stored",
-      "description": "Timestamp when the email was verified",
+      "description": "Timestamp when the email was verified through confirmation link or other verification mechanism",
       "nullable": true
     },
     {
       "name": "person",
       "type": "Person",
       "mode": "stored",
-      "description": "Reference to personal information (name, date of birth, address, etc.)",
+      "description": "Reference to personal information (name, date of birth, address, etc.) when the user represents a human individual",
       "nullable": true
     },
     {
       "name": "status",
       "type": "string",
       "mode": "enum",
-      "description": "Current status of the user account",
-      "enum": ["active", "inactive", "suspended", "locked", "pending"],
+      "description": "Current status of the user account in its lifecycle",
+      "enum": [
+        "active",
+        "inactive",
+        "suspended",
+        "locked",
+        "pending"
+      ],
       "default": "pending",
       "example": "active"
     },
@@ -65,20 +63,21 @@
       "name": "statusReason",
       "type": "string",
       "mode": "stored",
-      "description": "Human-readable explanation for the current status",
+      "description": "Human-readable explanation for the current status, particularly useful for suspended or locked accounts",
       "nullable": true
     },
     {
       "name": "statusChangedAt",
       "type": "DateTime",
       "mode": "stored",
-      "description": "When the status was last changed"
+      "description": "When the status was last changed, may be null for accounts that have never changed status",
+      "nullable": true
     },
     {
       "name": "locale",
       "type": "string",
       "mode": "stored",
-      "description": "User's preferred language and region for UI display",
+      "description": "User's preferred language and region for UI display, using standard locale codes",
       "default": "en-US",
       "example": "fr-FR"
     },
@@ -86,7 +85,7 @@
       "name": "timezone",
       "type": "string",
       "mode": "stored",
-      "description": "User's timezone for displaying dates and scheduling",
+      "description": "User's timezone for displaying dates and scheduling, using IANA timezone database names",
       "default": "UTC",
       "example": "Europe/Paris"
     },
@@ -94,89 +93,59 @@
       "name": "registeredAt",
       "type": "DateTime",
       "mode": "stored",
-      "description": "When the user first signed up",
+      "description": "When the user account was first created in the system",
       "required": true
     },
     {
       "name": "registrationSource",
       "type": "string",
       "mode": "enum",
-      "description": "How the user account was created",
-      "enum": ["web", "mobile", "api", "admin", "import", "social"],
+      "description": "The channel or method through which the user account was created",
+      "enum": [
+        "web",
+        "mobile",
+        "api",
+        "admin",
+        "import",
+        "social"
+      ],
       "example": "web"
-    },
-    {
-      "name": "registrationIp",
-      "type": "string",
-      "mode": "stored",
-      "description": "IP address used during registration for security tracking",
-      "nullable": true
     },
     {
       "name": "activatedAt",
       "type": "DateTime",
       "mode": "stored",
-      "description": "When the account was activated and became usable",
+      "description": "When the account was activated and became usable, typically after email verification or admin approval",
       "nullable": true
     },
     {
       "name": "deactivatedAt",
       "type": "DateTime",
       "mode": "stored",
-      "description": "When the account was deactivated",
+      "description": "When the account was deactivated, either by user request or administrative action",
       "nullable": true
-    },
-    {
-      "name": "deletedAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "Soft delete timestamp - account is hidden but not removed from database",
-      "nullable": true
-    },
-    {
-      "name": "version",
-      "type": "integer",
-      "mode": "stored",
-      "description": "Version number to prevent concurrent update conflicts",
-      "default": 1
-    },
-    {
-      "name": "createdAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "When this record was created in the database",
-      "required": true
-    },
-    {
-      "name": "updatedAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "When this record was last modified"
     }
   ],
   "examples": [
     {
       "@type": "User",
-      "userId": "550e8400-e29b-41d4-a716-446655440000",
       "username": "sarah.johnson",
       "email": "sarah.johnson@techcorp.com",
-      "emailVerified": true,
       "emailVerifiedAt": "2024-01-15T10:30:00Z",
       "status": "active",
       "statusReason": null,
+      "statusChangedAt": "2024-01-15T10:30:00Z",
       "locale": "en-US",
       "timezone": "America/Los_Angeles",
       "registeredAt": "2024-01-15T09:00:00Z",
       "registrationSource": "web",
-      "registrationIp": "192.168.1.100",
-      "activatedAt": "2024-01-15T10:30:00Z"
+      "activatedAt": "2024-01-15T10:30:00Z",
+      "deactivatedAt": null
     },
     {
       "@type": "User",
-      "userId": "6ba7b810-9dad-11d1-80b4-00c04fd430c8",
       "username": "admin.system",
       "email": "admin@company.com",
-      "emailVerified": true,
       "emailVerifiedAt": "2023-06-01T08:00:00Z",
       "status": "locked",
       "statusReason": "Too many failed login attempts from unknown location",
@@ -185,8 +154,23 @@
       "timezone": "Europe/London",
       "registeredAt": "2023-06-01T08:00:00Z",
       "registrationSource": "admin",
-      "registrationIp": "10.0.0.50",
-      "activatedAt": "2023-06-01T08:00:00Z"
+      "activatedAt": "2023-06-01T08:00:00Z",
+      "deactivatedAt": null
+    },
+    {
+      "@type": "User",
+      "username": "maria.garcia",
+      "email": "maria.garcia@university.edu",
+      "emailVerifiedAt": null,
+      "status": "pending",
+      "statusReason": "Awaiting email verification",
+      "statusChangedAt": null,
+      "locale": "es-ES",
+      "timezone": "Europe/Madrid",
+      "registeredAt": "2024-03-20T16:45:00Z",
+      "registrationSource": "mobile",
+      "activatedAt": null,
+      "deactivatedAt": null
     }
   ]
 }

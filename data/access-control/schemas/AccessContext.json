@@ -5,23 +5,15 @@
   "description": "Captures the complete environmental and situational context in which an access request occurs, providing crucial information for context-aware authorization decisions. This entity represents the 'circumstances' of access - not just who wants what, but when, where, how, and under what conditions. It includes technical context (IP address, device, browser), temporal context (time of day, day of week, timezone), geographic context (location, jurisdiction), behavioral context (access patterns, risk indicators), and business context (project phase, emergency status). Modern zero-trust architectures use this rich context to make dynamic authorization decisions - the same user might be granted access from the office during business hours but denied from an unknown location at midnight. The context enables adaptive security where access requirements change based on threat level, implements conditional access policies ('require MFA from untrusted networks'), and supports compliance requirements ('EU data only accessible from EU locations'). It captures session information, authentication strength, device trust level, and network security posture. The entity also tracks anomalies and risk signals that might indicate compromised credentials or insider threats. This contextual awareness transforms static permission checks into dynamic, risk-based access decisions that adapt to changing security landscapes and business needs.",
   "properties": [
     {
-      "name": "contextId",
-      "type": "uuid",
-      "mode": "stored",
-      "description": "Unique identifier for this access context",
-      "required": true,
-      "unique": true
-    },
-    {
-      "name": "sessionId",
-      "type": "string",
+      "name": "session",
+      "type": "Session",
       "mode": "stored",
       "description": "Associated user session",
       "required": true
     },
     {
-      "name": "userId",
-      "type": "uuid",
+      "name": "user",
+      "type": "User",
       "mode": "stored",
       "description": "User making the access request",
       "required": true
@@ -88,7 +80,13 @@
       "type": "string",
       "mode": "enum",
       "description": "Strength of authentication",
-      "enum": ["none", "weak", "medium", "strong", "very_strong"],
+      "enum": [
+        "none",
+        "weak",
+        "medium",
+        "strong",
+        "very_strong"
+      ],
       "required": true
     },
     {
@@ -103,7 +101,14 @@
       "type": "string",
       "mode": "enum",
       "description": "Type of network connection",
-      "enum": ["corporate", "vpn", "public", "home", "mobile", "unknown"],
+      "enum": [
+        "corporate",
+        "vpn",
+        "public",
+        "home",
+        "mobile",
+        "unknown"
+      ],
       "required": true
     },
     {
@@ -147,7 +152,8 @@
       "mode": "stored",
       "description": "Calculated risk score (0-100)",
       "min": 0,
-      "max": 100
+      "max": 100,
+      "nullable": true
     },
     {
       "name": "riskFactors",
@@ -204,7 +210,12 @@
       "type": "string",
       "mode": "enum",
       "description": "System environment",
-      "enum": ["development", "testing", "staging", "production"],
+      "enum": [
+        "development",
+        "testing",
+        "staging",
+        "production"
+      ],
       "required": true
     },
     {
@@ -215,15 +226,15 @@
       "default": false
     },
     {
-      "name": "parentContextId",
-      "type": "uuid",
+      "name": "parentContext",
+      "type": "AccessContext",
       "mode": "stored",
       "description": "Previous context in session chain",
       "nullable": true
     },
     {
       "name": "metadata",
-      "type": "object",
+      "type": "string",
       "mode": "stored",
       "description": "Additional context data"
     }
@@ -231,9 +242,6 @@
   "examples": [
     {
       "@type": "AccessContext",
-      "contextId": "ctx_abc123",
-      "sessionId": "sess_xyz789",
-      "userId": "user_john_doe",
       "timestamp": "2024-03-15T14:30:00Z",
       "ipAddress": "203.0.113.42",
       "ipReputation": "{\"score\":95,\"category\":\"corporate\",\"threat_level\":\"low\",\"asn\":\"AS12345\"}",
@@ -261,13 +269,12 @@
       "metadata": {
         "session_age_minutes": 45,
         "requests_in_session": 23
-      }
+      },
+      "user": "user_john_doe",
+      "session": "sess_xyz789"
     },
     {
       "@type": "AccessContext",
-      "contextId": "ctx_risk_456",
-      "sessionId": "sess_suspicious_001",
-      "userId": "user_contractor",
       "timestamp": "2024-03-15T02:45:00Z",
       "ipAddress": "198.51.100.99",
       "ipReputation": "{\"score\":45,\"category\":\"vpn_exit\",\"threat_level\":\"medium\",\"anonymous_proxy\":true}",
@@ -296,7 +303,9 @@
       "metadata": {
         "alert_triggered": true,
         "security_review_required": true
-      }
+      },
+      "user": "user_contractor",
+      "session": "sess_suspicious_001"
     }
   ]
 }

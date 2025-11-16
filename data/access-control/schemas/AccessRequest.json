@@ -5,19 +5,20 @@
   "description": "Manages formal requests for access to resources, roles, or permissions that require approval, implementing a complete workflow from request submission through review to final grant or denial. This entity handles scenarios where users need access beyond their current permissions - requesting a new role, access to sensitive data, temporary elevated privileges, or entry to restricted systems. Each request captures comprehensive justification including business need, duration required, specific resources needed, and risk acknowledgment. The approval workflow can be simple (single manager) or complex (multiple stakeholders, security review, legal sign-off), with configurable routing based on request type, risk level, and resource sensitivity. The entity tracks the complete lifecycle: draft, submitted, under review, approved/denied, provisioned, and expired. It supports emergency requests that bypass normal workflows with heavy auditing, time-boxed access that automatically expires, and conditional approvals with specific constraints. Requests can include attestations where requesters confirm understanding of policies, accept liability, or complete required training. The system handles delegation where managers can request on behalf of their teams, bulk requests for multiple users, and recurring requests for periodic access needs. This formal process is essential for compliance with regulations requiring documented access approval, maintaining zero-standing privileges, and providing evidence of proper authorization during audits.",
   "properties": [
     {
-      "name": "requestId",
-      "type": "uuid",
-      "mode": "stored",
-      "description": "Unique identifier for this access request",
-      "required": true,
-      "unique": true
-    },
-    {
       "name": "requestType",
       "type": "string",
       "mode": "enum",
       "description": "Category of access being requested",
-      "enum": ["role", "permission", "resource", "group", "elevation", "emergency", "temporary", "permanent"],
+      "enum": [
+        "role",
+        "permission",
+        "resource",
+        "group",
+        "elevation",
+        "emergency",
+        "temporary",
+        "permanent"
+      ],
       "required": true
     },
     {
@@ -55,7 +56,15 @@
       "type": "string",
       "mode": "enum",
       "description": "Business driver for request",
-      "enum": ["project", "operational", "support", "audit", "compliance", "emergency", "training"],
+      "enum": [
+        "project",
+        "operational",
+        "support",
+        "audit",
+        "compliance",
+        "emergency",
+        "training"
+      ],
       "required": true
     },
     {
@@ -63,7 +72,13 @@
       "type": "string",
       "mode": "enum",
       "description": "Urgency level of the request",
-      "enum": ["low", "medium", "high", "critical", "emergency"],
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical",
+        "emergency"
+      ],
       "default": "medium"
     },
     {
@@ -92,7 +107,17 @@
       "type": "string",
       "mode": "enum",
       "description": "Current status of the request",
-      "enum": ["draft", "submitted", "under_review", "approved", "denied", "provisioned", "expired", "revoked", "cancelled"],
+      "enum": [
+        "draft",
+        "submitted",
+        "under_review",
+        "approved",
+        "denied",
+        "provisioned",
+        "expired",
+        "revoked",
+        "cancelled"
+      ],
       "default": "draft",
       "required": true
     },
@@ -109,7 +134,8 @@
       "mode": "stored",
       "description": "Calculated risk score of granting access",
       "min": 0,
-      "max": 100
+      "max": 100,
+      "nullable": true
     },
     {
       "name": "riskFactors",
@@ -255,28 +281,15 @@
       "default": true
     },
     {
-      "name": "parentRequestId",
-      "type": "uuid",
+      "name": "parentRequest",
+      "type": "AccessRequest",
       "mode": "stored",
       "description": "Original request if this is a renewal",
       "nullable": true
     },
     {
-      "name": "createdAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "When request was created",
-      "required": true
-    },
-    {
-      "name": "updatedAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "Last modification time"
-    },
-    {
       "name": "metadata",
-      "type": "object",
+      "type": "string",
       "mode": "stored",
       "description": "Additional request data"
     }
@@ -284,7 +297,6 @@
   "examples": [
     {
       "@type": "AccessRequest",
-      "requestId": "req_abc123",
       "requestType": "role",
       "justification": "Need production database access to investigate and resolve critical performance issues affecting customers",
       "businessNeed": "operational",
@@ -309,7 +321,6 @@
       "attestations": "[{\"policy\":\"production_access_policy\",\"agreed\":true,\"timestamp\":\"2024-03-15T13:00:00Z\"},{\"training\":\"database_security\",\"completed\":true,\"completedDate\":\"2024-03-01T00:00:00Z\"}]",
       "conditions": "{\"readonly_first_24h\":true,\"audit_all_queries\":true,\"no_data_export\":true}",
       "renewalAllowed": true,
-      "createdAt": "2024-03-15T12:30:00Z",
       "metadata": {
         "ticket": "INC-2024-4521",
         "on_call": true
@@ -317,7 +328,6 @@
     },
     {
       "@type": "AccessRequest",
-      "requestId": "req_emrg_789",
       "requestType": "emergency",
       "justification": "Critical security incident - need immediate access to investigate potential data breach",
       "businessNeed": "emergency",
@@ -339,7 +349,6 @@
       "actualEndDate": "2024-03-15T06:00:00Z",
       "attestations": "[{\"policy\":\"emergency_access_policy\",\"agreed\":true},{\"acknowledgment\":\"post_review_required\",\"agreed\":true}]",
       "conditions": "{\"full_audit\":true,\"video_recording\":true,\"post_incident_review\":\"required\"}",
-      "createdAt": "2024-03-15T02:00:00Z",
       "metadata": {
         "incident_id": "SEC-2024-CRITICAL-001",
         "authorized_by": "CISO_on_call"

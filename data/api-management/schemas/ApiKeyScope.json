@@ -1,0 +1,119 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "ApiKeyScope",
+  "description": "Defines granular permission boundaries for API authentication credentials using resource-action scope patterns, following the principle of least privilege. A scope represents a specific permission grant that allows an authenticated API client to perform a particular action on a defined resource type. This entity implements the widely-adopted OAuth 2.0 scope pattern, where permissions are expressed as resource:action pairs such as 'documents:read' or 'transactions:write', making authorization rules explicit and auditable. Scopes enable fine-grained access control across diverse domains - healthcare systems limit access to patient records, financial platforms restrict transaction capabilities, educational systems control grade modifications, and logistics networks manage shipment tracking permissions. Each scope can include structured constraint data to further narrow permissions, such as limiting access to specific organizational units, geographic regions, data classifications, or time windows. Multiple scopes combine to form complete permission sets, allowing system administrators to grant precisely the access needed for integration partners, automated processes, mobile applications, or third-party developers. This separation of individual permissions from the authentication credential itself enables dynamic permission management, detailed access auditing, selective revocation, and compliance with security frameworks like RBAC and ABAC across industries including government, healthcare, finance, education, and enterprise software.",
+  "properties": [
+    {
+      "name": "apiKey",
+      "type": "ApiKey",
+      "mode": "stored",
+      "description": "The API authentication credential to which this permission scope is attached, establishing the relationship between the credential and its authorized capabilities",
+      "required": true
+    },
+    {
+      "name": "resource",
+      "type": "string",
+      "mode": "stored",
+      "description": "The resource type or entity category this scope grants access to, typically representing a domain object like documents, users, transactions, or shipments",
+      "required": true,
+      "example": "documents"
+    },
+    {
+      "name": "action",
+      "type": "string",
+      "mode": "stored",
+      "description": "The operation or action permitted on the resource, commonly including read, write, create, update, delete, or domain-specific actions like approve or publish",
+      "required": true,
+      "example": "read"
+    },
+    {
+      "name": "constraints",
+      "type": "string",
+      "mode": "stored",
+      "description": "Additional structured limitations on the scope in JSON format, enabling fine-grained restrictions such as filtering by attribute values, limiting result quantities, or specifying allowed parameter ranges",
+      "nullable": true,
+      "example": "{\"classification\": [\"public\", \"internal\"], \"department\": \"engineering\"}"
+    },
+    {
+      "name": "description",
+      "type": "string",
+      "mode": "stored",
+      "description": "Human-readable explanation of what this scope permits, aiding administrators and developers in understanding the permission grant without parsing technical scope syntax",
+      "nullable": true,
+      "example": "Read access to public and internal documents within the engineering department"
+    },
+    {
+      "name": "isActive",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Indicates whether this scope is currently enforced during authorization checks, allowing temporary suspension of specific permissions without deletion",
+      "required": true,
+      "default": true
+    },
+    {
+      "name": "expiresAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Optional expiration timestamp after which this scope becomes invalid, supporting time-limited access grants for temporary integrations or trial periods",
+      "nullable": true
+    },
+    {
+      "name": "grantedBy",
+      "type": "User",
+      "mode": "stored",
+      "description": "The user or administrator who authorized this scope, providing accountability and audit trail for permission grants",
+      "nullable": true
+    }
+  ],
+  "examples": [
+    {
+      "@type": "ApiKeyScope",
+      "apiKey": {
+        "@type": "ApiKey",
+        "name": "Integration Service Key"
+      },
+      "resource": "transactions",
+      "action": "write",
+      "constraints": "{\"status\": [\"pending\", \"processing\"], \"maximumValue\": 50000}",
+      "description": "Create and update transactions up to 50,000 units in pending or processing status",
+      "isActive": true,
+      "expiresAt": null,
+      "grantedBy": {
+        "@type": "User",
+        "email": "admin@example.org"
+      }
+    },
+    {
+      "@type": "ApiKeyScope",
+      "apiKey": {
+        "@type": "ApiKey",
+        "name": "Reporting Dashboard Key"
+      },
+      "resource": "metrics",
+      "action": "read",
+      "constraints": "{\"timePeriod\": \"last_90_days\", \"categories\": [\"performance\", \"usage\", \"quality\"]}",
+      "description": "Read-only access to performance, usage, and quality metrics for the last 90 days",
+      "isActive": true,
+      "expiresAt": "2025-12-31T23:59:59Z",
+      "grantedBy": {
+        "@type": "User",
+        "email": "supervisor@example.org"
+      }
+    },
+    {
+      "@type": "ApiKeyScope",
+      "apiKey": {
+        "@type": "ApiKey",
+        "name": "Mobile App Key"
+      },
+      "resource": "records",
+      "action": "create",
+      "constraints": "{\"recordType\": \"observation\", \"geographicRegion\": \"EMEA\"}",
+      "description": "Create observation records within the EMEA geographic region only",
+      "isActive": true,
+      "expiresAt": null,
+      "grantedBy": null
+    }
+  ]
+}

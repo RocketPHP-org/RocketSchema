@@ -5,16 +5,8 @@
   "description": "Quantifies and tracks the trustworthiness of security principals (users, services, devices) through continuous assessment of behavior, compliance, and risk indicators, enabling dynamic trust-based access control. This entity implements zero-trust principles where trust is never assumed but continuously earned and verified. Trust scores are calculated from multiple factors: authentication strength (password, MFA, biometrics), behavioral patterns (typical vs anomalous activity), compliance status (training completed, policies acknowledged), historical reliability (past violations, successful operations), and environmental context (device security, network location). Trust levels dynamically adjust based on positive signals (successful verifications, consistent behavior) and negative signals (failed attempts, policy violations, suspicious patterns). The entity enables trust-based authorization where higher trust unlocks more privileges, trust degradation where violations reduce access progressively, and trust recovery where good behavior restores standing. It supports trust federation where external trust assessments are incorporated, trust inheritance where new principals inherit baseline trust from their organization, and trust delegation where trusted principals can vouch for others. Trust scores influence various security decisions: required authentication strength, permission activation, audit intensity, and session duration. This continuous trust assessment is essential for adaptive security that responds to changing risk, insider threat detection through trust anomalies, and compliance with zero-trust architectures.",
   "properties": [
     {
-      "name": "trustId",
-      "type": "uuid",
-      "mode": "stored",
-      "description": "Unique identifier for this trust record",
-      "required": true,
-      "unique": true
-    },
-    {
-      "name": "principalId",
-      "type": "uuid",
+      "name": "principal",
+      "type": "SecurityPrincipal",
       "mode": "stored",
       "description": "Security principal being assessed",
       "required": true
@@ -24,7 +16,13 @@
       "type": "string",
       "mode": "enum",
       "description": "Type of principal",
-      "enum": ["user", "service", "device", "application", "network"],
+      "enum": [
+        "user",
+        "service",
+        "device",
+        "application",
+        "network"
+      ],
       "required": true
     },
     {
@@ -41,7 +39,13 @@
       "type": "string",
       "mode": "enum",
       "description": "Categorized trust level",
-      "enum": ["untrusted", "low", "medium", "high", "verified"],
+      "enum": [
+        "untrusted",
+        "low",
+        "medium",
+        "high",
+        "verified"
+      ],
       "required": true
     },
     {
@@ -109,7 +113,12 @@
       "type": "string",
       "mode": "enum",
       "description": "Direction of trust change",
-      "enum": ["increasing", "stable", "decreasing", "volatile"],
+      "enum": [
+        "increasing",
+        "stable",
+        "decreasing",
+        "volatile"
+      ],
       "default": "stable"
     },
     {
@@ -212,7 +221,7 @@
     },
     {
       "name": "metadata",
-      "type": "object",
+      "type": "string",
       "mode": "stored",
       "description": "Additional trust data"
     }
@@ -220,8 +229,6 @@
   "examples": [
     {
       "@type": "PrincipalTrust",
-      "trustId": "trust_user_001",
-      "principalId": "user_john_doe",
       "principalType": "user",
       "trustScore": 78,
       "trustLevel": "high",
@@ -243,13 +250,12 @@
       "metadata": {
         "employee_type": "full_time",
         "tenure_years": 3
-      }
+      },
+      "principal": "user_john_doe"
     },
     {
       "@type": "PrincipalTrust",
-      "trustId": "trust_svc_002",
       "principalType": "service",
-      "principalId": "svc_payment_processor",
       "trustScore": 92,
       "trustLevel": "verified",
       "scoreComponents": "{\"authentication\":25,\"behavior\":23,\"compliance\":22,\"history\":22,\"context\":0}",
@@ -270,7 +276,8 @@
       "metadata": {
         "service_criticality": "high",
         "sla_tier": "platinum"
-      }
+      },
+      "principal": "svc_payment_processor"
     }
   ]
 }

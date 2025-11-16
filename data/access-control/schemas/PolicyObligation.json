@@ -5,16 +5,8 @@
   "description": "Defines mandatory actions that must be performed when a policy decision is made, ensuring that access control decisions are accompanied by necessary security, compliance, or operational activities. Obligations are the 'must-do' requirements triggered by policy evaluation - when access is granted, specific actions like logging, encryption, notification, or data masking must occur. Unlike the access decision itself (permit/deny), obligations are post-decision requirements that enforce additional controls. For example, accessing sensitive data might obligate the system to create detailed audit logs, send notifications to data owners, or apply encryption to responses. Obligations can be conditional based on the decision outcome - different obligations for permit versus deny. They support compliance requirements like GDPR's notification obligations for data breaches or HIPAA's audit requirements for patient record access. The entity tracks obligation fulfillment to ensure all required actions complete successfully - if an obligation fails, the entire access might be revoked. Obligations can be chained (one triggering another), time-bound (must complete within X seconds), or compensating (alternative actions if primary fails). This mechanism transforms simple yes/no access decisions into complex, auditable, compliant operations that meet regulatory and business requirements while maintaining security posture.",
   "properties": [
     {
-      "name": "obligationId",
-      "type": "uuid",
-      "mode": "stored",
-      "description": "Unique identifier for this obligation",
-      "required": true,
-      "unique": true
-    },
-    {
-      "name": "policyId",
-      "type": "uuid",
+      "name": "policy",
+      "type": "AccessPolicy",
       "mode": "stored",
       "description": "Policy that defines this obligation",
       "required": true
@@ -47,7 +39,16 @@
       "type": "string",
       "mode": "enum",
       "description": "Category of obligation",
-      "enum": ["audit", "notification", "encryption", "masking", "approval", "consent", "retention", "deletion"],
+      "enum": [
+        "audit",
+        "notification",
+        "encryption",
+        "masking",
+        "approval",
+        "consent",
+        "retention",
+        "deletion"
+      ],
       "required": true
     },
     {
@@ -55,7 +56,13 @@
       "type": "string",
       "mode": "enum",
       "description": "When this obligation is triggered",
-      "enum": ["on_permit", "on_deny", "on_error", "always", "conditional"],
+      "enum": [
+        "on_permit",
+        "on_deny",
+        "on_error",
+        "always",
+        "conditional"
+      ],
       "default": "on_permit"
     },
     {
@@ -63,7 +70,12 @@
       "type": "string",
       "mode": "enum",
       "description": "When obligation must be executed",
-      "enum": ["before_access", "during_access", "after_access", "async"],
+      "enum": [
+        "before_access",
+        "during_access",
+        "after_access",
+        "async"
+      ],
       "default": "before_access"
     },
     {
@@ -111,7 +123,7 @@
     },
     {
       "name": "fallbackObligation",
-      "type": "uuid",
+      "type": "PolicyObligation",
       "mode": "stored",
       "description": "Alternative obligation if this one fails",
       "nullable": true
@@ -167,15 +179,8 @@
       "default": true
     },
     {
-      "name": "createdAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "When obligation was defined",
-      "required": true
-    },
-    {
       "name": "metadata",
-      "type": "object",
+      "type": "string",
       "mode": "stored",
       "description": "Additional obligation configuration"
     }
@@ -183,8 +188,6 @@
   "examples": [
     {
       "@type": "PolicyObligation",
-      "obligationId": "obl_audit_001",
-      "policyId": "pol_sensitive_data",
       "obligationCode": "OBL_AUDIT_SENSITIVE",
       "name": "Sensitive Data Access Audit",
       "description": "Create detailed audit log for all sensitive data access including full context and data accessed",
@@ -202,16 +205,14 @@
       "complianceMapping": "{\"sox\":\"Section 404\",\"gdpr\":\"Article 30\"}",
       "validationRules": "{\"required_fields\":[\"user_id\",\"resource_id\",\"timestamp\",\"operation\"],\"max_delay_seconds\":5}",
       "isActive": true,
-      "createdAt": "2024-01-01T00:00:00Z",
       "metadata": {
         "alert_security_team": true,
         "real_time_monitoring": true
-      }
+      },
+      "policy": "pol_sensitive_data"
     },
     {
       "@type": "PolicyObligation",
-      "obligationId": "obl_encrypt_002",
-      "policyId": "pol_data_export",
       "obligationCode": "OBL_ENCRYPT_EXPORT",
       "name": "Export Data Encryption",
       "description": "Apply AES-256 encryption to all data exports before transmission",
@@ -229,11 +230,14 @@
       "chainedObligations": "[\"obl_notify_dpo\",\"obl_log_export\"]",
       "fulfillmentTracking": true,
       "isActive": true,
-      "createdAt": "2024-01-01T00:00:00Z",
       "metadata": {
-        "encryption_required_by": ["gdpr", "company_policy"],
+        "encryption_required_by": [
+          "gdpr",
+          "company_policy"
+        ],
         "key_rotation_days": 90
-      }
+      },
+      "policy": "pol_data_export"
     }
   ]
 }

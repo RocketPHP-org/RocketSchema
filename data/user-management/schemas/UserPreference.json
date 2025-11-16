@@ -2,137 +2,55 @@
   "@type": "Schema",
   "@context": "https://rocketschema.org/context",
   "name": "UserPreference",
-  "description": "Stores personalized settings and preferences for each user's experience in the application. This entity allows users to customize how the application looks, behaves, and communicates with them. Preferences can range from UI themes and layout choices to notification settings, privacy options, and feature toggles. Each preference is stored as a key-value pair, making the system extensible - new preferences can be added without changing the database schema. The entity supports different data types (boolean, string, number, JSON) and can organize preferences into categories like 'appearance', 'notifications', or 'privacy'. Default values ensure new users get a sensible starting configuration, while user-specific values override these defaults. This personalization improves user satisfaction by letting each person tailor the application to their needs and working style.",
+  "description": "Stores the personalized configuration choices made by individual users for specific preference settings within a system. Each instance represents a single user's selected value for one preference, creating a customized experience tailored to their needs and working style. This entity forms the user-specific layer of a preference system, where PreferenceDefinition entities define what preferences exist and their characteristics, while UserPreference entities capture each user's actual selections. By separating user choices from preference metadata, the design achieves normalization and allows preference definitions to be managed centrally while user values remain independent. Users can override system defaults, adjust settings to match their preferences, and create personalized configurations across various domains such as interface appearance, notification delivery, accessibility features, regional formats, privacy controls, and feature toggles. The entity supports different value types (string, number, boolean, JSON, date) as defined by the referenced preference definition. This architecture enables systems to provide flexible customization without requiring schema changes when new preferences are introduced, scales efficiently across large user populations, and maintains clear separation between configuration templates and user-specific data. Applications range from simple on-off toggles to complex structured configurations like custom dashboard layouts or workflow preferences.",
   "properties": [
     {
       "name": "user",
       "type": "User",
       "mode": "stored",
-      "description": "The user who owns these preferences",
+      "description": "The user who has set this personalized preference value",
       "required": true
     },
     {
-      "name": "key",
-      "type": "string",
+      "name": "preferenceDefinition",
+      "type": "PreferenceDefinition",
       "mode": "stored",
-      "description": "Unique identifier for the preference setting",
-      "required": true,
-      "example": "theme.colorScheme"
+      "description": "The preference definition that specifies the structure, validation rules, and metadata for this preference",
+      "required": true
     },
     {
       "name": "value",
       "type": "string",
       "mode": "stored",
-      "description": "The preference value stored as a string (can be parsed based on type)",
+      "description": "The user's chosen value for this preference, stored as a string and parsed according to the preference definition's value type",
       "required": true,
       "example": "dark"
     },
     {
-      "name": "type",
+      "name": "effectiveValue",
       "type": "string",
-      "mode": "enum",
-      "description": "Data type of the preference value for proper parsing",
-      "enum": ["string", "number", "boolean", "json", "date"],
-      "default": "string",
-      "example": "string"
+      "mode": "computed",
+      "description": "The actual value in effect for this user, which may be the user-set value or the default from the preference definition if no user value exists"
     },
     {
-      "name": "category",
-      "type": "string",
-      "mode": "stored",
-      "description": "Grouping category for organizing related preferences",
-      "example": "appearance"
-    },
-    {
-      "name": "label",
-      "type": "string",
-      "mode": "stored",
-      "description": "Human-readable name for the preference",
-      "example": "Color Scheme"
-    },
-    {
-      "name": "description",
-      "type": "string",
-      "mode": "stored",
-      "description": "Help text explaining what this preference does",
-      "example": "Choose between light and dark theme"
-    },
-    {
-      "name": "defaultValue",
-      "type": "string",
-      "mode": "stored",
-      "description": "System default if user hasn't set a value",
-      "example": "light"
-    },
-    {
-      "name": "possibleValues",
-      "type": "string[]",
-      "mode": "stored",
-      "description": "List of allowed values for validation",
-      "example": ["light", "dark", "auto"]
-    },
-    {
-      "name": "isPublic",
+      "name": "isOverridden",
       "type": "boolean",
-      "mode": "stored",
-      "description": "Whether other users can see this preference (for social features)",
-      "default": false
-    },
-    {
-      "name": "isEditable",
-      "type": "boolean",
-      "mode": "stored",
-      "description": "Whether the user can change this preference",
-      "default": true
-    },
-    {
-      "name": "lastModifiedAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "When the user last changed this preference"
-    },
-    {
-      "name": "metadata",
-      "type": "object",
-      "mode": "stored",
-      "description": "Additional configuration or validation rules"
+      "mode": "computed",
+      "description": "Whether the user has explicitly set a value different from the system default"
     }
   ],
   "examples": [
     {
       "@type": "UserPreference",
-      "key": "notifications.email.marketing",
-      "value": "false",
-      "type": "boolean",
-      "category": "notifications",
-      "label": "Marketing Emails",
-      "description": "Receive promotional emails and newsletters about new features and updates",
-      "defaultValue": "true",
-      "possibleValues": ["true", "false"],
-      "isPublic": false,
-      "isEditable": true,
-      "lastModifiedAt": "2024-03-10T14:00:00Z",
-      "metadata": {
-        "frequency": "weekly",
-        "lastOptOut": "2024-03-10T14:00:00Z"
-      }
+      "value": "false"
     },
     {
       "@type": "UserPreference",
-      "key": "dashboard.widgets.layout",
-      "value": "{\"columns\":3,\"widgets\":[{\"id\":\"stats\",\"position\":1},{\"id\":\"chart\",\"position\":2},{\"id\":\"tasks\",\"position\":3}]}",
-      "type": "json",
-      "category": "dashboard",
-      "label": "Dashboard Layout",
-      "description": "Customized arrangement of widgets on your dashboard",
-      "defaultValue": "{\"columns\":2,\"widgets\":[]}",
-      "isPublic": false,
-      "isEditable": true,
-      "lastModifiedAt": "2024-02-28T09:30:00Z",
-      "metadata": {
-        "maxWidgets": 10,
-        "allowedWidgets": ["stats", "chart", "tasks", "calendar", "news"]
-      }
+      "value": "{\"columns\":3,\"components\":[{\"id\":\"statistics\",\"position\":1},{\"id\":\"chart\",\"position\":2},{\"id\":\"list\",\"position\":3}]}"
+    },
+    {
+      "@type": "UserPreference",
+      "value": "Asia/Tokyo"
     }
   ]
 }

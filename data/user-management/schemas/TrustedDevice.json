@@ -2,225 +2,201 @@
   "@type": "Schema",
   "@context": "https://rocketschema.org/context",
   "name": "TrustedDevice",
-  "description": "Manages devices that users have marked as trusted to bypass two-factor authentication requirements. When a user successfully logs in with 2FA from a device, they can choose to 'Remember this device' or 'Trust this device for 30 days', which creates a trusted device record. This significantly improves user experience by not requiring 2FA on every login from frequently-used devices like their personal laptop or phone, while still maintaining security on unknown devices. The system creates a unique fingerprint for each device using various characteristics like browser type, operating system, screen resolution, and installed plugins - making it difficult for attackers to impersonate a trusted device. Trust can be time-limited (expires after 30 days) or revoked manually by the user or automatically if suspicious activity is detected. Users can view and manage all their trusted devices from their security settings, seeing details like when each device was last used and from what location. This feature balances security with usability, similar to how banks remember your computer but still require extra verification from new devices.",
+  "description": "Represents a device that has been designated as trusted for authentication purposes, allowing users to bypass additional verification steps on recognized devices. When a user successfully authenticates from a device, they can designate it as trusted, creating a trust relationship that persists across sessions. This improves user experience by reducing authentication friction on frequently-used devices while maintaining security on unrecognized devices. Each device is identified through a unique fingerprint derived from device characteristics, making it difficult to impersonate trusted devices. Trust relationships can be time-limited with automatic expiration, or manually revoked by users or security systems when suspicious activity is detected. Users typically manage their trusted devices through security settings, monitoring which devices have access and when they were last verified. This pattern balances security requirements with usability, commonly seen in banking systems, enterprise applications, and consumer platforms that remember authorized devices while requiring additional verification from new ones.",
   "properties": [
     {
-      "name": "deviceId",
-      "type": "uuid",
+      "name": "principal",
+      "type": "SecurityPrincipal",
       "mode": "stored",
-      "description": "Unique identifier for this trusted device",
-      "required": true,
-      "unique": true
-    },
-    {
-      "name": "userId",
-      "type": "uuid",
-      "mode": "stored",
-      "description": "User who has trusted this device",
+      "description": "The security principal (user, service account, or system) that has established trust with this device",
       "required": true
     },
     {
-      "name": "deviceName",
+      "name": "label",
       "type": "string",
       "mode": "stored",
-      "description": "User-friendly name for the device",
+      "description": "Human-readable label assigned to this device for easy identification in device management interfaces",
       "required": true,
-      "example": "John's MacBook Pro"
+      "example": "Office Workstation"
     },
     {
-      "name": "deviceType",
+      "name": "category",
       "type": "string",
       "mode": "enum",
-      "description": "Category of the trusted device",
-      "enum": ["desktop", "laptop", "mobile", "tablet", "browser", "api_client", "smart_tv", "wearable"],
+      "description": "Classification of the device form factor, used for display purposes and potential policy application",
+      "enum": [
+        "desktop",
+        "laptop",
+        "mobile",
+        "tablet",
+        "browser",
+        "terminal",
+        "kiosk",
+        "embedded"
+      ],
       "required": true
     },
     {
-      "name": "deviceFingerprint",
+      "name": "fingerprint",
       "type": "string",
       "mode": "stored",
-      "description": "Unique fingerprint combining multiple device characteristics",
+      "description": "Cryptographic or composite identifier uniquely representing this device based on multiple immutable or semi-permanent characteristics, used as the primary mechanism for device recognition across sessions",
       "required": true,
+      "unique": true,
       "private": true
     },
     {
-      "name": "userAgent",
-      "type": "string",
+      "name": "characteristics",
+      "type": "JSON",
       "mode": "stored",
-      "description": "Browser user agent string for device identification",
+      "description": "Structured collection of device attributes captured during trust establishment, such as platform type, client version, hardware identifiers, and capability flags, stored for audit and verification purposes",
       "nullable": true
     },
     {
-      "name": "operatingSystem",
-      "type": "string",
-      "mode": "stored",
-      "description": "Operating system name and version",
-      "nullable": true,
-      "example": "macOS 14.2"
-    },
-    {
-      "name": "browser",
-      "type": "string",
-      "mode": "stored",
-      "description": "Browser name and version",
-      "nullable": true,
-      "example": "Chrome 121.0.6167.184"
-    },
-    {
-      "name": "ipAddress",
-      "type": "string",
-      "mode": "stored",
-      "description": "Last known IP address of the device",
-      "nullable": true
-    },
-    {
-      "name": "location",
-      "type": "string",
-      "mode": "stored",
-      "description": "Approximate geographic location",
-      "nullable": true,
-      "example": "San Francisco, CA, USA"
-    },
-    {
-      "name": "trustedAt",
+      "name": "establishedAt",
       "type": "DateTime",
       "mode": "stored",
-      "description": "When the device was first trusted",
+      "description": "Timestamp when the trust relationship was initially created and the device was first designated as trusted",
       "required": true
     },
     {
-      "name": "trustedUntil",
+      "name": "expiresAt",
       "type": "DateTime",
       "mode": "stored",
-      "description": "When the trust expires (null for permanent trust)",
+      "description": "Timestamp when the trust relationship automatically expires and the device will no longer be recognized as trusted, null indicates permanent trust subject to manual revocation only",
       "nullable": true
-    },
-    {
-      "name": "lastUsedAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "Most recent activity from this device",
-      "nullable": true
-    },
-    {
-      "name": "lastVerifiedAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "Last time the device passed trust verification",
-      "nullable": true
-    },
-    {
-      "name": "usageCount",
-      "type": "integer",
-      "mode": "stored",
-      "description": "Number of times this device has been used for login",
-      "default": 0
-    },
-    {
-      "name": "isActive",
-      "type": "boolean",
-      "mode": "stored",
-      "description": "Whether the device is currently trusted",
-      "default": true
     },
     {
       "name": "revokedAt",
       "type": "DateTime",
       "mode": "stored",
-      "description": "When trust was revoked for this device",
+      "description": "Timestamp when the trust relationship was explicitly revoked, either by user action, administrative intervention, or automated security policy",
       "nullable": true
     },
     {
-      "name": "revokedReason",
+      "name": "revocationCategory",
       "type": "string",
-      "mode": "stored",
-      "description": "Why the device trust was revoked",
+      "mode": "enum",
+      "description": "Classification of why the trust relationship was terminated, providing context for security auditing and user notification",
+      "enum": [
+        "user_initiated",
+        "device_lost",
+        "device_stolen",
+        "device_compromised",
+        "security_policy",
+        "suspicious_activity",
+        "account_closure",
+        "expired_unused",
+        "administrative"
+      ],
       "nullable": true
     },
     {
-      "name": "riskScore",
+      "name": "riskLevel",
       "type": "integer",
-      "mode": "stored",
-      "description": "Calculated risk level for this device (0-100)",
+      "mode": "computed",
+      "description": "Numerical assessment of security risk associated with this device based on usage patterns, verification history, and behavioral analysis, ranging from 0 (lowest risk) to 100 (highest risk)",
       "min": 0,
-      "max": 100
+      "max": 100,
+      "nullable": true
     },
     {
-      "name": "metadata",
-      "type": "object",
-      "mode": "stored",
-      "description": "Additional device characteristics and flags"
+      "name": "isCurrentlyTrusted",
+      "type": "boolean",
+      "mode": "computed",
+      "description": "Indicates whether the device trust is currently valid, derived from revocation status, expiration time, and active security policies"
     },
     {
-      "name": "createdAt",
+      "name": "lastVerificationAt",
       "type": "DateTime",
-      "mode": "stored",
-      "description": "When this record was created",
-      "required": true
+      "mode": "computed",
+      "description": "Timestamp of the most recent successful verification event for this device, computed from authentication or verification activity logs"
     },
     {
-      "name": "updatedAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "Last modification of this record"
+      "name": "verificationCount",
+      "type": "integer",
+      "mode": "computed",
+      "description": "Total number of times this device has been successfully verified or used for authentication, derived from activity event history"
     }
   ],
   "examples": [
     {
       "@type": "TrustedDevice",
-      "deviceId": "dev_550e8400",
-      "userId": "user_123456",
-      "deviceName": "Sarah's Work Laptop",
-      "deviceType": "laptop",
-      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
-      "operatingSystem": "macOS 14.2",
-      "browser": "Chrome 121.0.6167.184",
-      "ipAddress": "192.168.1.100",
-      "location": "New York, NY, USA",
-      "trustedAt": "2024-01-15T10:00:00Z",
-      "trustedUntil": "2024-04-15T10:00:00Z",
-      "lastUsedAt": "2024-03-15T08:30:00Z",
-      "lastVerifiedAt": "2024-03-15T08:30:00Z",
-      "usageCount": 145,
-      "isActive": true,
-      "riskScore": 5,
-      "metadata": {
-        "screenResolution": "2560x1440",
+      "principal": {
+        "@type": "SecurityPrincipal",
+        "identifier": "alice.johnson"
+      },
+      "label": "Primary Workstation",
+      "category": "desktop",
+      "fingerprint": "sha256:8f434346648f6b96df89dda901c5176b10a6d83961dd3c1ac88b59b2dc327aa4",
+      "characteristics": {
+        "platform": "desktop-unix",
+        "clientType": "browser",
+        "clientVersion": "122.0",
+        "displayResolution": "2560x1440",
         "colorDepth": 24,
         "timezone": "America/New_York",
-        "language": "en-US"
+        "locale": "en-US"
       },
-      "createdAt": "2024-01-15T10:00:00Z",
-      "updatedAt": "2024-03-15T08:30:00Z"
+      "establishedAt": "2024-01-15T10:00:00Z",
+      "expiresAt": "2024-04-15T10:00:00Z",
+      "revokedAt": null,
+      "revocationCategory": null,
+      "riskLevel": 5,
+      "isCurrentlyTrusted": true,
+      "lastVerificationAt": "2024-03-15T08:30:00Z",
+      "verificationCount": 145
     },
     {
       "@type": "TrustedDevice",
-      "deviceId": "dev_mobile_789",
-      "userId": "user_456789",
-      "deviceName": "iPhone 14 Pro",
-      "deviceType": "mobile",
-      "userAgent": "MyApp/2.5.0 (iPhone; iOS 17.3)",
-      "operatingSystem": "iOS 17.3",
-      "browser": null,
-      "ipAddress": "172.58.12.34",
-      "location": "London, UK",
-      "trustedAt": "2024-02-01T14:00:00Z",
-      "trustedUntil": null,
-      "lastUsedAt": "2024-03-14T19:45:00Z",
-      "lastVerifiedAt": "2024-03-14T19:45:00Z",
-      "usageCount": 89,
-      "isActive": false,
-      "revokedAt": "2024-03-15T09:00:00Z",
-      "revokedReason": "User manually revoked after device was lost",
-      "riskScore": 0,
-      "metadata": {
-        "appVersion": "2.5.0",
-        "deviceModel": "iPhone15,2",
-        "biometricEnabled": true,
-        "jailbroken": false
+      "principal": {
+        "@type": "SecurityPrincipal",
+        "identifier": "bob.martinez"
       },
-      "createdAt": "2024-02-01T14:00:00Z",
-      "updatedAt": "2024-03-15T09:00:00Z"
+      "label": "Personal Mobile Device",
+      "category": "mobile",
+      "fingerprint": "sha256:2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae",
+      "characteristics": {
+        "platform": "mobile-ios",
+        "clientType": "native_app",
+        "clientVersion": "2.5.0",
+        "deviceModel": "mobile-premium-2023",
+        "biometricCapable": true,
+        "secureEnclavePresent": true
+      },
+      "establishedAt": "2024-02-01T14:00:00Z",
+      "expiresAt": null,
+      "revokedAt": "2024-03-15T09:00:00Z",
+      "revocationCategory": "device_lost",
+      "riskLevel": 0,
+      "isCurrentlyTrusted": false,
+      "lastVerificationAt": "2024-03-14T19:45:00Z",
+      "verificationCount": 89
+    },
+    {
+      "@type": "TrustedDevice",
+      "principal": {
+        "@type": "SecurityPrincipal",
+        "identifier": "automated-service-001"
+      },
+      "label": "Production API Client",
+      "category": "terminal",
+      "fingerprint": "sha256:5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8",
+      "characteristics": {
+        "platform": "server-linux",
+        "clientType": "api_client",
+        "clientVersion": "3.1.4",
+        "certificateThumbprint": "a1b2c3d4e5f6",
+        "ipAddressRange": "10.0.0.0/24"
+      },
+      "establishedAt": "2023-11-20T08:00:00Z",
+      "expiresAt": null,
+      "revokedAt": null,
+      "revocationCategory": null,
+      "riskLevel": 2,
+      "isCurrentlyTrusted": true,
+      "lastVerificationAt": "2024-03-16T12:00:00Z",
+      "verificationCount": 12450
     }
   ]
 }

@@ -2,194 +2,99 @@
   "@type": "Schema",
   "@context": "https://rocketschema.org/context",
   "name": "UserEmail",
-  "description": "Manages multiple email addresses for a single user account, supporting various use cases like work emails, personal emails, and recovery addresses. Modern users often have multiple email addresses they use for different purposes - this entity allows them to associate all these addresses with their account while maintaining one as primary. Each email can serve different functions: the primary email for login and important notifications, secondary emails for specific types of communications, recovery emails for account access issues, and notification-only emails for subscriptions or alerts. The entity tracks verification status for each email independently, as users must prove ownership before an email can be used for authentication or sensitive operations. This multi-email support is essential for professional users who might change jobs but want to maintain account access, or for users who want different notification types sent to different addresses (bills to personal email, newsletters to a dedicated inbox). The system ensures email uniqueness across all users - no two accounts can claim the same email address. When users change their primary email, the old one can be retained as secondary for account recovery purposes, providing a safety net against account lockouts.",
+  "description": "Represents an email address associated with a user account in any system where users need contact information or electronic communication channels. This entity models the fundamental relationship between a person and their email addresses, which is universal across industries - from healthcare patient portals to financial services customer accounts, from educational institutions to government services. Users may associate multiple email addresses with their account for different purposes, and each email serves as both an identifier and a communication channel. The entity captures essential attributes like the email address itself, its purpose or category, and verification status (whether the user has proven ownership). In modern multi-channel systems, users often maintain several email addresses serving different roles: one might be designated for authentication and critical notifications, another for routine communications, and others for specific categories of correspondence. The verification status is crucial because unverified emails cannot be reliably used for authentication or sensitive communications - users must prove ownership before an email becomes fully functional. Email addresses must be unique across all users in most systems, preventing conflicts and ensuring reliable message delivery. This entity is deliberately focused on the core email-user relationship, with related concerns like verification workflows, notification preferences, and delivery tracking handled by separate specialized entities following proper normalization principles.",
   "properties": [
     {
-      "name": "userId",
-      "type": "uuid",
+      "name": "user",
+      "type": "User",
       "mode": "stored",
-      "description": "User who owns this email address",
+      "description": "The user account to which this email address belongs",
       "required": true
     },
     {
-      "name": "email",
+      "name": "address",
       "type": "string",
       "mode": "stored",
-      "description": "The email address",
+      "description": "The email address in standard format",
       "required": true,
       "format": "email",
       "unique": true
     },
     {
-      "name": "emailType",
+      "name": "category",
       "type": "string",
       "mode": "enum",
-      "description": "Purpose of this email address",
-      "enum": ["primary", "secondary", "recovery", "notification", "billing", "work", "personal"],
-      "default": "secondary"
+      "description": "The functional category or purpose of this email address",
+      "enum": [
+        "primary",
+        "alternate",
+        "recovery"
+      ],
+      "required": true
     },
     {
       "name": "isVerified",
       "type": "boolean",
       "mode": "stored",
-      "description": "Whether ownership of this email has been confirmed",
+      "description": "Whether the user has proven ownership of this email address through a verification process",
+      "required": true,
       "default": false
     },
     {
-      "name": "verifiedAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "When the email verification was completed",
-      "nullable": true
-    },
-    {
-      "name": "verificationToken",
-      "type": "string",
-      "mode": "stored",
-      "description": "Unique token sent to email for verification",
-      "nullable": true,
-      "private": true
-    },
-    {
-      "name": "verificationSentAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "When the verification email was sent",
-      "nullable": true
-    },
-    {
-      "name": "verificationAttempts",
-      "type": "integer",
-      "mode": "stored",
-      "description": "Number of verification emails sent",
-      "default": 0
-    },
-    {
-      "name": "verificationExpiresAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "When the verification token expires",
-      "nullable": true
-    },
-    {
-      "name": "isPrimary",
+      "name": "isActive",
       "type": "boolean",
       "mode": "stored",
-      "description": "Whether this is the main contact email",
-      "default": false
-    },
-    {
-      "name": "canReceiveNotifications",
-      "type": "boolean",
-      "mode": "stored",
-      "description": "Whether to send notifications to this address",
+      "description": "Whether this email address is currently active and available for use",
+      "required": true,
       "default": true
     },
     {
-      "name": "notificationPreferences",
-      "type": "string",
-      "mode": "stored",
-      "description": "JSON object of notification types allowed for this email",
-      "nullable": true,
-      "example": "{\"marketing\":false,\"security\":true,\"updates\":true}"
-    },
-    {
-      "name": "canBeUsedForLogin",
+      "name": "canAuthenticate",
       "type": "boolean",
       "mode": "stored",
-      "description": "Whether this email can be used as username for login",
+      "description": "Whether this email address can be used as an identifier for authentication purposes",
+      "required": true,
       "default": false
     },
     {
-      "name": "canBeUsedForRecovery",
+      "name": "canRecover",
       "type": "boolean",
       "mode": "stored",
-      "description": "Whether password resets can be sent here",
+      "description": "Whether this email address can be used for account recovery operations",
+      "required": true,
       "default": true
-    },
-    {
-      "name": "addedAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "When this email was added to the account",
-      "required": true
-    },
-    {
-      "name": "addedBy",
-      "type": "string",
-      "mode": "enum",
-      "description": "How this email was added",
-      "enum": ["user", "admin", "system", "import", "oauth"],
-      "default": "user"
-    },
-    {
-      "name": "lastUsedAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "Last time this email was used for any operation",
-      "nullable": true
-    },
-    {
-      "name": "bounceCount",
-      "type": "integer",
-      "mode": "stored",
-      "description": "Number of email delivery failures",
-      "default": 0
-    },
-    {
-      "name": "isBlacklisted",
-      "type": "boolean",
-      "mode": "stored",
-      "description": "Whether this email is blocked due to bounces or complaints",
-      "default": false
-    },
-    {
-      "name": "metadata",
-      "type": "string",
-      "mode": "stored",
-      "description": "Additional data about this email address",
-      "nullable": true
     }
   ],
   "examples": [
     {
       "@type": "UserEmail",
-      "userId": "user_550e8400",
-      "email": "john.smith@techcorp.com",
-      "emailType": "work",
+      "user": "user_a7f3c2b1",
+      "address": "sarah.martinez@example.com",
+      "category": "primary",
       "isVerified": true,
-      "verifiedAt": "2024-01-15T10:30:00Z",
-      "verificationAttempts": 1,
-      "isPrimary": true,
-      "canReceiveNotifications": true,
-      "notificationPreferences": "{\"marketing\":true,\"security\":true,\"updates\":true,\"billing\":true}",
-      "canBeUsedForLogin": true,
-      "canBeUsedForRecovery": true,
-      "addedAt": "2024-01-15T10:00:00Z",
-      "addedBy": "user",
-      "lastUsedAt": "2024-03-15T14:30:00Z",
-      "bounceCount": 0,
-      "isBlacklisted": false
+      "isActive": true,
+      "canAuthenticate": true,
+      "canRecover": true
     },
     {
       "@type": "UserEmail",
-      "userId": "user_550e8400",
-      "email": "jsmith.personal@gmail.com",
-      "emailType": "personal",
+      "user": "user_a7f3c2b1",
+      "address": "smartinez.backup@example.net",
+      "category": "recovery",
       "isVerified": true,
-      "verifiedAt": "2024-02-01T09:00:00Z",
-      "verificationAttempts": 2,
-      "isPrimary": false,
-      "canReceiveNotifications": true,
-      "notificationPreferences": "{\"marketing\":false,\"security\":true,\"updates\":false,\"billing\":true}",
-      "canBeUsedForLogin": false,
-      "canBeUsedForRecovery": true,
-      "addedAt": "2024-02-01T08:30:00Z",
-      "addedBy": "user",
-      "lastUsedAt": "2024-03-10T11:00:00Z",
-      "bounceCount": 0,
-      "isBlacklisted": false,
-      "metadata": "{\"provider\":\"gmail\",\"preferred_for\":\"personal_receipts\"}"
+      "isActive": true,
+      "canAuthenticate": false,
+      "canRecover": true
+    },
+    {
+      "@type": "UserEmail",
+      "user": "user_b8e4d3c2",
+      "address": "james.chen@example.org",
+      "category": "primary",
+      "isVerified": false,
+      "isActive": false,
+      "canAuthenticate": false,
+      "canRecover": false
     }
   ]
 }

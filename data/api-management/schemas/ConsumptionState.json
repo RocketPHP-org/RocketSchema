@@ -1,0 +1,194 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "ConsumptionState",
+  "description": "Tracks the real-time consumption state for resource usage enforcement, maintaining current counters and temporal boundaries for any controlled resource access. This entity records actual runtime consumption data - how many operations have been performed, when the current enforcement window started, and when limits will reset. While consumption rules are defined separately in configuration, this state entity captures the live execution metrics required for enforcement decisions. The state is updated with each resource access attempt, recording successful operations and tracking when limits are approached or exceeded. When consumption exceeds defined thresholds, the enforcement system sets blocking flags and calculates when the consumer can resume access. This pattern applies universally across domains: manufacturing systems tracking machine cycle counts per shift, healthcare platforms monitoring data export volumes per patient per day, financial systems measuring transaction velocity per account per hour, telecommunications networks tracking bandwidth consumption per subscriber per billing period, or educational platforms limiting assessment attempts per student per semester. The state provides a persistent audit trail for compliance reporting and enables system recovery after infrastructure restarts. By separating transient state from persistent configuration, systems can implement high-performance enforcement using fast storage while maintaining durable records for analysis and debugging.",
+  "properties": [
+    {
+      "name": "name",
+      "type": "string",
+      "mode": "stored",
+      "description": "Human-readable identifier for this consumption state record, typically combining subject and scope information",
+      "required": true,
+      "example": "Production App - Customer API - Hourly Window"
+    },
+    {
+      "name": "rateLimitConfig",
+      "type": "RateLimitConfig",
+      "mode": "stored",
+      "description": "Reference to the consumption control configuration that defines the limits and enforcement rules for this state",
+      "required": true
+    },
+    {
+      "name": "subject",
+      "type": "SecurityPrincipal",
+      "mode": "stored",
+      "description": "The security principal (user, application, device, organization) whose consumption is being tracked",
+      "required": true
+    },
+    {
+      "name": "resource",
+      "type": "Resource",
+      "mode": "stored",
+      "description": "The specific resource whose consumption is being monitored and controlled",
+      "nullable": true
+    },
+    {
+      "name": "operationCount",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Number of operations performed by the subject during the current enforcement window",
+      "required": true,
+      "default": 0,
+      "min": 0
+    },
+    {
+      "name": "windowStart",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Beginning timestamp of the current enforcement window during which consumption is being measured",
+      "required": true
+    },
+    {
+      "name": "windowEnd",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "End timestamp of the current enforcement window, after which counters reset and a new window begins",
+      "required": true
+    },
+    {
+      "name": "isBlocked",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether the subject is currently blocked from accessing the resource due to consumption limit enforcement",
+      "required": true,
+      "default": false
+    },
+    {
+      "name": "blockedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Timestamp when the blocking enforcement began for this consumption window",
+      "nullable": true
+    },
+    {
+      "name": "rejectionCount",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Number of operation attempts that were rejected due to consumption limits during the current window",
+      "required": true,
+      "default": 0,
+      "min": 0
+    },
+    {
+      "name": "lastOperationAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Timestamp of the most recent operation attempt, whether successful or rejected",
+      "nullable": true
+    },
+    {
+      "name": "peakOperationRate",
+      "type": "number",
+      "mode": "stored",
+      "description": "Highest operations per second rate observed during the current enforcement window",
+      "nullable": true,
+      "min": 0
+    },
+    {
+      "name": "remainingCapacity",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Number of operations remaining before reaching the configured consumption limit for this window",
+      "nullable": true,
+      "min": 0
+    },
+    {
+      "name": "version",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Optimistic locking version number incremented with each state update to handle concurrent access safely",
+      "required": true,
+      "default": 1,
+      "min": 1
+    }
+  ],
+  "examples": [
+    {
+      "@type": "ConsumptionState",
+      "name": "Production Application - Customer Data Access - Current Hour",
+      "rateLimitConfig": {
+        "@type": "RateLimitConfig",
+        "name": "Standard Operation Limit"
+      },
+      "subject": {
+        "@type": "SecurityPrincipal",
+        "name": "Production Application"
+      },
+      "resource": {
+        "@type": "Resource",
+        "name": "Customer Data API"
+      },
+      "operationCount": 8470,
+      "windowStart": "2024-03-15T14:00:00Z",
+      "windowEnd": "2024-03-15T15:00:00Z",
+      "isBlocked": false,
+      "rejectionCount": 0,
+      "lastOperationAt": "2024-03-15T14:47:23Z",
+      "peakOperationRate": 12.5,
+      "remainingCapacity": 1530,
+      "version": 8470
+    },
+    {
+      "@type": "ConsumptionState",
+      "name": "External Integration - Document Export - Current Minute",
+      "rateLimitConfig": {
+        "@type": "RateLimitConfig",
+        "name": "Document Export Throttle"
+      },
+      "subject": {
+        "@type": "SecurityPrincipal",
+        "name": "External Integration Service"
+      },
+      "resource": {
+        "@type": "Resource",
+        "name": "Document Export Endpoint"
+      },
+      "operationCount": 100,
+      "windowStart": "2024-03-15T14:46:00Z",
+      "windowEnd": "2024-03-15T14:47:00Z",
+      "isBlocked": true,
+      "blockedAt": "2024-03-15T14:46:42Z",
+      "rejectionCount": 15,
+      "lastOperationAt": "2024-03-15T14:46:58Z",
+      "peakOperationRate": 5.2,
+      "remainingCapacity": 0,
+      "version": 115
+    },
+    {
+      "@type": "ConsumptionState",
+      "name": "Manufacturing Station 7 - Assembly Operations - Current Shift",
+      "rateLimitConfig": {
+        "@type": "RateLimitConfig",
+        "name": "Machine Cycle Limit"
+      },
+      "subject": {
+        "@type": "SecurityPrincipal",
+        "name": "Assembly Station 7"
+      },
+      "resource": {
+        "@type": "Resource",
+        "name": "Component Assembly Process"
+      },
+      "operationCount": 450,
+      "windowStart": "2024-03-15T06:00:00Z",
+      "windowEnd": "2024-03-15T14:00:00Z",
+      "isBlocked": false,
+      "rejectionCount": 0,
+      "lastOperationAt": "2024-03-15T13:58:30Z",
+      "peakOperationRate": 2.1,
+      "remainingCapacity": 50,
+      "version": 450
+    }
+  ]
+}

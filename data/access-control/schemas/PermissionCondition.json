@@ -5,14 +5,6 @@
   "description": "Defines conditional logic that must be satisfied for permissions to be valid, implementing dynamic authorization where access rights change based on runtime conditions. Unlike static permissions that are always active, conditional permissions adapt to circumstances - a user might have 'approve expenses' permission but only for amounts under $5000, only during business hours, or only for their direct reports. This entity captures complex boolean expressions, mathematical comparisons, temporal constraints, and business rules that gate permission activation. Conditions can evaluate user attributes (seniority level, certifications), resource properties (document state, data classification), environmental factors (time, location, threat level), and business context (project phase, audit mode). The entity supports nested conditions with AND/OR/NOT logic, mathematical operations for numerical comparisons, string matching with regex patterns, and date arithmetic for temporal rules. Conditions can reference external services for dynamic evaluation ('check with risk scoring API'), aggregate functions ('user has approved less than 10 items today'), and historical data ('user has not failed audit in past year'). This conditional approach enables least-privilege access that automatically adjusts to risk, implements separation of duties (can't approve what you created), and enforces business policies (no changes during freeze periods) without constant manual permission updates.",
   "properties": [
     {
-      "name": "conditionId",
-      "type": "uuid",
-      "mode": "stored",
-      "description": "Unique identifier for this condition",
-      "required": true,
-      "unique": true
-    },
-    {
       "name": "conditionName",
       "type": "string",
       "mode": "stored",
@@ -32,7 +24,15 @@
       "type": "string",
       "mode": "enum",
       "description": "Category of condition",
-      "enum": ["temporal", "numerical", "attribute", "contextual", "aggregate", "external", "composite"],
+      "enum": [
+        "temporal",
+        "numerical",
+        "attribute",
+        "contextual",
+        "aggregate",
+        "external",
+        "composite"
+      ],
       "required": true
     },
     {
@@ -48,7 +48,12 @@
       "type": "string",
       "mode": "enum",
       "description": "How the condition is evaluated",
-      "enum": ["static", "dynamic", "cached", "real_time"],
+      "enum": [
+        "static",
+        "dynamic",
+        "cached",
+        "real_time"
+      ],
       "default": "dynamic"
     },
     {
@@ -100,7 +105,12 @@
       "type": "string",
       "mode": "enum",
       "description": "What to do if evaluation fails",
-      "enum": ["deny", "allow", "use_default", "require_manual"],
+      "enum": [
+        "deny",
+        "allow",
+        "use_default",
+        "require_manual"
+      ],
       "default": "deny"
     },
     {
@@ -169,21 +179,8 @@
       "default": 1
     },
     {
-      "name": "createdBy",
-      "type": "User",
-      "mode": "stored",
-      "description": "Who created this condition"
-    },
-    {
-      "name": "createdAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "When condition was created",
-      "required": true
-    },
-    {
       "name": "metadata",
-      "type": "object",
+      "type": "string",
       "mode": "stored",
       "description": "Additional condition configuration"
     }
@@ -191,7 +188,6 @@
   "examples": [
     {
       "@type": "PermissionCondition",
-      "conditionId": "cond_amount_limit",
       "conditionName": "Expense Approval Limit",
       "description": "Limits expense approval based on user's approval authority and amount",
       "conditionType": "numerical",
@@ -209,7 +205,6 @@
       "bypassRoles": "[\"cfo\",\"finance_director\"]",
       "isActive": true,
       "version": 2,
-      "createdAt": "2024-01-01T00:00:00Z",
       "metadata": {
         "currency_conversion": true,
         "include_tax": true
@@ -217,7 +212,6 @@
     },
     {
       "@type": "PermissionCondition",
-      "conditionId": "cond_separation_duties",
       "conditionName": "Separation of Duties Check",
       "description": "Prevents users from approving their own requests or changes",
       "conditionType": "contextual",
@@ -234,7 +228,6 @@
       "testCases": "[{\"scenario\":\"user_approves_own\",\"should_fail\":true},{\"scenario\":\"manager_approves_report\",\"should_pass\":true}]",
       "isActive": true,
       "version": 1,
-      "createdAt": "2024-01-15T00:00:00Z",
       "metadata": {
         "sox_compliant": true,
         "audit_required": true

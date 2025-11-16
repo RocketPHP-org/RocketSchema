@@ -5,14 +5,6 @@
   "description": "Enables temporary transfer of permissions from one user to another, supporting scenarios like vacation coverage, emergency access, and task delegation. This entity manages the complex process of permission delegation where a user (delegator) temporarily grants some or all of their permissions to another user (delegate). This is essential for business continuity - when a manager goes on vacation, they can delegate approval permissions to their deputy. The delegation can be partial (only specific permissions) or complete (all permissions), time-bounded (active only during specific dates), and conditional (only for certain resources or contexts). The system tracks the delegation chain to prevent recursive delegations and maintains audit trails showing who used delegated permissions and when. Delegations can require approval from security teams or higher management, especially for sensitive permissions. The entity handles automatic activation and deactivation based on schedules, sends notifications when delegations are used, and can instantly revoke delegations if misuse is detected. This is critical for maintaining operational flexibility while preserving security and accountability, as all actions taken with delegated permissions are traceable back to both the delegate and the original permission holder.",
   "properties": [
     {
-      "name": "delegationId",
-      "type": "uuid",
-      "mode": "stored",
-      "description": "Unique identifier for this delegation",
-      "required": true,
-      "unique": true
-    },
-    {
       "name": "delegator",
       "type": "User",
       "mode": "stored",
@@ -39,7 +31,13 @@
       "type": "string",
       "mode": "enum",
       "description": "Type of delegation",
-      "enum": ["full", "partial", "role_based", "task_specific", "emergency"],
+      "enum": [
+        "full",
+        "partial",
+        "role_based",
+        "task_specific",
+        "emergency"
+      ],
       "required": true,
       "example": "partial"
     },
@@ -50,13 +48,6 @@
       "description": "Explanation for why delegation is needed",
       "required": true,
       "example": "Annual vacation coverage from March 1-15"
-    },
-    {
-      "name": "createdAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "When the delegation was created",
-      "required": true
     },
     {
       "name": "startsAt",
@@ -135,7 +126,13 @@
       "type": "string",
       "mode": "enum",
       "description": "Current status of the delegation",
-      "enum": ["pending", "active", "expired", "revoked", "suspended"],
+      "enum": [
+        "pending",
+        "active",
+        "expired",
+        "revoked",
+        "suspended"
+      ],
       "default": "pending",
       "required": true
     },
@@ -204,7 +201,7 @@
     },
     {
       "name": "metadata",
-      "type": "object",
+      "type": "string",
       "mode": "stored",
       "description": "Additional delegation configuration"
     }
@@ -212,11 +209,9 @@
   "examples": [
     {
       "@type": "DelegatedPermission",
-      "delegationId": "del_vacation_123",
       "delegationType": "partial",
       "reason": "Two-week vacation coverage for team management duties",
       "permissions": "[\"approve_timesheets\",\"approve_expenses_under_1000\",\"manage_team_calendar\",\"conduct_one_on_ones\"]",
-      "createdAt": "2024-02-25T10:00:00Z",
       "startsAt": "2024-03-01T00:00:00Z",
       "endsAt": "2024-03-15T23:59:59Z",
       "scope": "team:backend_engineering",
@@ -238,11 +233,9 @@
     },
     {
       "@type": "DelegatedPermission",
-      "delegationId": "del_emergency_456",
       "delegationType": "emergency",
       "reason": "Emergency access for critical production incident while primary admin unreachable",
       "permissions": "[\"production_deploy\",\"database_write\",\"configuration_change\",\"service_restart\"]",
-      "createdAt": "2024-03-15T02:00:00Z",
       "startsAt": "2024-03-15T02:00:00Z",
       "endsAt": "2024-03-15T06:00:00Z",
       "constraints": "{\"services\":[\"api\",\"database\"],\"actions_require_dual_approval\":true}",

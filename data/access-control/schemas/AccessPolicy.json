@@ -5,14 +5,6 @@
   "description": "Defines high-level security policies that govern access control decisions across the entire system, implementing policy-based access control (PBAC) on top of role and permission-based systems. Access policies are rules that apply globally or to specific contexts, enforcing organizational security requirements like 'all financial data requires MFA' or 'contractors cannot access customer PII'. These policies act as an additional layer above RBAC, allowing dynamic, attribute-based decisions. Policies can be preventive (blocking access even if permissions exist) or permissive (granting access in specific situations). They evaluate multiple factors including user attributes (department, clearance level), resource attributes (classification, owner), environmental context (time, location, threat level), and action context (sensitivity, risk). Policies support complex boolean logic, combining multiple conditions with AND/OR operators. They can enforce compliance requirements ('GDPR data can only be accessed from EU locations'), implement zero-trust principles ('verify device trust before allowing access'), or handle break-glass scenarios ('allow emergency access with heavy auditing'). The entity includes policy versioning for change tracking, testing capabilities to validate policies before activation, and conflict resolution when multiple policies apply. This is essential for large enterprises with complex compliance requirements and dynamic security needs.",
   "properties": [
     {
-      "name": "policyId",
-      "type": "uuid",
-      "mode": "stored",
-      "description": "Unique identifier for this policy",
-      "required": true,
-      "unique": true
-    },
-    {
       "name": "code",
       "type": "string",
       "mode": "stored",
@@ -42,7 +34,13 @@
       "type": "string",
       "mode": "enum",
       "description": "Type of access policy",
-      "enum": ["preventive", "permissive", "detective", "corrective", "mandatory"],
+      "enum": [
+        "preventive",
+        "permissive",
+        "detective",
+        "corrective",
+        "mandatory"
+      ],
       "required": true,
       "example": "preventive"
     },
@@ -51,7 +49,13 @@
       "type": "string",
       "mode": "enum",
       "description": "Scope where this policy applies",
-      "enum": ["global", "organization", "department", "resource_type", "custom"],
+      "enum": [
+        "global",
+        "organization",
+        "department",
+        "resource_type",
+        "custom"
+      ],
       "default": "global"
     },
     {
@@ -67,7 +71,14 @@
       "type": "string",
       "mode": "enum",
       "description": "What happens when policy conditions are met",
-      "enum": ["allow", "deny", "require_mfa", "require_approval", "audit", "notify"],
+      "enum": [
+        "allow",
+        "deny",
+        "require_mfa",
+        "require_approval",
+        "audit",
+        "notify"
+      ],
       "required": true,
       "example": "deny"
     },
@@ -124,7 +135,12 @@
       "type": "string",
       "mode": "enum",
       "description": "How to handle conflicts with other policies",
-      "enum": ["deny_overrides", "allow_overrides", "priority_based", "most_restrictive"],
+      "enum": [
+        "deny_overrides",
+        "allow_overrides",
+        "priority_based",
+        "most_restrictive"
+      ],
       "default": "deny_overrides"
     },
     {
@@ -192,22 +208,8 @@
       "nullable": true
     },
     {
-      "name": "createdBy",
-      "type": "User",
-      "mode": "stored",
-      "description": "Policy author",
-      "required": true
-    },
-    {
-      "name": "createdAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "When policy was created",
-      "required": true
-    },
-    {
       "name": "metadata",
-      "type": "object",
+      "type": "string",
       "mode": "stored",
       "description": "Additional policy configuration"
     }
@@ -215,7 +217,6 @@
   "examples": [
     {
       "@type": "AccessPolicy",
-      "policyId": "pol_gdpr_001",
       "code": "POL_GDPR_DATA_LOCALITY",
       "name": "GDPR Data Locality Requirement",
       "description": "Ensures personal data of EU residents is only accessed from approved EU locations or with explicit consent",
@@ -236,15 +237,21 @@
       "complianceFramework": "GDPR Article 44-49",
       "approvedBy": "compliance_officer",
       "approvedAt": "2024-01-01T00:00:00Z",
-      "createdAt": "2023-12-01T10:00:00Z",
       "metadata": {
-        "eu_countries": ["DE","FR","IT","ES","NL","BE","PL"],
+        "eu_countries": [
+          "DE",
+          "FR",
+          "IT",
+          "ES",
+          "NL",
+          "BE",
+          "PL"
+        ],
         "audit_requirement": "quarterly_review"
       }
     },
     {
       "@type": "AccessPolicy",
-      "policyId": "pol_finance_002",
       "code": "POL_HIGH_VALUE_TRANSACTION_MFA",
       "name": "High-Value Transaction MFA Policy",
       "description": "Requires multi-factor authentication and manager approval for financial transactions exceeding thresholds",
@@ -267,8 +274,6 @@
       "complianceFramework": "SOX Section 404",
       "approvedBy": "cfo",
       "approvedAt": "2024-01-01T00:00:00Z",
-      "createdBy": "security_architect",
-      "createdAt": "2023-12-15T14:00:00Z",
       "metadata": {
         "thresholds": {
           "low": 1000,

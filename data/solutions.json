@@ -6,6 +6,7 @@
     "icon": "user-heart",
     "color": "purple",
     "domains": [
+      "api-management",
       "user-management",
       "access-control",
       "support-types",
@@ -39,6 +40,7 @@
     "icon": "shopping-cart",
     "color": "blue",
     "domains": [
+      "api-management",
       "user-management",
       "access-control",
       "support-types",
@@ -77,6 +79,7 @@
     "icon": "building",
     "color": "green",
     "domains": [
+      "api-management",
       "user-management",
       "access-control",
       "support-types",
@@ -116,6 +119,7 @@
     "icon": "heart-pulse",
     "color": "red",
     "domains": [
+      "api-management",
       "user-management",
       "access-control",
       "support-types",
@@ -157,6 +161,7 @@
     "icon": "user-check",
     "color": "orange",
     "domains": [
+      "api-management",
       "user-management",
       "access-control",
       "support-types",
@@ -193,6 +198,7 @@
     "icon": "truck",
     "color": "yellow",
     "domains": [
+      "api-management",
       "user-management",
       "access-control",
       "support-types",
@@ -229,6 +235,7 @@
     "icon": "book-open",
     "color": "indigo",
     "domains": [
+      "api-management",
       "user-management",
       "access-control",
       "support-types",
@@ -262,6 +269,7 @@
     "icon": "rocket",
     "color": "cyan",
     "domains": [
+      "api-management",
       "user-management",
       "access-control",
       "support-types",

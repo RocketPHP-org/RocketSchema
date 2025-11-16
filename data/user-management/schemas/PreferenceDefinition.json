@@ -1,0 +1,148 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "PreferenceDefinition",
+  "description": "Defines the structure, validation rules, and metadata for a specific configurable preference option available within a system. This entity serves as the schema or template that describes what preferences exist, what values they can accept, and how they should be presented to users. Each preference definition specifies characteristics like the data type (string, number, boolean, JSON, date), the unique identifier key used to reference it, human-readable labels and descriptions for user interfaces, organizational categories for grouping related preferences, default values for new users, and validation constraints such as allowed value sets or ranges. This centralized definition ensures consistency across all users who interact with the preference, separates configuration metadata from user-specific choices, and enables the preference system to be extended with new options without modifying database schemas. Preference definitions are typically managed by administrators or developers and remain stable over time, while individual user preferences reference these definitions to store personalized values. Common applications include interface customization, notification settings, accessibility options, regional formats, and feature toggles.",
+  "properties": [
+    {
+      "name": "key",
+      "type": "string",
+      "mode": "stored",
+      "description": "Unique identifier used to reference this preference throughout the system",
+      "required": true,
+      "unique": true,
+      "example": "interface.theme.colorScheme"
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "mode": "stored",
+      "description": "Human-readable name displayed in user interfaces",
+      "required": true,
+      "example": "Color Scheme"
+    },
+    {
+      "name": "description",
+      "type": "string",
+      "mode": "stored",
+      "description": "Explanatory text helping users understand the preference's purpose and effect",
+      "required": true,
+      "example": "Controls the visual theme of the interface, affecting colors, contrast, and readability"
+    },
+    {
+      "name": "category",
+      "type": "string",
+      "mode": "stored",
+      "description": "Organizational grouping for related preferences, used for navigation and settings organization",
+      "example": "interface"
+    },
+    {
+      "name": "valueType",
+      "type": "string",
+      "mode": "enum",
+      "description": "Data type that values for this preference must conform to",
+      "enum": ["string", "number", "boolean", "json", "date"],
+      "required": true,
+      "default": "string"
+    },
+    {
+      "name": "defaultValue",
+      "type": "string",
+      "mode": "stored",
+      "description": "Initial value assigned when no user-specific preference has been set",
+      "required": true,
+      "example": "light"
+    },
+    {
+      "name": "validationRules",
+      "type": "object",
+      "mode": "stored",
+      "description": "Constraints and rules for validating user-provided values, such as allowed value sets, numeric ranges, pattern matching, or structural requirements"
+    },
+    {
+      "name": "isUserModifiable",
+      "type": "boolean",
+      "mode": "stored",
+      "description": "Whether individual users are permitted to change this preference value",
+      "default": true
+    },
+    {
+      "name": "scope",
+      "type": "string",
+      "mode": "enum",
+      "description": "Visibility and applicability level of the preference",
+      "enum": ["private", "public", "organizational", "system"],
+      "default": "private"
+    },
+    {
+      "name": "displayOrder",
+      "type": "number",
+      "mode": "stored",
+      "description": "Suggested sequence position for presenting this preference in user interfaces"
+    },
+    {
+      "name": "metadata",
+      "type": "object",
+      "mode": "stored",
+      "description": "Additional configuration data specific to particular preference types or use cases"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "PreferenceDefinition",
+      "key": "notification.channel.email.enabled",
+      "label": "Email Notifications",
+      "description": "Enable or disable delivery of notifications through email channel",
+      "category": "notification",
+      "valueType": "boolean",
+      "defaultValue": "true",
+      "validationRules": {
+        "allowedValues": ["true", "false"]
+      },
+      "isUserModifiable": true,
+      "scope": "private",
+      "displayOrder": 10
+    },
+    {
+      "@type": "PreferenceDefinition",
+      "key": "interface.layout.configuration",
+      "label": "Layout Configuration",
+      "description": "Customized arrangement and positioning of interface components",
+      "category": "interface",
+      "valueType": "json",
+      "defaultValue": "{\"columns\":2,\"components\":[]}",
+      "validationRules": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "columns": {"type": "number", "min": 1, "max": 4},
+            "components": {"type": "array"}
+          }
+        },
+        "maxComponents": 10
+      },
+      "isUserModifiable": true,
+      "scope": "private",
+      "displayOrder": 20,
+      "metadata": {
+        "availableComponents": ["statistics", "chart", "list", "calendar", "feed"]
+      }
+    },
+    {
+      "@type": "PreferenceDefinition",
+      "key": "regional.timezone",
+      "label": "Time Zone",
+      "description": "Geographic time zone used for displaying dates and times",
+      "category": "regional",
+      "valueType": "string",
+      "defaultValue": "UTC",
+      "validationRules": {
+        "pattern": "^[A-Za-z]+/[A-Za-z_]+$",
+        "allowedValues": ["UTC", "America/New_York", "Europe/London", "Asia/Tokyo", "Australia/Sydney"]
+      },
+      "isUserModifiable": true,
+      "scope": "private",
+      "displayOrder": 5
+    }
+  ]
+}

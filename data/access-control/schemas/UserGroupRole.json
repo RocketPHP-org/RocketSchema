@@ -5,14 +5,6 @@
   "description": "Assigns roles to entire groups, enabling efficient permission management at scale by granting the same role to all group members simultaneously. This entity implements group-level role assignments where every member of a group automatically receives specific roles. For example, assigning the 'Financial Analyst' role to the 'Finance Department' group means all finance team members inherit that role without individual assignments. This dramatically simplifies administration - when someone joins the finance team, they automatically get all finance-related roles. The entity supports conditional assignments where roles might only apply during certain hours or from specific locations. It handles role inheritance through group hierarchies - if 'Company' group has 'Basic Employee' role, all subgroups inherit it. The system tracks who assigned roles to groups and why, maintaining accountability for bulk permission changes. Temporary role assignments are supported for project groups that need elevated permissions for limited periods. The entity also manages precedence when users belong to multiple groups with conflicting roles, using priority levels to resolve conflicts. This is essential for large organizations where managing individual role assignments would be impractical, and for ensuring consistent permissions across teams.",
   "properties": [
     {
-      "name": "assignmentId",
-      "type": "uuid",
-      "mode": "stored",
-      "description": "Unique identifier for this group-role assignment",
-      "required": true,
-      "unique": true
-    },
-    {
       "name": "group",
       "type": "UserGroup",
       "mode": "stored",
@@ -192,7 +184,7 @@
     },
     {
       "name": "metadata",
-      "type": "object",
+      "type": "string",
       "mode": "stored",
       "description": "Additional assignment configuration"
     }
@@ -200,7 +192,6 @@
   "examples": [
     {
       "@type": "UserGroupRole",
-      "assignmentId": "gra_eng_deploy",
       "assignedBy": "admin_cto",
       "assignedAt": "2024-01-15T10:00:00Z",
       "assignmentReason": "All backend engineers need deployment access to staging and production",
@@ -227,7 +218,6 @@
     },
     {
       "@type": "UserGroupRole",
-      "assignmentId": "gra_project_temp",
       "assignedBy": "manager_projects",
       "assignedAt": "2024-03-01T09:00:00Z",
       "assignmentReason": "Q2 project team needs elevated data access for migration project",

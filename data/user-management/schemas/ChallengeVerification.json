@@ -1,0 +1,169 @@
+{
+  "@type": "Schema",
+  "@context": "https://rocketschema.org/context",
+  "name": "ChallengeVerification",
+  "description": "Records an attempt to verify identity by answering one or more security challenge questions during authentication or account recovery flows. Challenge verifications are created each time a user attempts to prove their identity by providing answers to previously configured security questions. This entity captures the complete audit trail of verification attempts, including which questions were presented, whether the provided answers matched the stored responses, and the context in which the verification occurred. This information is crucial for security monitoring, detecting suspicious access patterns, and implementing protective measures like temporary lockouts after multiple failed attempts. Challenge verifications enable organizations to track how frequently users rely on knowledge-based authentication versus other methods, helping inform decisions about security policy and user experience. The entity supports both single-question and multi-question verification scenarios, where users must correctly answer multiple questions in sequence or combination. By maintaining detailed records of each verification event, the system can identify potential security threats such as credential stuffing attacks or account takeover attempts. The verification history also provides valuable forensic evidence during security investigations and helps users understand their own account activity through access logs and security dashboards.",
+  "properties": [
+    {
+      "name": "principal",
+      "type": "SecurityPrincipal",
+      "mode": "stored",
+      "description": "The security principal whose identity is being verified through the challenge question process",
+      "required": true
+    },
+    {
+      "name": "securityQuestion",
+      "type": "SecurityQuestion",
+      "mode": "stored",
+      "description": "Reference to the specific security question that was presented during this verification attempt",
+      "required": true
+    },
+    {
+      "name": "outcome",
+      "type": "string",
+      "mode": "enum",
+      "description": "Result of the verification attempt indicating success, failure, or other terminal states",
+      "enum": [
+        "success",
+        "failure",
+        "timeout",
+        "cancelled",
+        "locked"
+      ],
+      "required": true,
+      "example": "success"
+    },
+    {
+      "name": "attemptedAt",
+      "type": "DateTime",
+      "mode": "stored",
+      "description": "Precise timestamp when the verification attempt was initiated by the user or system",
+      "required": true,
+      "example": "2024-11-15T10:30:45Z"
+    },
+    {
+      "name": "responseTime",
+      "type": "integer",
+      "mode": "stored",
+      "description": "Duration in milliseconds between question presentation and answer submission, useful for detecting automated attacks",
+      "required": false,
+      "nullable": true,
+      "example": 8500
+    },
+    {
+      "name": "verificationContext",
+      "type": "string",
+      "mode": "enum",
+      "description": "The operational scenario that triggered this challenge verification",
+      "enum": [
+        "login",
+        "password_reset",
+        "account_recovery",
+        "sensitive_operation",
+        "device_verification",
+        "settings_change"
+      ],
+      "required": false,
+      "nullable": true,
+      "example": "password_reset"
+    },
+    {
+      "name": "ipAddress",
+      "type": "string",
+      "mode": "stored",
+      "description": "Network address from which the verification attempt originated, supporting geographic and threat analysis",
+      "required": false,
+      "nullable": true,
+      "example": "192.168.1.100"
+    },
+    {
+      "name": "userAgent",
+      "type": "string",
+      "mode": "stored",
+      "description": "Browser or application identifier used during the verification, helping detect anomalous access patterns",
+      "required": false,
+      "nullable": true,
+      "example": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)"
+    },
+    {
+      "name": "deviceFingerprint",
+      "type": "string",
+      "mode": "stored",
+      "description": "Unique identifier for the device or browser used in the verification, enabling device-based risk assessment",
+      "required": false,
+      "nullable": true,
+      "example": "fp_9a8b7c6d5e4f3a2b"
+    },
+    {
+      "name": "riskScore",
+      "type": "number",
+      "mode": "stored",
+      "description": "Calculated risk assessment for this verification attempt based on behavioral analytics and threat intelligence",
+      "required": false,
+      "nullable": true,
+      "example": 0.25
+    },
+    {
+      "name": "consecutiveFailures",
+      "type": "integer",
+      "mode": "computed",
+      "description": "Number of consecutive failed verification attempts for this principal at the time of this verification, computed from prior ChallengeVerification records",
+      "required": false,
+      "nullable": true,
+      "example": 0
+    },
+    {
+      "name": "notes",
+      "type": "string",
+      "mode": "stored",
+      "description": "Additional context or annotations about this verification attempt, such as security alerts or special circumstances",
+      "required": false,
+      "nullable": true,
+      "example": "Verification from new country detected"
+    }
+  ],
+  "examples": [
+    {
+      "@type": "ChallengeVerification",
+      "principal": {
+        "@type": "SecurityPrincipal",
+        "identifier": "user_12345"
+      },
+      "securityQuestion": {
+        "@type": "SecurityQuestion",
+        "identifier": "sq_abc123"
+      },
+      "outcome": "success",
+      "attemptedAt": "2024-11-15T10:30:45Z",
+      "responseTime": 8500,
+      "verificationContext": "password_reset",
+      "ipAddress": "192.168.1.100",
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
+      "deviceFingerprint": "fp_9a8b7c6d5e4f3a2b",
+      "riskScore": 0.15,
+      "consecutiveFailures": 0,
+      "notes": null
+    },
+    {
+      "@type": "ChallengeVerification",
+      "principal": {
+        "@type": "SecurityPrincipal",
+        "identifier": "user_67890"
+      },
+      "securityQuestion": {
+        "@type": "SecurityQuestion",
+        "identifier": "sq_xyz789"
+      },
+      "outcome": "failure",
+      "attemptedAt": "2024-11-15T14:22:30Z",
+      "responseTime": 2100,
+      "verificationContext": "login",
+      "ipAddress": "203.0.113.42",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0",
+      "deviceFingerprint": "fp_1a2b3c4d5e6f7a8b",
+      "riskScore": 0.72,
+      "consecutiveFailures": 2,
+      "notes": "Suspicious location detected - account temporarily locked"
+    }
+  ]
+}

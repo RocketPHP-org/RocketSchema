@@ -5,19 +5,17 @@
   "description": "Associates conditions with permissions, roles, or policies, creating dynamic authorization rules where access rights are contingent upon runtime condition evaluation. This junction entity bridges static permission definitions with dynamic conditions, enabling context-aware access control. Rather than granting permissions unconditionally, this link makes them dependent on specific circumstances being met. For example, linking 'delete_records' permission with 'business_hours' condition ensures deletion only occurs during monitored times. The entity supports multiple conditions per permission with complex boolean combinations (ALL must pass, ANY can pass, custom logic), weighted conditions where some are more important than others, and fallback chains where alternative conditions apply if primary ones fail. It handles condition precedence, determining which conditions to evaluate first for performance optimization, and short-circuit evaluation to skip unnecessary checks. The link can be temporary (conditions only apply during specific periods), progressive (different conditions at different trust levels), or contextual (different conditions in different environments). This mechanism enables sophisticated scenarios like escalating approval requirements based on risk, time-based permission activation for temporary access, and compliance rules that overlay business permissions. The entity maintains evaluation history for audit purposes and performance metrics for optimization.",
   "properties": [
     {
-      "name": "linkId",
-      "type": "uuid",
-      "mode": "stored",
-      "description": "Unique identifier for this condition link",
-      "required": true,
-      "unique": true
-    },
-    {
       "name": "targetType",
       "type": "string",
       "mode": "enum",
       "description": "Type of entity this condition is linked to",
-      "enum": ["permission", "role", "policy", "group", "resource"],
+      "enum": [
+        "permission",
+        "role",
+        "policy",
+        "group",
+        "resource"
+      ],
       "required": true
     },
     {
@@ -28,8 +26,8 @@
       "required": true
     },
     {
-      "name": "conditionId",
-      "type": "uuid",
+      "name": "condition",
+      "type": "PermissionCondition",
       "mode": "stored",
       "description": "The condition being linked",
       "required": true
@@ -39,7 +37,13 @@
       "type": "string",
       "mode": "enum",
       "description": "Nature of the link",
-      "enum": ["required", "optional", "enhancing", "restricting", "alternative"],
+      "enum": [
+        "required",
+        "optional",
+        "enhancing",
+        "restricting",
+        "alternative"
+      ],
       "default": "required"
     },
     {
@@ -54,7 +58,13 @@
       "type": "string",
       "mode": "enum",
       "description": "How to combine with other conditions",
-      "enum": ["AND", "OR", "XOR", "NOT", "CUSTOM"],
+      "enum": [
+        "AND",
+        "OR",
+        "XOR",
+        "NOT",
+        "CUSTOM"
+      ],
       "default": "AND"
     },
     {
@@ -111,8 +121,8 @@
       "nullable": true
     },
     {
-      "name": "fallbackConditionId",
-      "type": "uuid",
+      "name": "fallbackCondition",
+      "type": "PermissionCondition",
       "mode": "stored",
       "description": "Alternative condition if primary fails",
       "nullable": true
@@ -181,21 +191,8 @@
       "default": true
     },
     {
-      "name": "createdBy",
-      "type": "User",
-      "mode": "stored",
-      "description": "Who created this link"
-    },
-    {
-      "name": "createdAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "When link was created",
-      "required": true
-    },
-    {
       "name": "metadata",
-      "type": "object",
+      "type": "string",
       "mode": "stored",
       "description": "Additional link configuration"
     }
@@ -203,10 +200,8 @@
   "examples": [
     {
       "@type": "PermissionConditionLink",
-      "linkId": "link_001",
       "targetType": "permission",
       "targetId": "perm_delete_records",
-      "conditionId": "cond_business_hours",
       "linkType": "required",
       "evaluationOrder": 1,
       "combineOperator": "AND",
@@ -222,18 +217,16 @@
       "avgEvaluationTime": 12.5,
       "lastEvaluatedAt": "2024-03-15T14:30:00Z",
       "isActive": true,
-      "createdAt": "2024-01-01T00:00:00Z",
       "metadata": {
         "business_justification": "Prevent accidental deletions outside monitored hours",
         "compliance_requirement": "SOX-404"
-      }
+      },
+      "condition": "cond_business_hours"
     },
     {
       "@type": "PermissionConditionLink",
-      "linkId": "link_002",
       "targetType": "role",
       "targetId": "role_financial_approver",
-      "conditionId": "cond_amount_limit",
       "linkType": "restricting",
       "evaluationOrder": 2,
       "combineOperator": "AND",
@@ -242,7 +235,6 @@
       "mandatory": true,
       "parameters": "{\"max_amount\":50000,\"currency\":\"USD\",\"check_budget\":true}",
       "overrideValues": "{\"escalation_threshold\":40000}",
-      "fallbackConditionId": "cond_request_approval",
       "negateResult": false,
       "validFrom": "2024-01-01T00:00:00Z",
       "validUntil": "2024-12-31T23:59:59Z",
@@ -251,11 +243,12 @@
       "failureCount": 136,
       "avgEvaluationTime": 25.3,
       "isActive": true,
-      "createdAt": "2024-01-01T00:00:00Z",
       "metadata": {
         "annual_review_required": true,
         "auto_adjust_for_inflation": true
-      }
+      },
+      "condition": "cond_amount_limit",
+      "fallbackCondition": "cond_request_approval"
     }
   ]
 }

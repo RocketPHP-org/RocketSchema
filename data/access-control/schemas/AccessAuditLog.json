@@ -5,14 +5,6 @@
   "description": "Comprehensive audit trail of all access control decisions and security events in the system, providing forensic evidence for security investigations, compliance reporting, and behavioral analysis. This entity records every authorization attempt, whether successful or failed, capturing the complete context: who tried to access what, when, from where, why it was allowed or denied, and which policies were evaluated. Unlike general activity logs, this focuses specifically on access control events like permission checks, role changes, policy violations, and authentication events. Each entry includes the decision path showing which rules, roles, and permissions were evaluated, making it possible to understand exactly why access was granted or denied. This is crucial for debugging permission problems ('Why can't user X access resource Y?'), investigating breaches ('Who accessed sensitive data last month?'), and proving compliance ('Show all access to patient records'). The log captures risk indicators like unusual access patterns, privilege escalations, or access from new locations. It supports real-time alerting for high-risk events and provides data for machine learning models that detect anomalous behavior. Retention policies ensure logs are kept as long as required by regulations while managing storage costs. The immutable nature of these logs makes them admissible as evidence in legal proceedings.",
   "properties": [
     {
-      "name": "auditId",
-      "type": "uuid",
-      "mode": "stored",
-      "description": "Unique identifier for this audit entry",
-      "required": true,
-      "unique": true
-    },
-    {
       "name": "timestamp",
       "type": "DateTime",
       "mode": "stored",
@@ -24,12 +16,22 @@
       "type": "string",
       "mode": "enum",
       "description": "Category of access event",
-      "enum": ["permission_check", "authentication", "authorization", "role_change", "policy_evaluation", "privilege_escalation", "access_denied", "access_granted", "suspicious_activity"],
+      "enum": [
+        "permission_check",
+        "authentication",
+        "authorization",
+        "role_change",
+        "policy_evaluation",
+        "privilege_escalation",
+        "access_denied",
+        "access_granted",
+        "suspicious_activity"
+      ],
       "required": true
     },
     {
-      "name": "userId",
-      "type": "uuid",
+      "name": "user",
+      "type": "User",
       "mode": "stored",
       "description": "User who attempted access",
       "required": true
@@ -75,7 +77,13 @@
       "type": "string",
       "mode": "enum",
       "description": "Access control decision",
-      "enum": ["allow", "deny", "partial", "conditional", "error"],
+      "enum": [
+        "allow",
+        "deny",
+        "partial",
+        "conditional",
+        "error"
+      ],
       "required": true
     },
     {
@@ -119,7 +127,8 @@
       "mode": "stored",
       "description": "Calculated risk level of this access (0-100)",
       "min": 0,
-      "max": 100
+      "max": 100,
+      "nullable": true
     },
     {
       "name": "riskFactors",
@@ -155,8 +164,8 @@
       "nullable": true
     },
     {
-      "name": "sessionId",
-      "type": "string",
+      "name": "session",
+      "type": "Session",
       "mode": "stored",
       "description": "Session during which access occurred",
       "nullable": true
@@ -172,7 +181,8 @@
       "name": "responseTime",
       "type": "integer",
       "mode": "stored",
-      "description": "Milliseconds taken to make decision"
+      "description": "Milliseconds taken to make decision",
+      "nullable": true
     },
     {
       "name": "dataAccessed",
@@ -211,7 +221,7 @@
     },
     {
       "name": "metadata",
-      "type": "object",
+      "type": "string",
       "mode": "stored",
       "description": "Additional audit context"
     }
@@ -219,10 +229,8 @@
   "examples": [
     {
       "@type": "AccessAuditLog",
-      "auditId": "audit_abc123",
       "timestamp": "2024-03-15T14:30:45.123Z",
       "eventType": "access_denied",
-      "userId": "user_john_doe",
       "userContext": "{\"roles\":[\"developer\"],\"groups\":[\"engineering\"],\"mfa_verified\":false}",
       "resourceType": "database",
       "resourceId": "db_financial_prod",
@@ -239,7 +247,6 @@
       "ipAddress": "203.0.113.42",
       "userAgent": "Mozilla/5.0 (X11; Linux x86_64)",
       "location": "Mumbai, India",
-      "sessionId": "sess_xyz789",
       "requestId": "req_2024031514304512",
       "responseTime": 47,
       "alertsTriggered": "[{\"type\":\"security_team\",\"severity\":\"high\",\"message\":\"Unauthorized financial data access attempt\"}]",
@@ -248,14 +255,14 @@
       "metadata": {
         "threat_score": 8,
         "anomaly_detected": true
-      }
+      },
+      "user": "user_john_doe",
+      "session": "sess_xyz789"
     },
     {
       "@type": "AccessAuditLog",
-      "auditId": "audit_def456",
       "timestamp": "2024-03-15T09:15:00.000Z",
       "eventType": "access_granted",
-      "userId": "user_admin",
       "userContext": "{\"roles\":[\"admin\",\"security_officer\"],\"groups\":[\"security_team\"],\"mfa_verified\":true}",
       "resourceType": "audit_logs",
       "resourceId": "security_audit_export",
@@ -272,7 +279,6 @@
       "userAgent": "SecurityAuditTool/2.1",
       "location": "Corporate Office, New York",
       "deviceId": "device_corp_laptop_001",
-      "sessionId": "sess_admin_abc",
       "responseTime": 23,
       "dataVolume": 52428800,
       "complianceFlags": "{\"sox\":true,\"quarterly_audit\":true}",
@@ -280,7 +286,9 @@
       "metadata": {
         "export_format": "csv",
         "report_period": "Q1-2024"
-      }
+      },
+      "user": "user_admin",
+      "session": "sess_admin_abc"
     }
   ]
 }

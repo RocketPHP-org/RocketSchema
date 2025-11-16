@@ -5,14 +5,6 @@
   "description": "Defines row-level and attribute-based filtering rules that restrict which data records a user can access within their permitted resources, implementing fine-grained data access control beyond simple resource permissions. While permissions determine if a user can access a database or API, data filters determine which specific records they see - a manager might have 'read employees' permission but filters ensure they only see their direct reports. This entity enables multi-tenant isolation (customers see only their data), hierarchical visibility (see only your department's data), temporal filtering (hide records older than X), and conditional exposure (show salary only for employees below your level). Filters use expressions that evaluate against record attributes, user properties, and contextual factors. They support complex boolean logic combining multiple conditions with AND/OR/NOT operators. Filters can be positive (defining what to include) or negative (defining what to exclude), with precedence rules for conflicts. They enable dynamic data masking where sensitive fields are hidden or redacted based on viewer privileges. The entity handles filter composition when users have multiple roles, each contributing different filters. This is essential for regulatory compliance (GDPR's data minimization), implementing Chinese walls in financial services, and maintaining data confidentiality in shared systems while allowing necessary access for business operations.",
   "properties": [
     {
-      "name": "filterId",
-      "type": "uuid",
-      "mode": "stored",
-      "description": "Unique identifier for this data filter",
-      "required": true,
-      "unique": true
-    },
-    {
       "name": "filterName",
       "type": "string",
       "mode": "stored",
@@ -40,7 +32,13 @@
       "type": "string",
       "mode": "enum",
       "description": "Type of filtering",
-      "enum": ["row_level", "column_level", "cell_level", "aggregate", "dynamic"],
+      "enum": [
+        "row_level",
+        "column_level",
+        "cell_level",
+        "aggregate",
+        "dynamic"
+      ],
       "required": true
     },
     {
@@ -48,7 +46,12 @@
       "type": "string",
       "mode": "enum",
       "description": "How the filter operates",
-      "enum": ["include", "exclude", "mask", "transform"],
+      "enum": [
+        "include",
+        "exclude",
+        "mask",
+        "transform"
+      ],
       "default": "include"
     },
     {
@@ -94,7 +97,12 @@
       "type": "string",
       "mode": "enum",
       "description": "How to combine with other filters",
-      "enum": ["and", "or", "override", "merge"],
+      "enum": [
+        "and",
+        "or",
+        "override",
+        "merge"
+      ],
       "default": "and"
     },
     {
@@ -155,7 +163,12 @@
       "type": "string",
       "mode": "enum",
       "description": "Expected performance impact",
-      "enum": ["minimal", "low", "medium", "high"],
+      "enum": [
+        "minimal",
+        "low",
+        "medium",
+        "high"
+      ],
       "default": "low"
     },
     {
@@ -194,21 +207,8 @@
       "default": false
     },
     {
-      "name": "createdBy",
-      "type": "User",
-      "mode": "stored",
-      "description": "Who created this filter"
-    },
-    {
-      "name": "createdAt",
-      "type": "DateTime",
-      "mode": "stored",
-      "description": "When filter was created",
-      "required": true
-    },
-    {
       "name": "metadata",
-      "type": "object",
+      "type": "string",
       "mode": "stored",
       "description": "Additional filter configuration"
     }
@@ -216,7 +216,6 @@
   "examples": [
     {
       "@type": "DataFilter",
-      "filterId": "filter_dept_001",
       "filterName": "Department Data Isolation",
       "description": "Ensures users only see data from their own department unless marked as public",
       "resourceType": "employee_records",
@@ -238,15 +237,16 @@
       "auditBypass": true,
       "isActive": true,
       "testMode": false,
-      "createdAt": "2024-01-01T00:00:00Z",
       "metadata": {
         "filter_version": "2.0",
-        "indexed_columns": ["department_id", "visibility"]
+        "indexed_columns": [
+          "department_id",
+          "visibility"
+        ]
       }
     },
     {
       "@type": "DataFilter",
-      "filterId": "filter_pii_002",
       "filterName": "PII Data Masking",
       "description": "Masks personally identifiable information based on user clearance level",
       "resourceType": "customer_data",
@@ -268,7 +268,6 @@
       "auditBypass": true,
       "isActive": true,
       "testMode": false,
-      "createdAt": "2024-01-15T00:00:00Z",
       "metadata": {
         "gdpr_compliant": true,
         "masking_algorithm": "deterministic"
