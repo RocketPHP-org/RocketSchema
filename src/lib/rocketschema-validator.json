@@ -1,0 +1,132 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rocketschema.org/schemas/entity-schema.json",
+  "title": "RocketSchema Entity Definition",
+  "description": "Validator for RocketSchema Entity definitions (like Patient, Person, Organization, etc.)",
+
+  "$ref": "#/$defs/EntitySchema",
+
+  "$defs": {
+    "PropertyDefinition": {
+      "type": "object",
+      "description": "One property of an Entity schema",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Property name (field name)",
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+        },
+        "type": {
+          "type": "string",
+          "description": "Type of the property (primitive or reference, optionally with [] for arrays). Examples: 'string', 'number', 'integer', 'boolean', 'object', 'Date', 'DateTime', 'Person', 'Identifier[]'",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "description": "Human readable description"
+        },
+        "mode": {
+          "type": "string",
+          "description": "Storage/semantic mode of the property: 'stored' for persisted data, 'computed' for derived/calculated values, 'enum' for enumerated types",
+          "enum": ["stored", "computed", "enum"],
+          "default": "stored"
+        },
+        "required": {
+          "type": "boolean",
+          "description": "Whether this field is required on instances",
+          "default": false
+        },
+        "nullable": {
+          "type": "boolean",
+          "description": "Whether this property can be null",
+          "default": false
+        },
+        "default": {
+          "description": "Default value for this property (can be any type matching the property type)"
+        },
+        "enum": {
+          "type": "array",
+          "description": "Allowed values when this property is an enum",
+          "items": {
+            "type": ["string", "number", "boolean"]
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "allowedValues": {
+          "type": "array",
+          "description": "Alias for 'enum' - allowed values when this property is an enum (deprecated, use 'enum' instead)",
+          "items": {
+            "type": ["string", "number", "boolean"]
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "format": {
+          "type": "string",
+          "description": "String format hint (uri, email, date, date-time, etc.)"
+        },
+        "example": {
+          "description": "Example value for this property"
+        },
+        "properties": {
+          "type": "object",
+          "description": "Nested properties definition for object types (used when type is 'object'). Keys are property names, values can be type strings or property schemas.",
+          "additionalProperties": true
+        }
+      },
+      "required": ["name", "type", "description"]
+    },
+
+    "EntitySchema": {
+      "type": "object",
+      "title": "RocketSchema Entity",
+      "description": "Definition of a RocketSchema Entity such as Patient, Person, Organization...",
+      "additionalProperties": false,
+      "properties": {
+        "@type": {
+          "type": "string",
+          "const": "Schema",
+          "description": "Must be 'Schema' for entity definitions"
+        },
+        "@context": {
+          "type": "string",
+          "const": "https://rocketschema.org/context",
+          "description": "Context URL for RocketSchema definitions"
+        },
+        "name": {
+          "type": "string",
+          "description": "Entity name (e.g. 'Patient', 'Person', 'Organization')",
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+        },
+        "description": {
+          "type": "string",
+          "description": "High-level description of the entity"
+        },
+        "extends": {
+          "type": "string",
+          "description": "Name of the parent entity this one extends (e.g. 'Person')",
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+        },
+        "properties": {
+          "type": "array",
+          "description": "List of properties for this entity",
+          "items": {
+            "$ref": "#/$defs/PropertyDefinition"
+          },
+          "minItems": 1
+        },
+        "examples": {
+          "type": "array",
+          "description": "Example instances of this entity",
+          "items": {
+            "type": "object",
+            "description": "Instance example (free shape, only checked as JSON object)"
+          }
+        }
+      },
+      "required": ["@type", "@context", "name", "description", "properties"]
+    }
+  }
+}
